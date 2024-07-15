@@ -73,3 +73,20 @@ body {
   box-shadow: 10px 10px 
   #FFD60A;
 }
+
+.moveup{
+  animation: animation-bounce 2s infinite;
+}
+
+
+@keyframes animation-bounce{
+  0%{
+      transform: translateY(0);
+  }
+  50%{
+      transform: translateY(-5px);
+  }
+  100%{
+      transform: translateY(0);
+  }
+}

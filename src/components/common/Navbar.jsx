@@ -1,66 +1,135 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import toast from 'react-hot-toast';
-import logo from '../../assets/Logo/Logo-Full-Light.png'
-// import Login from './../pages/Login';
-// import Dashboard from './../pages/Dashboard';
-const Navbar = (props) => {
- let  isLoggedIn=props.isLoggedIn
- let  setIsLoggedIn=props.setIsLoggedIn
+import React from "react";
+import logo from "../../assets/Logo/Logo-Full-Light.png";
 
-  return (
-    <>
-    <div className=' flex  justify-around items-center my-1 py-4 w-11/12  mx-auto   '>
-      <Link to="/">
-        <img src={logo} alt=""  className='w-[200px] max-sm:w-[150px]'/>
-      </Link>
-      <nav className='max-sm:hidden'>
-        <ul className='flex gap-4  text-lg text-pure-greys-5'> 
-          <Link to={"/"}>
-          <li>Home</li>
-          </Link>
-          <Link to={"/about"}>
-          <li>About</li>
-          </Link>
-          <Link to={"/contactus"}>
-          <li>Contact</li>
-          </Link>
+import { NavbarLinks } from "./../../data/navbar-links";
+import { Link, useLocation } from "react-router-dom";
+import { matchPath } from "react-router-dom";
+import { useSelector } from "react-redux";
+import ProfileDropDown from "../Auth/ProfileDropDown";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import { useState } from "react";
+import {apiConnector }from "../../services/apiconnector"
+import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { useEffect } from "react";
+import {categories} from "../../services/apis"
+
+const Navbar = () => {
+  const location = useLocation();
+  const { token } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.profile);
+  const {totalItems}=useSelector((state) => state.cart);
+  const matchRoute = (route) => {
+    try {
+      return matchPath({ path: route }, location.pathname);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const [ssubLinks, setSsubLinks]  = useState([]);
+  const fetchSublinks = async() => {
+    try{
+        const result = await apiConnector("GET", categories.CATEGORIES_API);
+        console.log("Printing Sublinks result:" , result);
+        setSsubLinks(result.data.data);
+        console.log("Sublinks",ssubLinks)
        
-        
-        </ul>
-      </nav>
-      <div>
-        {  !isLoggedIn &&
-          <Link to="/login" >
-            <button className='py-2 px-4 mx-2 bg-[#FFD60A] text-black  rounded-md hover:scale-90 transition-all  hover:font-medium' >Login</button>
-          </Link>
-        }
-        {
-          !isLoggedIn &&
-          <Link to="/register">
-            <button className='py-2 px-4 mx-2 bg-[#FFD60A] text-black  rounded-md hover:scale-90 transition-all  hover:font-medium'>Sign Up</button>
-          </Link>
-        }
-        {
-           isLoggedIn &&
-          <Link to="/" >
-            <button className='py-2 px-4 mx-2 bg-[#FFD60A] text-black  rounded-md hover:scale-90 transition-all  hover:font-medium'  onClick={()=>{
-              setIsLoggedIn(false)
-              toast.success('Log Out Successfull')
-            }}>Log Out</button>
-          </Link>
-        }
-        {
-          isLoggedIn &&
-          <Link to="/dashboard">
-            <button className='py-2 px-4 mx-2 bg-[#FFD60A] text-black  rounded-md hover:scale-90 transition-all  hover:font-medium'>Dashboard</button>
-          </Link>
-        }
-      </div>
-    </div>
-    <div className='border-b-[2px] border-b-[#2C333F] w-[90%] mx-auto'></div>
-    </>
-  )
+    }
+    catch(error) {
+        console.log("Could not fetch the category list");
+    }
 }
 
-export default Navbar
+
+useEffect( () => {
+    fetchSublinks();
+},[] )
+
+
+
+
+
+  return (
+    <div className="bg-richblack-900 border-b-[1px] border-richblack-600 h-14 flex items-center py-2">
+      <div className="w-11/12 max-w-maxContent mx-auto flex justify-between  items-center gap-4 ">
+        {/* Logo  */}
+        <div>
+          <img src={logo} alt="" className="max-h-8 max-w-[180px]" />
+        </div>
+
+        {/* Navigation links  */}
+        <nav>
+          <ul className="flex gap-4 text-richblack-5 text-base font-semibold">
+            {NavbarLinks.map((nav, index) => (
+              (nav.title==="Catalog") ?(<div className="flex items-center  gap-1 relative group">
+                
+                  <p>{nav.title}
+                  </p>
+                  <IoIosArrowDropdownCircle/>
+               
+                  <div className="lg:w-[300px] flex flex-col bg-richblack-5 text-richblack-900 p-4 rounded-md gap-3 absolute translate-x-[-50%] translate-y-[80%] invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-500 z-10 ">
+                  <div className="w-6 h-6 absolute bg-richblack-5 -top-3 translate-x-[85%] rotate-45 left-[60%]"></div>
+                    
+                    {
+                       ssubLinks.map((link,index)=>{
+                         return(
+                          <Link key={index} to={`/catalog/${link.name}`}>
+                            <li>{link.name}</li>
+                          </Link>
+                         )
+                       })
+                    }
+                  </div>
+                
+              </div>):(
+              <Link to={nav.path}>
+                <li
+                  key={index}
+                  className={`${
+                    matchRoute(nav?.path)
+                      ? "text-yellow-25"
+                      : "text-richblack-25"
+                  }`}
+                >
+                  {nav.title}
+                </li>
+              </Link>)
+            ))}
+          </ul>
+        </nav>
+
+        {/* login- signup-dashboard  */}
+        <div className="text-richblack-50 flex gap-x-4 items-center text-sm ">
+          {token == null && (
+            <Link to="/login">
+              <div className="border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md">
+                Login
+              </div>
+            </Link>
+          )}
+          {token == null && (
+            <Link to="/signup">
+              <div className="border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md">
+                signup
+              </div>
+            </Link>
+          )}
+          {user  && user?.accountType !== "Instructor" && (
+                    <Link to="/dashboard/cart" className='relative'>
+                    <AiOutlineShoppingCart  className="text-2xl"/>
+                    {
+                        totalItems > 0 && (
+                            <span className="text-xs bg-white rounded-full w-4 h-4  absolute -top-1 right-0 flex items-center justify-center text-richblack-800  moveup">
+                                {totalItems} 
+                            </span>
+                        )
+                    }
+                </Link>
+          )}
+          {token !== null && <ProfileDropDown />}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Navbar;

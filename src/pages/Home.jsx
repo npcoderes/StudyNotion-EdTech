@@ -9,14 +9,12 @@ import TimeLinesec from "../components/cors/homepage/TimeLinesec";
 import LearningLanguageSection from "./../components/cors/homepage/LearningLanguageSection";
 import InstructorSection from "./../components/cors/homepage/InstructorSection";
 import Footer from "./../components/common/Footer";
-import Navbar from "./../components/common/Navbar";
 import ExploreSection from "../components/cors/homepage/ExploreSection";
 
 const Home = () => {
   return (
     <div>
-      {/* Navbar  */}
-      <Navbar />
+
 
       {/* Section-1 */}
 
@@ -125,7 +123,7 @@ const Home = () => {
         <div className="h-[320px] sec-2">
           <div className="w-11/12 max-w-maxContent flex flex-col items-center justify-between ga-5 mx-auto">
             <div className="h-[150px]"></div>
-            <div className="flex flex-row gap-7 text-white mt-4">
+            <div className="flex flex-row gap-7 text-white lg:mt-4">
               <HButton active={true} linkto={"/signup"}>
                 <div className="flex flex-row gap-3 items-center">
                   Explore Full Catalog

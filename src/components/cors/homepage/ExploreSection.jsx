@@ -23,19 +23,19 @@ const ExploreSection = () => {
     }
   return (
     <div className=''>
-        <div className='text-4xl font-semibold text-center'>
+        <div className='text-4xl max-sm:text-2xl font-semibold text-center'>
         Unlock the <HighlightText text={"Power of Code"}> </HighlightText>
         </div>
-        <div className='text-center text-richblack-300 mt-3 text-sm text-[16px]'>
+        <div className='text-center text-richblack-300 mt-3 text-sm text-[16px] max-sm:text-xs'>
         Learn to Build Anything You Can Imagine
         </div>
-        <div className='mt-5 flex flex-row rounded-full bg-richblack-800 mb-5 border-richblack-100
+        <div className='mt-5 flex flex-row rounded-full bg-richblack-800 mb-5 border-richblack-100 flex-wrap max-sm:max-w-96 justify-center items-center
       px-1 py-1'>
       {
         tabsName.map( (element, index) => {
             return (
                 <div
-                className={`text-[16px] flex flex-row items-center gap-2 
+                className={`text-[16px] flex flex-row items-center gap-2  max-sm:text-xs
                 ${currentTab === element 
                 ? "bg-richblack-900 text-richblack-5 font-medium"
                 : "text-richblack-200" } rounded-full transition-all duration-200 cursor-pointer
@@ -50,7 +50,7 @@ const ExploreSection = () => {
       }
       </div>
         <div className='lg:h-[150px]'></div>
-        <div className='flex gap-10 w-full absolute -bottom-32 left-20 '>
+        <div className='flex gap-10 w-full  lg:absolute lg:-bottom-32 lg:left-20 flex-row max-sm:flex-col items-center'>
             {
                 courses.map((course,index)=>{
                     return(
