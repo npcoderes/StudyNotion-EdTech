@@ -50,7 +50,7 @@ const cartSlice= createSlice({
               toast.success("Course removed from cart")
             }
         },
-        resetItem: (state, action) => {
+        resetCart: (state, action) => {
             state.cart = []
             state.total = 0
             state.totalItems = 0
@@ -62,6 +62,6 @@ const cartSlice= createSlice({
         },
     }
 })
-export const {addItem,removeItem,resetItem}= cartSlice.actions
+export const {addItem,removeItem,resetCart}= cartSlice.actions
 
 export default cartSlice.reducer;

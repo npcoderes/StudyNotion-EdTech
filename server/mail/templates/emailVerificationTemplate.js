@@ -11,7 +11,6 @@ const otpTemplate = (otp) => {
 				font-family: Arial, sans-serif;
 				font-size: 16px;
 				line-height: 1.4;
-				color: 
 				color: #1A2421;
 				margin: 0;
 				padding: 0;

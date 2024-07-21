@@ -8,6 +8,7 @@ const {
   signup,
   sendotp,
   changePassword,
+  signgoogle
 } = require("../controllers/Auth")
 const {
   resetPasswordToken,
@@ -43,6 +44,7 @@ router.post("/reset-password-token", resetPasswordToken)
 
 // Route for resetting user's password after verification
 router.post("/reset-password", resetPassword)
+router.post("/googlelogin",signgoogle)
 
 // Export the router for use in the main application
 module.exports = router

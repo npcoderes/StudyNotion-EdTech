@@ -297,3 +297,43 @@ exports.changePassword = async (req, res) => {
 		});
 	}
 };
+
+
+exports.signgoogle=async(req,res)=>{
+	try{
+           const email=req.body.email
+		   const user=await User.findOne({ email: email }).populate("additionalDetails");
+		   if(user){
+			const token = jwt.sign(
+				{ email: user.email, id: user._id, accountType: user.accountType },
+				process.env.JWT_SECRET,
+				{
+					expiresIn: "24h",
+				})
+							// Save token to user document in database
+			user.token = token;
+			user.password = undefined;
+			// Set cookie for token and return success response
+			const options = {
+				expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+				httpOnly: true,
+			};
+			res.cookie("token", token, options).status(200).json({
+				success: true,
+				token,
+				user,
+				message: `User Login Success`,
+			});
+		   }  
+		
+
+	}catch(err){
+		console.error("Error occurred while updating password:", error);
+		return res.status(500).json({
+			success: false,
+			message: "Error occurred while updating password",
+			error: error.message,
+		});
+	}
+}
+	

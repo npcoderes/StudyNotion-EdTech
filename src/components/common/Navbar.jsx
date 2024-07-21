@@ -12,6 +12,7 @@ import {apiConnector }from "../../services/apiconnector"
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { useEffect } from "react";
 import {categories} from "../../services/apis"
+import {profileEndpoints} from "../../services/apis"
 
 const Navbar = () => {
   const location = useLocation();
@@ -42,6 +43,37 @@ const Navbar = () => {
 
 useEffect( () => {
     fetchSublinks();
+    // const fetchUserData = async () => {
+    //   try {
+    //     const response = await apiConnector("GET", profileEndpoints.GET_USER_DETAILS_API, {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+    //     const userData = response.data;
+    //     console.log("User Data", userData);
+    //     // Process the user data here
+    //   } catch (error) {
+    //     console.error("Failed to fetch user data", error.message);
+    //     if (error.response) {
+    //       // The request was made and the server responded with a status code
+    //       // that falls out of the range of 2xx
+    //       console.error("Error Response", error.response.data);
+    //       console.error("Error Status", error.response.status);
+    //       console.error("Error Headers", error.response.headers);
+    //     } else if (error.request) {
+    //       // The request was made but no response was received
+    //       console.error("Error Request", error.request);
+    //     } else {
+    //       // Something happened in setting up the request that triggered an Error
+    //       console.error("Error Message", error.message);
+    //     }
+    //   }
+    // };
+
+    
+    //   fetchUserData();
+   
 },[] )
 
 
@@ -126,6 +158,10 @@ useEffect( () => {
                 </Link>
           )}
           {token !== null && <ProfileDropDown />}
+          {
+            console.log(token)
+            
+          }
         </div>
       </div>
     </div>
