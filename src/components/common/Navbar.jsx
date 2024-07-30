@@ -118,7 +118,7 @@ useEffect( () => {
                   key={index}
                   className={`${
                     matchRoute(nav?.path)
-                      ? "text-yellow-25"
+                      ? "text-yellow-25 border-b-[1px]"
                       : "text-richblack-25"
                   }`}
                 >

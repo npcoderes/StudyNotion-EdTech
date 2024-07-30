@@ -14,6 +14,7 @@ const {
   resetPasswordToken,
   resetPassword,
 } = require("../controllers/ResetPassword")
+const {senduserquery}=require("../controllers/Contactus")
 
 const { auth } = require("../middleware/auth")
 
@@ -45,6 +46,8 @@ router.post("/reset-password-token", resetPasswordToken)
 // Route for resetting user's password after verification
 router.post("/reset-password", resetPassword)
 router.post("/googlelogin",signgoogle)
+router.post("/senduserquery",senduserquery)
+
 
 // Export the router for use in the main application
 module.exports = router

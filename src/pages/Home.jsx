@@ -10,10 +10,18 @@ import LearningLanguageSection from "./../components/cors/homepage/LearningLangu
 import InstructorSection from "./../components/cors/homepage/InstructorSection";
 import Footer from "./../components/common/Footer";
 import ExploreSection from "../components/cors/homepage/ExploreSection";
+import { motion } from "framer-motion"
+import { fadeIn } from "../components/common/Motion";
 
 const Home = () => {
   return (
-    <div>
+    <motion.div
+     initial={{opacity:0}}
+     animate={{ opacity: 1 }}
+     transition={{ duration: 0.3, ease: [0.6, 0.01, 0.3, 0.9] }}
+     exit={{ opacity: 0 }}
+    
+    >
 
 
       {/* Section-1 */}
@@ -27,16 +35,26 @@ const Home = () => {
             </div>
           </div>
         </Link>
-        <div className="text-center text-4xl font-semibold mt-8 max-sm:text-left">
-          Empower Your Future with
-          <HighlightText text={"Coding skills"} />
-        </div>
-        <div className="w-[90%] text-center max-sm:w-full max-sm:text-left mt-10 text-md font-bold text-[#2D5A6A]  max-w-[913px]">
-          With our online coding courses, you can learn at your own pace, from
-          anywhere in the world, and get access to a wealth of resources,
-          including hands-on projects, quizzes, and personalized feedback from
-          instructors.
-        </div>
+        <motion.div
+                        variants={fadeIn('left', 0.1)}
+                        initial='hidden'
+                        whileInView={'show'}
+                        viewport={{ once: false, amount: 0.1 }}
+                        className='text-center text-3xl lg:text-4xl font-semibold mt-7  '
+                    >
+                        Empower Your Future with
+                        <HighlightText text={"Coding Skills"} color={"textgrad2"}/>
+                    </motion.div>
+
+                    <motion.div
+                        variants={fadeIn('right', 0.1)}
+                        initial='hidden'
+                        whileInView={'show'}
+                        viewport={{ once: false, amount: 0.1 }}
+                        className=' mt-4 w-[90%] text-center text-base lg:text-base font-bold text-richblack-300'
+                    >
+                        With our online coding courses, you can learn at your own pace, from anywhere in the world, and get access to a wealth of resources, including hands-on projects, quizzes, and personalized feedback from instructors.
+                    </motion.div>
 
         <div className="flex flex-row gap-7 mt-8">
           <HButton active={true} linkto={"/signup"}>
@@ -107,8 +125,8 @@ const Home = () => {
               linkto: "/login",
               active: false,
             }}
-            codeblock={`<<!DOCTYPE html>\n<html>\n<head><title>Example</title><linkrel="stylesheet"href="styles.css">\n</head>\n`}
-            codecolor={"text-blue-200"}
+            codecolor={"textgrad3"}
+            codeblock={`import React from "react";\n import CTAButton from "./Button";\nimport TypeAnimation from "react-type";\nimport { FaArrowRight } from "react-icons/fa";\n\nconst Home = () => {\nreturn (\n<div>Home</div>\n)\n}\nexport default Home;`}
             backgroundgradint={
               "bg-gradient-to-r from-blue-400 via-red-500 to-blue-500"
             }
@@ -173,7 +191,7 @@ const Home = () => {
 
       {/* Footer  */}
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

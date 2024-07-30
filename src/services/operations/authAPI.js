@@ -13,7 +13,8 @@ const {
   LOGIN_API,
   RESETPASSTOKEN_API,
   RESETPASSWORD_API,
-  GOOGLE_LOGIN_API
+  GOOGLE_LOGIN_API,
+  USER_QUERY_API
 } = endpoints
 
 export function sendOtp(email, navigate) {
@@ -30,14 +31,18 @@ export function sendOtp(email, navigate) {
       console.log(response.data.success)
 
       if (!response.data.success) {
+        toast.dismiss(toastId)
+        // toast.error("Can't Generate OTP")
+        navigate("/signup")
         throw new Error(response.data.message)
+
       }
 
       toast.success("OTP Sent Successfully")
       navigate("/verify-email")
     } catch (error) {
       console.log("SENDOTP API ERROR............", error)
-      toast.error(error.response.data.message)
+      toast.error(error.message)
     }
     dispatch(setLoading(false))
     toast.dismiss(toastId)
@@ -101,7 +106,16 @@ export function login(email, password, navigate) {
         throw new Error(response.data.message)
       }
 
-      toast.success("Login Successful")
+      toast(`Hello ${response.data.user.firstName} Welcome to StudyNotion!`,
+        {
+          icon: '👏',
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        }
+      );
       dispatch(setToken(response.data.token))
       const userImage = response.data?.user?.image
         ? response.data.user.image
@@ -203,7 +217,16 @@ export function googleLogin(email,navigate){
         throw new Error(response.data.message)
       }
 
-      toast.success("Login Successful")
+      toast(`Hello ${response.data.user.firstName} Welcome to StudyNotion!`,
+        {
+          icon: '👏',
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        }
+      );
       dispatch(setToken(response.data.token))
       const userImage = response.data?.user?.image
         ? response.data.user.image
@@ -222,4 +245,41 @@ export function googleLogin(email,navigate){
   dispatch(setLoading(false))
   toast.dismiss(toastId)
 }
+}
+
+
+export function userquery(firstName,message,email) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Loading...")
+    dispatch(setLoading(true))
+    try {
+      const response = await apiConnector("POST", USER_QUERY_API, {
+        firstName,
+        email,
+        message
+      
+      })
+      console.log("SENDUSERQUERY API RESPONSE............", response)
+
+      console.log(response.data.success)
+
+
+      toast(`Hello ${firstName} Thank You For Sending Query We Will Contact You Soon...!`,
+        {
+          icon: '👏',
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        }
+      );
+    
+    } catch (error) {
+      console.log("USERQUERY API ERROR............", error)
+      toast.error(error.message)
+    }
+    dispatch(setLoading(false))
+    toast.dismiss(toastId)
+  }
 }

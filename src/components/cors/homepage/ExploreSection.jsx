@@ -50,7 +50,7 @@ const ExploreSection = () => {
       }
       </div>
         <div className='lg:h-[150px]'></div>
-        <div className='flex gap-10 w-full  lg:absolute lg:-bottom-32 lg:left-20 flex-row max-sm:flex-col items-center'>
+        <div className='flex gap-10 w-full  lg:absolute lg:-bottom-32 lg:left-20 flex-row max-sm:flex-col items-center transition-all duration-200 '>
             {
                 courses.map((course,index)=>{
                     return(

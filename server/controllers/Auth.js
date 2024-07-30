@@ -328,11 +328,11 @@ exports.signgoogle=async(req,res)=>{
 		
 
 	}catch(err){
-		console.error("Error occurred while updating password:", error);
+		console.error("Error occurred while updating password:", err);
 		return res.status(500).json({
 			success: false,
 			message: "Error occurred while updating password",
-			error: error.message,
+			error: err.message,
 		});
 	}
 }
