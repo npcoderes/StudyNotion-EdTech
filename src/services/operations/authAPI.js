@@ -239,6 +239,7 @@ export function googleLogin(email,navigate){
     
      
    }catch(error){
+    toast.dismiss(toastId)
      console.log("Error in google login",error)
      toast.error(error.response.data.message)
   }
