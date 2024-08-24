@@ -2,9 +2,10 @@ import React from 'react'
 import { matchPath, NavLink } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 import * as icon from 'react-icons/vsc'
+import {IoCartOutline} from 'react-icons/io5'
 
 const SideBarLinks = ({ link, iconName }) => {
-    const Icon = icon[iconName]
+    const Icon = iconName===("IoCartOutline") ?(IoCartOutline):(icon[iconName])
     const location = useLocation()
     function matchroute(route) {
         return matchPath({ path: route }, location.pathname)

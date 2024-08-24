@@ -7,6 +7,7 @@ const IconBtn = ({
     disabled,
     outline=false,
     customClasses,
+    spanclass,
     type,
 }) => {
   return (
@@ -14,11 +15,11 @@ const IconBtn = ({
     disabled={disabled}
     onClick={onclick}
     type={type}
-    className={`bg-yellow-50 py-2 px-4 rounded-lg text-black ${customClasses} font-semibold text-sm flex gap-1 items-center`}>
+    className={`bg-yellow-50 py-2 px-4 rounded-lg text-black ${customClasses}  text-sm flex gap-1 items-center`}>
         {
             children ? (
                 <>
-                    <span>
+                    <span className={spanclass}>
                         {text}
                     </span>
                     {children}

@@ -247,13 +247,13 @@ exports.changePassword = async (req, res) => {
 		}
 
 		// Match new password and confirm new password
-		if (newPassword !== confirmNewPassword) {
-			// If new password and confirm new password do not match, return a 400 (Bad Request) error
-			return res.status(400).json({
-				success: false,
-				message: "The password and confirm password does not match",
-			});
-		}
+		// if (newPassword !== confirmNewPassword) {
+		// 	// If new password and confirm new password do not match, return a 400 (Bad Request) error
+		// 	return res.status(400).json({
+		// 		success: false,
+		// 		message: "The password and confirm password does not match",
+		// 	});
+		// }
 
 		// Update password
 		const encryptedPassword = await bcrypt.hash(newPassword, 10);

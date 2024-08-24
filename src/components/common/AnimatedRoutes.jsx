@@ -15,6 +15,9 @@ import PrivateRoute from "../Auth/PrivateRoute";
 import  Dashboard  from "../../pages/Dashboard";
 import  MyProfile  from "../cors/Dashboard/MyProfile";
 import ProfileSet from "../cors/Dashboard/ProfileSet";
+import EnrollCourse from "../cors/Dashboard/EnrollCourse";
+import Cart from "../cors/Dashboard/cart/Cart";
+import MyCourse from "../cors/Dashboard/MyCourse/MyCourse";
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
@@ -85,6 +88,9 @@ const AnimatedRoutes = () => {
         >
           <Route path="/dashboard/my-profile" element={<MyProfile />} />
           <Route path="/dashboard/settings" element={<ProfileSet />} />
+          <Route path="/dashboard/enrolled-courses" element={<EnrollCourse />} />
+          <Route path="/dashboard/cart" element={<Cart />} />
+          <Route path="/dashboard/my-courses" element={<MyCourse />} />
           
 
         </Route>
