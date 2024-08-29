@@ -18,6 +18,8 @@ import ProfileSet from "../cors/Dashboard/ProfileSet";
 import EnrollCourse from "../cors/Dashboard/EnrollCourse";
 import Cart from "../cors/Dashboard/cart/Cart";
 import MyCourse from "../cors/Dashboard/MyCourse/MyCourse";
+import AddCourses from "../cors/Dashboard/AddCourse/AddCourses";
+import EditCourse from "../cors/Dashboard/EditCourse/EditCourse";
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
@@ -91,6 +93,8 @@ const AnimatedRoutes = () => {
           <Route path="/dashboard/enrolled-courses" element={<EnrollCourse />} />
           <Route path="/dashboard/cart" element={<Cart />} />
           <Route path="/dashboard/my-courses" element={<MyCourse />} />
+          <Route path="/dashboard/add-course" element={<AddCourses />} />
+          <Route path="/dashboard/edit-course/:courseId" element={<EditCourse />} />
           
 
         </Route>

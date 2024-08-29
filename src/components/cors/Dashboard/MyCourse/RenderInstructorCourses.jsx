@@ -1,16 +1,11 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import { AiFillEdit } from "react-icons/ai";
-
 import { apiConnector } from "../../../../services/apiconnector";
-import { IoMdCheckmarkCircle } from "react-icons/io";
-
 import { profileEndpoints } from "../../../../services/apis";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { FaClock, FaRupeeSign } from 'react-icons/fa';
-import { MdDeleteForever } from "react-icons/md";
+
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css'
 
@@ -19,11 +14,17 @@ import { FiEdit2 } from "react-icons/fi"
 import { HiClock } from "react-icons/hi"
 import { RiDeleteBin6Line } from "react-icons/ri"
 import { COURSE_STATUS } from "../../../../utils/constants";
+import ConfirmationModal from "../../../common/ConfirmationModal";
+import { deleteCourse } from "../../../../services/operations/courseDetailsAPI";
+import { useNavigate } from "react-router-dom";
+
 const RenderInstructorCourses = () => {
   const TRUNCATE_LENGTH = 25
   const { token } = useSelector((state) => state.auth);
   const [EnrollCourse, setEnrollCourse] = useState(null);
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState(null); 
+const navigate= useNavigate()
   const fetchenroll = async () => {
     const toastId = toast.loading("Loading...");
 
@@ -51,6 +52,34 @@ const RenderInstructorCourses = () => {
   useEffect(() => {
     fetchenroll();
   }, []);
+
+  // delete cours point 
+  const handleCourseDelete =async(courseId)=>{
+     setLoading(true);
+     try{
+      await deleteCourse ({courseId}, token);
+      const cour = await apiConnector(
+        "GET",
+        profileEndpoints.GET_USER_ENROLLED_COURSES_API,
+        null,
+        {
+          Authorisation: `Bearer ${token}`,
+        }
+      );
+
+      if(cour)
+      {
+       setEnrollCourse(cour.data.data);
+      }
+      setConfirmationModal(null);
+      setLoading(false);
+
+     }catch(e){
+       console.log("Error deleting course", e);
+       toast.error("Error deleting course");
+       setLoading(false);
+     }
+  }
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -154,8 +183,8 @@ const RenderInstructorCourses = () => {
                 <Td className="text-sm font-medium text-richblack-100 ">
                   {/* Edit button */}
                   <button
-                    // disabled={loading}
-                    // onClick={() => { navigate(`/dashboard/edit-course/${course._id}`) }}
+                    disabled={loading}
+                    onClick={() => { navigate(`/dashboard/edit-course/${course._id}`) }}
                     title="Edit"
                     className="px-2 transition-all duration-200 hover:scale-110 hover:text-caribbeangreen-300"
                   >
@@ -164,23 +193,23 @@ const RenderInstructorCourses = () => {
 
                   {/* Delete button */}
                   <button
-                    // disabled={loading}
-                    // onClick={() => {
-                    //   setConfirmationModal({
-                    //     text1: "Do you want to delete this course?",
-                    //     text2:
-                    //       "All the data related to this course will be deleted",
-                    //     btn1Text: !loading ? "Delete" : "Loading...  ",
-                    //     btn2Text: "Cancel",
-                    //     btn1Handler: !loading
-                    //       ? () => handleCourseDelete(course._id)
-                    //       : () => { },
-                    //     btn2Handler: !loading
-                    //       ? () => setConfirmationModal(null)
-                    //       : () => { },
+                    disabled={loading}
+                    onClick={() => {
+                      setConfirmationModal({
+                        text1: "Do you want to delete this course?",
+                        text2:
+                          "All the data related to this course will be deleted",
+                        btn1Text: !loading ? "Delete" : "Loading...  ",
+                        btn2Text: "Cancel",
+                        btn1Handler: !loading
+                          ? () => handleCourseDelete(course._id)
+                          : () => { },
+                        btn2Handler: !loading
+                          ? () => setConfirmationModal(null)
+                          : () => { },
 
-                    //   })
-                    // }}
+                      })
+                    }}
                     title="Delete"
                     className="px-1 transition-all duration-200 hover:scale-110 hover:text-[#ff0000]"
                   >
@@ -190,8 +219,15 @@ const RenderInstructorCourses = () => {
               </Tr>
             ))
           )}
-      </Tbody>
+      </Tbody> 
     </Table>
+    {
+      confirmationModal && (
+        <ConfirmationModal
+          modalData={confirmationModal}
+        />
+      )
+    }
     </>
   );
 };
