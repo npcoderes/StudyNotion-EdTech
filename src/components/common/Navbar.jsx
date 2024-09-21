@@ -1,168 +1,141 @@
-import React from "react";
-import logo from "../../assets/Logo/Logo-Full-Light.png";
-
+import React, { useState, useEffect } from "react";
+import logo from "../../assets/Logo/Logo-Full-Dark.png";
 import { NavbarLinks } from "./../../data/navbar-links";
 import { Link, useLocation } from "react-router-dom";
 import { matchPath } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ProfileDropDown from "../Auth/ProfileDropDown";
-import { AiOutlineShoppingCart } from "react-icons/ai";
-import { useState } from "react";
-import {apiConnector }from "../../services/apiconnector"
-import { IoIosArrowDropdownCircle } from "react-icons/io";
-import { useEffect } from "react";
-import {categories} from "../../services/apis"
-import {profileEndpoints} from "../../services/apis"
+import { AiOutlineShoppingCart, AiOutlineMenu } from "react-icons/ai";
+import { apiConnector } from "../../services/apiconnector";
+import { categories } from "../../services/apis";
 
 const Navbar = () => {
   const location = useLocation();
   const { token } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.profile);
-  const {totalItems}=useSelector((state) => state.cart);
+  const { totalItems } = useSelector((state) => state.cart);
+  const [ssubLinks, setSsubLinks] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const matchRoute = (route) => {
+    return matchPath({ path: route }, location.pathname);
+  };
+
+  const fetchSublinks = async () => {
     try {
-      return matchPath({ path: route }, location.pathname);
-    } catch (err) {
-      console.log(err);
+      const result = await apiConnector("GET", categories.CATEGORIES_API);
+      setSsubLinks(result.data.data);
+    } catch (error) {
+      console.log("Could not fetch the category list");
     }
   };
-  const [ssubLinks, setSsubLinks]  = useState([]);
-  const fetchSublinks = async() => {
-    try{
-        const result = await apiConnector("GET", categories.CATEGORIES_API);
-        console.log("Printing Sublinks result:" , result);
-        setSsubLinks(result.data.data);
-        console.log("Sublinks",ssubLinks)
-       
-    }
-    catch(error) {
-        console.log("Could not fetch the category list");
-    }
-}
 
-
-useEffect( () => {
+  useEffect(() => {
     fetchSublinks();
-    // const fetchUserData = async () => {
-    //   try {
-    //     const response = await apiConnector("GET", profileEndpoints.GET_USER_DETAILS_API, {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-    //     const userData = response.data;
-    //     console.log("User Data", userData);
-    //     // Process the user data here
-    //   } catch (error) {
-    //     console.error("Failed to fetch user data", error.message);
-    //     if (error.response) {
-    //       // The request was made and the server responded with a status code
-    //       // that falls out of the range of 2xx
-    //       console.error("Error Response", error.response.data);
-    //       console.error("Error Status", error.response.status);
-    //       console.error("Error Headers", error.response.headers);
-    //     } else if (error.request) {
-    //       // The request was made but no response was received
-    //       console.error("Error Request", error.request);
-    //     } else {
-    //       // Something happened in setting up the request that triggered an Error
-    //       console.error("Error Message", error.message);
-    //     }
-    //   }
-    // };
-
-    
-    //   fetchUserData();
-   
-},[] )
-
-
-
-
+  }, []);
 
   return (
-    <div className="bg-richblack-900 border-b-[1px] border-richblack-600 h-14 flex items-center py-2">
-      <div className="w-11/12 max-w-maxContent mx-auto flex justify-between  items-center gap-4 ">
-        {/* Logo  */}
-        <div>
-          <img src={logo} alt="" className="max-h-8 max-w-[180px]" />
-        </div>
+    <div className="bg-white border-b-[1px] border-gray-200 py-3 shadow-sm">
+      <div className="w-11/12 max-w-maxContent mx-auto">
+        <div className="flex justify-between items-center">
+          {/* Logo */}
+          <Link to="/">
+            <img src={logo} alt="" className="max-h-8 max-w-[180px]" />
+          </Link>
 
-        {/* Navigation links  */}
-        <nav>
-          <ul className="flex gap-4 text-richblack-5 text-base font-semibold">
-            {NavbarLinks.map((nav, index) => (
-              (nav.title==="Catalog") ?(<div className="flex items-center  gap-1 relative group">
-                
-                  <p>{nav.title}
-                  </p>
-                  <IoIosArrowDropdownCircle/>
-               
-                  <div className="lg:w-[300px] flex flex-col bg-richblack-5 text-richblack-900 p-4 rounded-md gap-3 absolute translate-x-[-50%] translate-y-[80%] invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-500 z-10 ">
-                  <div className="w-6 h-6 absolute bg-richblack-5 -top-3 translate-x-[85%] rotate-45 left-[60%]"></div>
-                    
-                    {
-                       ssubLinks.map((link,index)=>{
-                         return(
+          {/* Navigation links for desktop */}
+          <nav className="hidden lg:block">
+            <ul className="flex gap-6 text-gray-700 text-base font-medium">
+              {NavbarLinks.map((nav, index) => (
+                <li key={index}>
+                  {nav.title === "Catalog" ? (
+                    <div className="flex items-center gap-1 relative group">
+                      <p className="cursor-pointer">{nav.title}</p>
+                      <div className="lg:w-[300px] flex flex-col bg-white text-gray-700 p-4 rounded-md gap-3 absolute top-[100%] left-1/2 transform -translate-x-1/2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 z-10 shadow-lg">
+                        {ssubLinks.map((link, index) => (
                           <Link key={index} to={`/catalog/${link.name}`}>
-                            <li>{link.name}</li>
+                            <li className="hover:text-blue-600 transition-colors duration-200">{link.name}</li>
                           </Link>
-                         )
-                       })
-                    }
-                  </div>
-                
-              </div>):(
-              <Link to={nav.path}>
-                <li
-                  key={index}
-                  className={`${
-                    matchRoute(nav?.path)
-                      ? "text-yellow-25 border-b-[1px]"
-                      : "text-richblack-25"
-                  }`}
-                >
-                  {nav.title}
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <Link to={nav.path}>
+                      <span
+                        className={`${
+                          matchRoute(nav?.path)
+                            ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                            : "text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                        }`}
+                      >
+                        {nav.title}
+                      </span>
+                    </Link>
+                  )}
                 </li>
-              </Link>)
-            ))}
-          </ul>
-        </nav>
+              ))}
+            </ul>
+          </nav>
 
-        {/* login- signup-dashboard  */}
-        <div className="text-richblack-50 flex gap-x-4 items-center text-sm ">
-          {token == null && (
-            <Link to="/login">
-              <div className="border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md">
-                Login
-              </div>
-            </Link>
-          )}
-          {token == null && (
-            <Link to="/signup">
-              <div className="border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md">
-                signup
-              </div>
-            </Link>
-          )}
-          {user  && user?.accountType !== "Instructor" && (
-                    <Link to="/dashboard/cart" className='relative'>
-                    <AiOutlineShoppingCart  className="text-2xl"/>
-                    {
-                        totalItems > 0 && (
-                            <span className="text-xs bg-white rounded-full w-4 h-4  absolute -top-1 right-0 flex items-center justify-center text-richblack-800  moveup">
-                                {totalItems} 
-                            </span>
-                        )
-                    }
+          {/* User actions */}
+          <div className="flex items-center gap-4">
+            {user && user?.accountType !== "Instructor" && (
+              <Link to="/dashboard/cart" className="relative">
+                <AiOutlineShoppingCart className="text-2xl text-gray-700 hover:text-blue-600 transition-colors duration-200" />
+                {totalItems > 0 && (
+                  <span className="text-xs bg-blue-600 text-white rounded-full w-5 h-5 absolute -top-2 -right-2 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
+            {token == null ? (
+              <div className="hidden lg:flex gap-4">
+                <Link to="/login">
+                  <button className="border border-blue-600 bg-white px-4 py-2 text-blue-600 rounded-md hover:bg-blue-50 transition-colors duration-200">
+                    Login
+                  </button>
                 </Link>
-          )}
-          {token !== null && <ProfileDropDown />}
-          {
-            console.log(token)
-            
-          }
+                <Link to="/signup">
+                  <button className="border border-blue-600 bg-blue-600 px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                    Sign Up
+                  </button>
+                </Link>
+              </div>
+            ) : (
+              <div className="hidden lg:block">
+                <ProfileDropDown NavbarLinks={NavbarLinks} ssubLinks={ssubLinks} />
+              </div>
+            )}
+
+            {/* Mobile menu button */}
+            <button className="lg:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              <AiOutlineMenu className="text-2xl text-gray-700" />
+            </button>
+          </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden mt-4 bg-white rounded-md shadow-md p-4">
+            {token == null ? (
+              <div className="flex flex-col gap-4">
+                <Link to="/login">
+                  <button className="w-full border border-blue-600 bg-white px-4 py-2 text-blue-600 rounded-md hover:bg-blue-50 transition-colors duration-200">
+                    Login
+                  </button>
+                </Link>
+                <Link to="/signup">
+                  <button className="w-full border border-blue-600 bg-blue-600 px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                    Sign Up
+                  </button>
+                </Link>
+              </div>
+            ) : (
+              <ProfileDropDown NavbarLinks={NavbarLinks} ssubLinks={ssubLinks} isMobile={true} />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -15,11 +15,12 @@ const IconBtn = ({
     disabled={disabled}
     onClick={onclick}
     type={type}
-    className={`bg-yellow-50 py-2 px-4 rounded-lg text-black ${customClasses}  text-sm flex gap-1 items-center`}>
+    className={`bg-yellow-50 py-2 px-4 rounded-lg text-black ${customClasses} text-sm flex gap-1 items-center
+                sm:text-base sm:py-2.5 sm:px-5 md:text-lg md:py-3 md:px-6`}>
         {
             children ? (
                 <>
-                    <span className={spanclass}>
+                    <span className={`${spanclass} text-xs sm:text-sm md:text-base`}>
                         {text}
                     </span>
                     {children}

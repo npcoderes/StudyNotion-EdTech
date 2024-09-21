@@ -35,7 +35,7 @@ const navigate= useNavigate()
         profileEndpoints.GET_USER_ENROLLED_COURSES_API,
         null,
         {
-          Authorisation: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         }
       );
 
@@ -63,7 +63,7 @@ const navigate= useNavigate()
         profileEndpoints.GET_USER_ENROLLED_COURSES_API,
         null,
         {
-          Authorisation: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         }
       );
 

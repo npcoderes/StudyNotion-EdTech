@@ -20,6 +20,7 @@ import Cart from "../cors/Dashboard/cart/Cart";
 import MyCourse from "../cors/Dashboard/MyCourse/MyCourse";
 import AddCourses from "../cors/Dashboard/AddCourse/AddCourses";
 import EditCourse from "../cors/Dashboard/EditCourse/EditCourse";
+import Catelog from "../../pages/Catelog";
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
@@ -99,7 +100,13 @@ const AnimatedRoutes = () => {
 
         </Route>
 
-
+        <Route 
+          path="/catalog/:catalogName"
+          element={
+            
+              <Catelog />
+            
+          } ></Route>
 
         <Route path="*" element={<PageNotFound />} />
 

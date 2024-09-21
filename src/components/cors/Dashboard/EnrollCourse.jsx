@@ -21,7 +21,7 @@ const EnrollCourse = () => {
         profileEndpoints.GET_USER_ENROLLED_COURSES_API,
         null,
         {
-          Authorisation: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         }
       );
 

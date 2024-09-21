@@ -7,6 +7,8 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from "react-redux";
 import rootReducer from "./reducer";
 import { Toaster } from "react-hot-toast";
+import { ReactLenis, useLenis } from 'lenis/react'
+
 const store = configureStore({
   reducer: rootReducer,
 })
@@ -14,11 +16,13 @@ const store = configureStore({
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
+  <ReactLenis root>
   <BrowserRouter>
     <Provider store={store}>
     <App />
     <Toaster />
     </Provider>
   </BrowserRouter>
+  </ReactLenis>
   
 );
