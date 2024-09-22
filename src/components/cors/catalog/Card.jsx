@@ -19,7 +19,7 @@ const Card = ({ course, Height }) => {
   // console.log("count............", avgReviewCount)
   return (
     <>
-      <div className="hover:scale-[1.03] transition-all duration-200 z-50">
+      <div className="hover:scale-[0.97] transition-all duration-200 z-50">
         <Link to={`/courses/${course._id}`}>
           <div>
             <div className="rounded-lg">

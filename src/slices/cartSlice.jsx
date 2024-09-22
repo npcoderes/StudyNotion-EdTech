@@ -18,20 +18,31 @@ const cartSlice= createSlice({
     initialState,
     reducers: {
         addItem: (state, action) => {
-           const course=action.payload
-           const itemIndex=state.cart.findIndex(x=>x.course._id===course._id)
-          if(itemIndex > 0){
-             toast.error("Item already in cart")
-          }
-          
-            state.cart.push(course)
-            state.total+=course.price
-            state.totalItems+=1
-            localStorage.setItem("cart", JSON.stringify(state.cart))
-            localStorage.setItem("total", JSON.stringify(state.total))
-            localStorage.setItem("totalItems", JSON.stringify(state.totalItems))
-            toast.success("Item added to cart")
-          
+            const course = action.payload;
+            if (!course || typeof course !== 'object') {
+                toast.error("Invalid course data");
+                return;
+            }
+
+            const courseId = course._id;
+            if (!courseId) {
+                toast.error("Course ID is missing");
+                return;
+            }
+
+            const itemIndex = state.cart.findIndex(item => item._id === courseId);
+            if (itemIndex >= 0) {
+                toast.error("Item already in cart");
+                return;
+            }
+
+            state.cart.push(course);
+            state.total += course.price || 0;
+            state.totalItems += 1;
+            localStorage.setItem("cart", JSON.stringify(state.cart));
+            localStorage.setItem("total", JSON.stringify(state.total));
+            localStorage.setItem("totalItems", JSON.stringify(state.totalItems));
+            toast.success("Item added to cart");
         },
         removeItem: (state, action) => {
             const courseId = action.payload

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/Logo/Logo-Full-Dark.png";
+import logo from "../../assets/Logo/Logo-Full-Light.png";
 import { NavbarLinks } from "./../../data/navbar-links";
 import { Link, useLocation } from "react-router-dom";
 import { matchPath } from "react-router-dom";
@@ -35,7 +35,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="bg-white border-b-[1px] border-gray-200 py-3 shadow-sm">
+    <div className="bg-richblack-900 border-b-[1px] border-richblack-700 py-3">
       <div className="w-11/12 max-w-maxContent mx-auto">
         <div className="flex justify-between items-center">
           {/* Logo */}
@@ -45,16 +45,16 @@ const Navbar = () => {
 
           {/* Navigation links for desktop */}
           <nav className="hidden lg:block">
-            <ul className="flex gap-6 text-gray-700 text-base font-medium">
+            <ul className="flex gap-6 text-richblack-25 text-base font-medium">
               {NavbarLinks.map((nav, index) => (
-                <li key={index}>
+                <li key={index} className="cursor-pointer">
                   {nav.title === "Catalog" ? (
-                    <div className="flex items-center gap-1 relative group">
-                      <p className="cursor-pointer">{nav.title}</p>
-                      <div className="lg:w-[300px] flex flex-col bg-white text-gray-700 p-4 rounded-md gap-3 absolute top-[100%] left-1/2 transform -translate-x-1/2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 z-10 shadow-lg">
+                    <div className="flex items-center gap-1 relative group cursor-pointer">
+                      <p>{nav.title}</p>
+                      <div className="lg:w-[300px] flex flex-col bg-richblack-800 text-richblack-25 p-4 rounded-md gap-3 absolute top-[100%] left-1/2 transform -translate-x-1/2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 z-10">
                         {ssubLinks.map((link, index) => (
                           <Link key={index} to={`/catalog/${link.name}`}>
-                            <li className="hover:text-blue-600 transition-colors duration-200">{link.name}</li>
+                            <span className="hover:text-yellow-50 transition-colors duration-200">{link.name}</span>
                           </Link>
                         ))}
                       </div>
@@ -64,8 +64,8 @@ const Navbar = () => {
                       <span
                         className={`${
                           matchRoute(nav?.path)
-                            ? "text-blue-600 border-b-2 border-blue-600 pb-1"
-                            : "text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                            ? "text-yellow-50 border-b-2 border-yellow-50 pb-1"
+                            : "text-richblack-25 hover:text-yellow-50 transition-colors duration-200"
                         }`}
                       >
                         {nav.title}
@@ -81,9 +81,9 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {user && user?.accountType !== "Instructor" && (
               <Link to="/dashboard/cart" className="relative">
-                <AiOutlineShoppingCart className="text-2xl text-gray-700 hover:text-blue-600 transition-colors duration-200" />
+                <AiOutlineShoppingCart className="text-2xl text-richblack-25 hover:text-yellow-50 transition-colors duration-200" />
                 {totalItems > 0 && (
-                  <span className="text-xs bg-blue-600 text-white rounded-full w-5 h-5 absolute -top-2 -right-2 flex items-center justify-center">
+                  <span className="text-xs bg-yellow-50 text-richblack-900 rounded-full w-5 h-5 absolute -top-2 -right-2 flex items-center justify-center">
                     {totalItems}
                   </span>
                 )}
@@ -92,12 +92,12 @@ const Navbar = () => {
             {token == null ? (
               <div className="hidden lg:flex gap-4">
                 <Link to="/login">
-                  <button className="border border-blue-600 bg-white px-4 py-2 text-blue-600 rounded-md hover:bg-blue-50 transition-colors duration-200">
+                  <button className="border border-richblack-700 bg-richblack-800 px-4 py-2 text-richblack-25 rounded-md hover:bg-richblack-700 transition-colors duration-200">
                     Login
                   </button>
                 </Link>
                 <Link to="/signup">
-                  <button className="border border-blue-600 bg-blue-600 px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                  <button className="border border-richblack-700 bg-yellow-50 px-4 py-2 text-richblack-900 rounded-md hover:bg-yellow-25 transition-colors duration-200">
                     Sign Up
                   </button>
                 </Link>
@@ -108,25 +108,26 @@ const Navbar = () => {
               </div>
             )}
 
+
             {/* Mobile menu button */}
             <button className="lg:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              <AiOutlineMenu className="text-2xl text-gray-700" />
+              <AiOutlineMenu className="text-2xl text-richblack-25" />
             </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-4 bg-white rounded-md shadow-md p-4">
+          <div className="lg:hidden mt-4 bg-richblack-800 rounded-md shadow-md p-4">
             {token == null ? (
               <div className="flex flex-col gap-4">
                 <Link to="/login">
-                  <button className="w-full border border-blue-600 bg-white px-4 py-2 text-blue-600 rounded-md hover:bg-blue-50 transition-colors duration-200">
+                  <button className="w-full border border-richblack-700 bg-richblack-800 px-4 py-2 text-richblack-25 rounded-md hover:bg-richblack-700 transition-colors duration-200">
                     Login
                   </button>
                 </Link>
                 <Link to="/signup">
-                  <button className="w-full border border-blue-600 bg-blue-600 px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                  <button className="w-full border border-richblack-700 bg-yellow-50 px-4 py-2 text-richblack-900 rounded-md hover:bg-yellow-25 transition-colors duration-200">
                     Sign Up
                   </button>
                 </Link>

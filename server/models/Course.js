@@ -31,7 +31,7 @@ const coursesSchema = new mongoose.Schema({
 		type: String,
 	},
 	tag: {
-		type: [String],
+		type: [Array],
 		required: true,
 	},
 	category: {

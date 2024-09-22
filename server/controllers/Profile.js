@@ -1,5 +1,6 @@
 const Profile = require("../models/Profile");
 const User = require("../models/User");
+
 const { uploadImageToCloudinary } = require("../utils/imageUploader");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -122,29 +123,77 @@ exports.updateDisplayPicture = async (req, res) => {
     }
 };
   
+// Helper function to convert seconds to HH:MM:SS format
+const formatDuration = (totalSeconds) => {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+
+  return [
+    hours.toString().padStart(2, '0'),
+    minutes.toString().padStart(2, '0'),
+    seconds.toString().padStart(2, '0')
+  ].join(':');
+};
+
 exports.getEnrolledCourses = async (req, res) => {
     try {
-      const userId = req.user.id
-      const userDetails = await User.findOne({
-        _id: userId,
-      })
-        .populate("courses")
-        .exec()
-      if (!userDetails) {
-        return res.status(400).json({
-          success: false,
-          message: `Could not find user with id: ${userDetails}`,
+      const userId = req.user.id;
+
+      const userDetails = await User.findById(userId)
+        .populate({
+          path: "courses",
+          populate: {
+            path: "courseContent",
+            populate: {
+              path: "subSection",
+            },
+          },
         })
+        .exec();
+
+      if (!userDetails) {
+        return res.status(404).json({
+          success: false,
+          message: `Could not find user with id: ${userId}`,
+        });
       }
+
+      const enrolledCourses = userDetails.courses.map(course => {
+        let totalDurationInSeconds = 0;
+        course.courseContent.forEach(content => {
+          content.subSection.forEach(subSection => {
+            let duration = parseFloat(subSection.timeDuration) || 0;
+            if (duration < 60) {
+              // Assume it's in minutes
+              duration *= 60;
+            } else if (duration >= 3600) {
+              // Assume it's in hours
+              duration *= 3600;
+            }
+            // If between 60 and 3600, assume it's already in seconds
+            totalDurationInSeconds += duration;
+          });
+        });
+
+        return {
+          ...course.toObject(),
+          totalDuration: formatDuration(totalDurationInSeconds),
+          totalDurationInSeconds: Math.round(totalDurationInSeconds)
+        };
+      });
+
       return res.status(200).json({
         success: true,
-        data: userDetails.courses,
-      })
+        data: enrolledCourses,
+      });
     } catch (error) {
+      console.error("Error fetching enrolled courses:", error);
       return res.status(500).json({
         success: false,
-        message: error.message,
-      })
+        message: "Error fetching enrolled courses",
+        error: error.message,
+      });
     }
 };
 

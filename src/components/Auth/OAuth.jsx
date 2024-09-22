@@ -23,9 +23,9 @@ const OAuth = () => {
   return (
     <>
 <div className="flex justify-between text-richblack-300 items-center my-4 ">
-  <diV className="h-[1px] bg-richblack-200 w-full"></diV>
-  <diV className="mx-2">OR</diV>
-  <diV className="h-[1px] bg-richblack-200 w-full"></diV>
+  <div className="h-[1px] bg-richblack-200 w-full"></div>
+  <div className="mx-2">OR</div>
+  <div className="h-[1px] bg-richblack-200 w-full"></div>
 </div>
       <div
         className="bg-richblack-900 text-richblue-50 w-full  px-2 py-3 mt-2 text-center rounded-3xl  border-richblack-700 flex justify-center items-center gap-2 text-base font-medium tracking-wider select-none hover:bg-richblack-800 transition-all duration-500"
