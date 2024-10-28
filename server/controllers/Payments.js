@@ -18,8 +18,8 @@ exports.capturePayment = async (req, res) => {
 
     // extract courseId & userId
     const { coursesId } = req.body;
-    // console.log('coursesId = ', typeof (coursesId))
-    // console.log('coursesId = ', coursesId)
+    console.log('coursesId = ', typeof (coursesId))
+    console.log('coursesId = ', coursesId)
 
     const userId = req.user.id;
 
@@ -27,10 +27,10 @@ exports.capturePayment = async (req, res) => {
     if (coursesId.length === 0) {
         return res.json({ success: false, message: "Please provide Course Id" });
     }
-
+    console.log(coursesId.length)
     let totalAmount = 0;
 
-    for (const course_id of coursesId) {
+    for (const course_id of coursesId[0]) {
         let course;
         try {
             // valid course Details
@@ -46,6 +46,7 @@ exports.capturePayment = async (req, res) => {
             }
 
             totalAmount += course.price;
+            console.log(totalAmount)
         }
         catch (error) {
             console.log(error);
@@ -115,8 +116,8 @@ const enrollStudents = async (courses, userId, res) => {
     if (!courses || !userId) {
         return res.status(400).json({ success: false, message: "Please Provide data for Courses or UserId" });
     }
-
-    for (const courseId of courses) {
+    console.log("Coursesssssss........",courses)
+    for (const courseId of courses[0]) {
         try {
             //find the course and enroll the student in it
             const enrolledCourse = await Course.findOneAndUpdate(

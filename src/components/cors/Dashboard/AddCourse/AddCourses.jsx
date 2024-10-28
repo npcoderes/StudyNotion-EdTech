@@ -11,7 +11,7 @@ const AddCourses = () => {
                 <RenderSteps />
             </div>
         </div>
-        <div className=' sticky top-10 hidden lg:block max-w-[400px] flex-1 rounded-md  border-[1px] border-richblack-700  bg-richblack-800 p-6'>
+        <div className='sticky  top-10 hidden lg:block max-w-[400px] flex-1 rounded-md  border-[1px] border-richblack-700  bg-richblack-800 p-6'>
            
                 <p className='text-lg text-richblack-5 mb-8'>⚡ Course Upload tips</p>
             

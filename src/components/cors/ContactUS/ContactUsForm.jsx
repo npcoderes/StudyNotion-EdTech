@@ -44,7 +44,7 @@ const ContactUsForm = () => {
     >
       <div className="flex flex-col gap-5 lg:flex-row">
         <div className="flex flex-col gap-2 lg:w-[48%]">
-          <label htmlFor="firstname" className="lable-style">
+          <label htmlFor="firstname" className="text-gray-700">
             First Name
           </label>
           <input
@@ -52,18 +52,18 @@ const ContactUsForm = () => {
             name="firstname"
             id="firstname"
             placeholder="Enter first name"
-            className=" bg-richblack-800 p-3 rounded-lg placeholder:text-sm"
+            className="bg-white border border-gray-300 p-3 rounded-lg placeholder:text-sm"
             {...register("firstname", { required: true })}
           />
           {errors.firstname && (
-            <span className="-mt-1 text-[12px] text-yellow-100">
+            <span className="-mt-1 text-[12px] text-red-500">
               Please enter your name.
             </span>
           )}
         </div>
         
         <div className="flex flex-col gap-2 lg:w-[48%]">
-          <label htmlFor="lastname" className="lable-style">
+          <label htmlFor="lastname" className="text-gray-700">
             Last Name
           </label>
           <input
@@ -71,14 +71,14 @@ const ContactUsForm = () => {
             name="lastname"
             id="lastname"
             placeholder="Enter last name"
-            className="  bg-richblack-800 p-3 rounded-lg placeholder:text-sm"
+            className="bg-white border border-gray-300 p-3 rounded-lg placeholder:text-sm"
             {...register("lastname")}
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="email" className="lable-style">
+        <label htmlFor="email" className="text-gray-700">
           Email Address
         </label>
         <input
@@ -86,29 +86,27 @@ const ContactUsForm = () => {
           name="email"
           id="email"
           placeholder="Enter email address"
-          className=" bg-richblack-800 p-3 rounded-lg placeholder:text-sm"
+          className="bg-white border border-gray-300 p-3 rounded-lg placeholder:text-sm"
           {...register("email", { required: true })}
         />
         {errors.email && (
-          <span className="-mt-1 text-[12px] text-yellow-100">
+          <span className="-mt-1 text-[12px] text-red-500">
             Please enter your Email address.
           </span>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="phonenumber" className="lable-style">
+        <label htmlFor="phonenumber" className="text-gray-700">
           Phone Number
         </label>
 
         <div className="flex gap-5">
           <div className="flex w-[81px] flex-col gap-2">
             <select
-              type="text"
-              name="firstname"
-              id="firstname"
-              placeholder="Enter first name"
-              className=" bg-richblack-800 p-3 rounded-lg placeholder:text-sm"
+              name="countrycode"
+              id="countrycode"
+              className="bg-white border border-gray-300 p-3  px-5 rounded-lg placeholder:text-sm"
               {...register("countrycode", { required: true })}
             >
               {CountryCode.map((ele, i) => {
@@ -127,7 +125,7 @@ const ContactUsForm = () => {
               name="phonenumber"
               id="phonenumber"
               placeholder="12345 67890"
-              className=" bg-richblack-800 p-3 rounded-lg placeholder:text-sm phone"
+              className="bg-white border border-gray-300 p-3 rounded-lg placeholder:text-sm"
               {...register("phoneNo", {
                 required: {
                   value: true,
@@ -140,14 +138,14 @@ const ContactUsForm = () => {
           </div>
         </div>
         {errors.phoneNo && (
-          <span className="-mt-1 text-[12px] text-yellow-100">
+          <span className="-mt-1 text-[12px] text-red-500">
             {errors.phoneNo.message}
           </span>
         )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="message" className="lable-style">
+        <label htmlFor="message" className="text-gray-700">
           Message
         </label>
         <textarea
@@ -156,11 +154,11 @@ const ContactUsForm = () => {
           cols="30"
           rows="7"
           placeholder="Enter your message here"
-          className=" bg-richblack-800 p-3 rounded-lg placeholder:text-sm"
+          className="bg-white border border-gray-300 p-3 rounded-lg placeholder:text-sm"
           {...register("message", { required: true })}
         />
         {errors.message && (
-          <span className="-mt-1 text-[12px] text-yellow-100">
+          <span className="-mt-1 text-[12px] text-red-500">
             Please enter your Message.
           </span>
         )}
@@ -169,10 +167,9 @@ const ContactUsForm = () => {
       <button
         disabled={loading}
         type="submit"
-        className={`rounded-md bg-yellow-50 px-6 py-3 text-center text-[13px] font-bold text-black shadow-[2px_2px_0px_0px_rgba(255,255,255,0.18)] 
-         ${!loading &&
-          "transition-all duration-200 hover:scale-95 hover:shadow-none"
-          }  disabled:bg-richblack-500 sm:text-[16px] `}
+        className={`rounded-md bg-[#422faf] px-6 py-3 text-center text-[13px] font-bold text-white shadow-md 
+         ${!loading && "transition-all duration-200 hover:scale-95 hover:shadow-none"} 
+         disabled:bg-gray-400 sm:text-[16px]`}
       >
         Send Message
       </button>

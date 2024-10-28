@@ -7,7 +7,7 @@ const CourseCard = ({ key, cardData, currentCard, SetCurrentCard }) => {
     <div>
       {data.map((card, index) => {
         return (
-          <div key={index} className={`flex flex-col gap-8 ${(currentCard===card.heading) ? " bg-white text-richblack-500 current-tab":"bg-richblack-800"} max-w-[341.33px] py-6 px-5 shadow-yellow-50 `}>
+          <div key={index} className={`flex flex-col gap-8 ${(currentCard===card.heading) ? " bg-white text-richblack-500 current-tab":"bg-richblack-200"} max-w-[341.33px] py-6 px-5 shadow-[#BB86FC]`}>
             <p className={`${(currentCard===card.heading) ? "text-black":""} font-semibold text-xl `}>{card.heading}
                
             </p>

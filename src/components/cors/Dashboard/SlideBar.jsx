@@ -5,8 +5,9 @@ import ConfirmationModal from '../../common/ConfirmationModal'
 import { useDispatch, useSelector } from 'react-redux'
 import { VscSignOut } from 'react-icons/vsc'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { logout } from "../../../services/operations/authAPI"
+import { Link } from 'react-router-dom'
 const SlideBar = () => {
     const { user } = useSelector((state) => state.profile)
     const [confirmationModal, setConfirmationModal] = useState(null);
@@ -14,9 +15,9 @@ const SlideBar = () => {
     const navigate = useNavigate()
 
     return (
-        <div className='text-white'>
+        <div className='text-[#E0E0E0]'>
             <div className='m-w-[222px] flex flex-col borde-r-[1px]  border-r-richblack-700
-        h-[calc(100vh-3.5rem)] bg-richblack-900 py-10'>
+        h-[calc(100vh-3.5rem)]  bg-[#1A1A1A] py-10'>
                 <div className='flex flex-col'>
                     {
 
@@ -48,6 +49,10 @@ const SlideBar = () => {
                             <span>Logout</span>
                         </div>
                     </button>
+
+
+    
+                  
                 </div>
 
             </div>

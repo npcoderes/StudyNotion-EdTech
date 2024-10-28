@@ -36,7 +36,7 @@ const TimeLinesec = () => {
           <div className="h-[300px] w-[1px] border-l-2  absolute top-10 my-2 border-dotted left-6 border-pure-greys-25"></div>
           {timeline.map((element, index) => (
             <div className="flex flex-row gap-8 mb-8 max-sm:mb-6" key={index}>
-              <div className="w-[50px] h-[50px] bg-pure-greys-5 flex items-center justify-center flex-col realtive z-10">
+              <div className="w-[50px] h-[50px] bg-pure-greys-5 flex items-center justify-center flex-col realtive z-10 rounded-full">
                 <img src={element.Logo} />
               </div>
 

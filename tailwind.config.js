@@ -123,6 +123,9 @@ module.exports = {
         800: "#171717",
         900: "#141414",
       },
+      'highlight-blue': '#0d9edf',
+      customPurple: '#BB86FC', // Soft Purple
+      customGray: '#E0E0E0',   // Light Gray
     },
     extend: {
       maxWidth: {

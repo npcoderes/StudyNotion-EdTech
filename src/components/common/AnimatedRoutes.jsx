@@ -22,6 +22,7 @@ import AddCourses from "../cors/Dashboard/AddCourse/AddCourses";
 import EditCourse from "../cors/Dashboard/EditCourse/EditCourse";
 import Catelog from "../../pages/Catelog";
 import CourseDetails from "../../pages/CourseDetails";
+import ManageCategory from "../../pages/ManageCategory";
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
@@ -97,6 +98,8 @@ const AnimatedRoutes = () => {
           <Route path="/dashboard/my-courses" element={<MyCourse />} />
           <Route path="/dashboard/add-course" element={<AddCourses />} />
           <Route path="/dashboard/edit-course/:courseId" element={<EditCourse />} />
+          <Route path="/manage-category" element={<ManageCategory />} />
+      
          
           
 
@@ -109,8 +112,12 @@ const AnimatedRoutes = () => {
               <Catelog />
             
           } ></Route>
-          <Route path="/courses/:courseId" element={<CourseDetails />} />
-
+        <Route path="/courses/:courseId" element={
+          <PrivateRoute>
+            <CourseDetails />
+          </PrivateRoute>
+        } />
+        {/* admin  */}
         <Route path="*" element={<PageNotFound />} />
 
 

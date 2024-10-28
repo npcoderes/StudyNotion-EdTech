@@ -22,7 +22,7 @@ const ExploreSection = () => {
         setCurrentCard(result[0].courses[0].heading);
     }
   return (
-    <div className=''>
+    <div className='z-10'>
         <div className='text-4xl max-sm:text-2xl font-semibold text-center'>
         Unlock the <HighlightText text={"Power of Code"}> </HighlightText>
         </div>
@@ -37,9 +37,9 @@ const ExploreSection = () => {
                 <div
                 className={`text-[16px] flex flex-row items-center gap-2  max-sm:text-xs
                 ${currentTab === element 
-                ? "bg-richblack-900 text-richblack-5 font-medium"
+                ? "bg-richblack-100 text-richblack-900 font-medium"
                 : "text-richblack-200" } rounded-full transition-all duration-200 cursor-pointer
-                hover:bg-richblack-900 hover:text-richblack-5 px-7 py-2`}
+                hover:bg-richblack-50 hover:text-richblack-5 px-7 py-2`}
                 key={index}
                 onClick={() => setMyCards(element)}
                 >

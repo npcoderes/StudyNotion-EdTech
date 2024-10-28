@@ -12,8 +12,10 @@ const RenderTotalAmount = () => {
    const {user}=useSelector(state=>state.profile)
     const handleBuyCourse = () => {
         const courses = cart.map((course) => course._id);
+        console.log("printing courses id  ",courses)
         if (token) {
           const coursesId = [courses]
+          console.log("printing courses id ......... ",courses)
           buyCourse(token, coursesId, user, navigate, dispatch)
           return
         }

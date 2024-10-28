@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 
 const PageNotFound = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-richblack-900 to-richblack-800 flex flex-col items-center justify-center text-white p-4">
+    <div className="min-h-screen bg-gradient-to-b from-white to-[#f0f0f0] flex flex-col items-center justify-center text-black p-4">
       <motion.h1 
-        className="text-9xl font-bold text-yellow-50"
+        className="text-9xl font-bold text-[#422faf]"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, type: "spring", stiffness: 120 }}
@@ -21,7 +21,7 @@ const PageNotFound = () => {
         transition={{ delay: 0.2, duration: 0.6 }}
       >
         <h2 className="text-4xl font-semibold mb-4">Oops! Page Not Found</h2>
-        <p className="text-xl text-richblack-200 mb-8">
+        <p className="text-xl text-gray-600 mb-8">
           The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
         </p>
       </motion.div>
@@ -32,10 +32,10 @@ const PageNotFound = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.6 }}
       >
-        <Link to="/" className="px-6 py-3 bg-yellow-50 text-richblack-900 rounded-full font-semibold hover:bg-yellow-100 transition duration-300">
+        <Link to="/" className="px-6 py-3 bg-[#422faf] text-white rounded-full font-semibold hover:bg-[#5a3e8c] transition duration-300">
           Go Home
         </Link>
-        <Link to="/contact" className="px-6 py-3 border border-yellow-50 text-yellow-50 rounded-full font-semibold hover:bg-yellow-50 hover:text-richblack-900 transition duration-300">
+        <Link to="/contact" className="px-6 py-3 border border-[#422faf] text-[#422faf] rounded-full font-semibold hover:bg-[#422faf] hover:text-white transition duration-300">
           Contact Support
         </Link>
       </motion.div>

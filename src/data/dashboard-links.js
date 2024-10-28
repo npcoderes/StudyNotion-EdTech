@@ -48,5 +48,12 @@ export const sidebarLinks = [
     type: ACCOUNT_TYPE.STUDENT,
     icon: "IoCartOutline",
   },
+  {
+    id: 8,
+    name: "Manage Category",
+    path: "/manage-category",
+    type: ACCOUNT_TYPE.ADMIN,
+    icon: "IoCartOutline",
+  },
   
 ];

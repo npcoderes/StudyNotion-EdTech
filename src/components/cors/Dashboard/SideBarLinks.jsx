@@ -13,10 +13,10 @@ const SideBarLinks = ({ link, iconName }) => {
 
     return (
         <NavLink to={link.path}
-            className={`relative px-8 py-2 text-sm font-medium ${matchroute(link.path) ? "bg-yellow-800" : ("bg-opacity-0")} `}>
+            className={`relative px-8 py-2 text-sm font-medium ${matchroute(link.path) ? "bg-[#333333]" : ("bg-opacity-0")} `}>
             {/* for highlite part which active window  */}
             <span className={`absolute left-0 top-0 h-full w-[0.2rem]
-        ${matchroute(link.path) ? " bg-yellow-50" : "opactity-0"}`} />
+        ${matchroute(link.path) ? " bg-[#BB86FC]" : "opactity-0"}`} />
 
 
             <div className='flex items-center gap-x-2'>

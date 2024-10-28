@@ -19,6 +19,7 @@ import { RxDropdownMenu } from "react-icons/rx";
 import { buyCourse } from "../services/operations/studentFeaturesAPI";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
+import Footer from "../components/common/Footer";
 const CourseDetails = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
@@ -109,15 +110,12 @@ const CourseDetails = () => {
 
 
 
-
-
-
   
 
   return (
     <>
       {/* section 1  */}
-      <div className="bg-richblack-800 min-h-[300px] w-full">
+      <div className="bg-[#121212] min-h-[300px] w-full mt-20 ">
         <section className="w-11/12 max-w-maxContent mx-auto flex gap-2 py-10 relative">
           <div className=" min-h-[100px] w-full ">
             {/* heder part  */}
@@ -125,7 +123,7 @@ const CourseDetails = () => {
               <p className="text-richblack-300 text-xs  tracking-widest">
                 {" "}
                 Course / Learning /{" "}
-                <span className="text-yellow-25">
+                <span className="text-[#bb86fc] ">
                   {" "}
                   {courseDetails?.courseDetails?.category?.name}{" "}
                 </span>
@@ -137,7 +135,7 @@ const CourseDetails = () => {
                 {courseDetails?.courseDetails?.courseDescription}
               </p>
               <div className="flex items-center gap-2">
-                <span className="text-yellow-5">{avgReviewCount}</span>
+                <span className="text-[#bb86fc] ">{avgReviewCount}</span>
                 <RatingStars Review_Count={avgReviewCount} />
                 <p className="text-richblack-50 text-sm">
                   ( {courseDetails?.courseDetails?.ratingAndReviews?.length}{" "}
@@ -173,7 +171,7 @@ const CourseDetails = () => {
           <div className="flex flex-col gap-2 p-4 bg-richblack-700 rounded-xl lg:absolute right-0 lg:max-w-[400px]  ">
             <Img
               src={courseDetails?.courseDetails?.thumbnail}
-              className={" h-[200px] w-[350px] object-cover rounded-t-xl"}
+              className="h-[200px] w-[350px] object-cover rounded-t-xl py-2 shadow-md shadow-richblack-800 "
             />
             <p className="text-richblack-5 text-2xl font-semibold">
               Rs. {courseDetails?.courseDetails?.price}
@@ -183,15 +181,15 @@ const CourseDetails = () => {
              {
                 user.accountType==="Student" && (<div className="flex  gap-3 flex-col ">
               {isInCart ? (
-                <Button active={true}>
-                  <span onClick={handleRemoveFromCart}>Remove from Cart</span>
-                </Button>
+                <button onClick={handleRemoveFromCart} className="bg-white/60 text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
+                  <span >Remove from Cart</span>
+                </button>
               ) : (
-                <Button active={false}>
-                  <span onClick={handleAddToCart}>Add To Cart</span>
-                </Button>
+                <button className="bg-white text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  " onClick={handleAddToCart}>
+                  <span >Add To Cart</span>
+                </button>
               )}
-               <button onClick={handleBuyCourse} className="bg-yellow-50 text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
+               <button onClick={handleBuyCourse} className="bg-[#bb86fc] text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
                 Buy Now
                </button>
             </div>)
@@ -226,6 +224,7 @@ const CourseDetails = () => {
               </div>
             </div>
           </div>
+          {/* end of card part  */}
         </section>
       </div>
       {/* section 2  */}
@@ -243,53 +242,48 @@ const CourseDetails = () => {
           </div>
         </div>
       </div>
-      {/* section-3  */}
-      <div className="w-11/12  max-w-maxContent mx-auto mt-10">
-        <div className="flex flex-col gap-4 w-2/3 border-2 border-richblack-700 rounded-xl p-6">
-          {courseDetails?.courseDetails?.courseContent?.map((item, index) => (
-            <details key={index} open>
-              <summary className="flex cursor-pointer items-center justify-between border-b-2 border-b-richblack-600 py-2">
-                {/* sectionName */}
-                <div className="flex items-center justify-between gap-x-3">
-                  <RxDropdownMenu className="text-2xl text-richblack-50" />
-                  <p className="font-semibold text-richblack-50">
-                    {item.sectionName}
-                  </p>
-             
-                </div>
-                <div className="flex items-center justify-between gap-x-3">
-                    <p className="text-yellow-50 text-sm">
-                      {
-                        item.subSection.length
-                      } lecture
-                    </p>
-                    <p className="text-richblack-50 text-sm">  {courseDetails?.totalDuration} </p>
-                </div>
-              </summary>
-              {/* render all sub-sections  */}
-              <div className="px-6 pb-4">
-                {item.subSection.map((data, index) => (
-                  <details key={index} className="pt-2" open>
-                    <summary className="flex items-center gap-x-3 cursor-pointer justify-between">
-                      <div className="flex items-center gap-x-3">
-                      <RxDropdownMenu className="text-2xl text-richblack-50" />
-                      <p className="text-richblack-50 text-sm">{data.title}</p>
-                      </div>
-                      <p className="text-richblack-50 text-sm"> {data?.timeDuration} </p>
-                    </summary>
-                    <p className="text-richblack-50 text-sm ml-9 mt-2">-{data?.description}</p>
-                    
-                  </details>
-                ))}
-                  
-                
+{/* section-3 */}
+<div className="w-11/12 max-w-maxContent mx-auto mt-10">
+      <div className="flex flex-col gap-4 w-2/3 border-2 border-[#2F3E46] rounded-xl p-6 bg-[#1A1A1A]">
+        {courseDetails?.courseDetails?.courseContent?.map((item, index) => (
+          <details key={index} open className="transition-all duration-300 ease-in-out">
+            <summary className="flex cursor-pointer items-center justify-between border-b-2 border-b-[#2F3E46] py-2 bg-[#2A2A2A] hover:bg-[#3B3B3B] rounded-md transition-colors duration-200">
+              {/* sectionName */}
+              <div className="flex items-center justify-between gap-x-3">
+                <RxDropdownMenu className="text-2xl text-green-400" />
+                <p className="font-semibold text-white">
+                  {item.sectionName}
+                </p>
               </div>
-            </details>
-          ))}
-        </div>
+              <div className="flex items-center justify-between gap-x-3">
+                <p className="text-green-400 text-sm">
+                  {item.subSection.length} lecture
+                </p>
+                <p className="text-gray-300 text-sm">{courseDetails?.totalDuration}</p>
+              </div>
+            </summary>
+            {/* render all sub-sections */}
+            <div className="px-6 pb-4 bg-[#2A2A2A] rounded-md transition-all duration-300 ease-in-out">
+              {item.subSection.map((data, index) => (
+                <details key={index} className="pt-2 transition-all duration-300 ease-in-out" open>
+                  <summary className="flex items-center gap-x-3 cursor-pointer justify-between bg-[#1A1A1A] hover:bg-[#3B3B3B] rounded-md transition-colors duration-200">
+                    <div className="flex items-center gap-x-3">
+                      <RxDropdownMenu className="text-xl text-green-400" />
+                      <p className="text-gray-200 text-sm">{data.title}</p>
+                    </div>
+                    <p className="text-gray-300 text-sm">{data?.timeDuration}</p>
+                  </summary>
+                  <p className="text-gray-300 text-sm ml-9 mt-2">-{data?.description}</p>
+                </details>
+              ))}
+            </div>
+          </details>
+        ))}
       </div>
+    </div>
+
       {/* section-4  */}
-      <div className="w-11/12  max-w-maxContent mx-auto mt-10">
+      <div className="w-11/12  max-w-maxContent mx-auto mt-10 mb-20">
         <div className="flex flex-col gap-4 w-2/3 border-2 border-richblack-700 rounded-xl p-6">
           <h1 className="text-richblack-5 text-3xl font-semibold">
             Author
@@ -316,6 +310,8 @@ const CourseDetails = () => {
         </div>
       </div>
       {confirmationModal && <ConfirmationModal confirmationModal={confirmationModal} />}
+
+      <Footer />
     </>
   );
 };

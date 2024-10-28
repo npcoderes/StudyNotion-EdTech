@@ -13,7 +13,7 @@ const InstructorSection = () => {
             <img
                 src={Instructor}
                 alt=""
-                className='shadow-white'
+                className='shadow-white rounded-lg'
             />
         </div>
 
