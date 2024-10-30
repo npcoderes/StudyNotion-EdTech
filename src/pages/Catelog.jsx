@@ -102,7 +102,7 @@ const Catelog = () => {
               <p className="text-3xl">
                 {catalogPageData?.selectedCategory?.name}
               </p>
-              <p className="text-richblack-500">{catalogPageData?.selectedCategory?.description}</p>
+              <p className="text-richblack-800">{catalogPageData?.selectedCategory?.description}</p>
             </div>
           </div>
         </div>

@@ -43,6 +43,9 @@ const CourseDetails = () => {
         const result = await getFullDetailsOfCourse(courseId, token);
         if (result) {
           setCourseDetails(result);
+          console.log("courseDetails?.courseDetails?.ratingAndReviews............", result?.courseDetails?.ratingAndReviews);   
+          const count = GetAvgRating(result?.courseDetails?.ratingAndReviews);
+          setAvgReviewCount(count); 
           console.log("result............", result);
         }
       } catch (error) {
@@ -56,10 +59,11 @@ const CourseDetails = () => {
 
     fetchCourseDetails();
   }, [courseId, token]);
-  useEffect(() => {
-    const count = GetAvgRating(courseDetails?.courseDetails?.ratingAndReviews);
-    setAvgReviewCount(count);
-  }, [courseId, token]);
+  // useEffect(() => {
+   
+  //   const count = GetAvgRating(courseDetails?.courseDetails?.ratingAndReviews);
+  //   setAvgReviewCount(count);
+  // }, [courseId, token]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -189,7 +193,7 @@ const CourseDetails = () => {
                   <span >Add To Cart</span>
                 </button>
               )}
-               <button onClick={handleBuyCourse} className="bg-[#bb86fc] text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
+               <button onClick={handleBuyCourse} className="bg-[#422faf] text-white text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
                 Buy Now
                </button>
             </div>)
@@ -228,15 +232,15 @@ const CourseDetails = () => {
         </section>
       </div>
       {/* section 2  */}
-      <div className="w-11/12  max-w-maxContent mx-auto mt-10">
-        <div className="flex flex-col gap-4 w-2/3 border-2 border-richblack-700 rounded-xl p-6">
-          <h1 className="text-richblack-5 text-3xl font-semibold">
+      <div className="w-11/12 max-w-maxContent mx-auto mt-10">
+        <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md">
+          <h1 className="text-[#1F2937] text-3xl font-semibold">
             What you'll learn
           </h1>
           <div className="flex flex-col space-y-2">
             {tags.map((item, index) => (
               <div key={index}>
-                <p className="text-richblack-50 text-sm">{item}</p>
+                <p className="text-[#374151] text-sm">{item}</p>
               </div>
             ))}
           </div>
@@ -244,36 +248,36 @@ const CourseDetails = () => {
       </div>
 {/* section-3 */}
 <div className="w-11/12 max-w-maxContent mx-auto mt-10">
-      <div className="flex flex-col gap-4 w-2/3 border-2 border-[#2F3E46] rounded-xl p-6 bg-[#1A1A1A]">
+      <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md">
         {courseDetails?.courseDetails?.courseContent?.map((item, index) => (
           <details key={index} open className="transition-all duration-300 ease-in-out">
-            <summary className="flex cursor-pointer items-center justify-between border-b-2 border-b-[#2F3E46] py-2 bg-[#2A2A2A] hover:bg-[#3B3B3B] rounded-md transition-colors duration-200">
+            <summary className="flex cursor-pointer items-center justify-between border-b-2 border-b-[#D1D5DB] py-3 bg-[#F9FAFB] rounded-md transition-colors duration-200 p-3">
               {/* sectionName */}
               <div className="flex items-center justify-between gap-x-3">
-                <RxDropdownMenu className="text-2xl text-green-400" />
-                <p className="font-semibold text-white">
+                <RxDropdownMenu className="text-2xl text-[#4B5563]" />
+                <p className="font-semibold text-[#1F2937]">
                   {item.sectionName}
                 </p>
               </div>
               <div className="flex items-center justify-between gap-x-3">
-                <p className="text-green-400 text-sm">
+                <p className="text-[#4B5563] text-sm">
                   {item.subSection.length} lecture
                 </p>
-                <p className="text-gray-300 text-sm">{courseDetails?.totalDuration}</p>
+                <p className="text-[#6B7280] text-sm">{courseDetails?.totalDuration}</p>
               </div>
             </summary>
             {/* render all sub-sections */}
-            <div className="px-6 pb-4 bg-[#2A2A2A] rounded-md transition-all duration-300 ease-in-out">
+            <div className="px-6 pb-4 bg-[#F9FAFB] rounded-md transition-all duration-300 ease-in-out">
               {item.subSection.map((data, index) => (
-                <details key={index} className="pt-2 transition-all duration-300 ease-in-out" open>
-                  <summary className="flex items-center gap-x-3 cursor-pointer justify-between bg-[#1A1A1A] hover:bg-[#3B3B3B] rounded-md transition-colors duration-200">
+                <details key={index} className="pt-2 transition-all duration-300 ease-in-out" >
+                  <summary className="flex items-center gap-x-3 cursor-pointer justify-between bg-[#ffffff] hrounded-md transition-colors duration-200 p-4">
                     <div className="flex items-center gap-x-3">
-                      <RxDropdownMenu className="text-xl text-green-400" />
-                      <p className="text-gray-200 text-sm">{data.title}</p>
+                      <RxDropdownMenu className="text-xl text-[#4B5563]" />
+                      <p className="text-[#1F2937] text-sm">{data.title}</p>
                     </div>
-                    <p className="text-gray-300 text-sm">{data?.timeDuration}</p>
+                    <p className="text-[#6B7280] text-sm">{data?.timeDuration}</p>
                   </summary>
-                  <p className="text-gray-300 text-sm ml-9 mt-2">-{data?.description}</p>
+                  <p className="text-[#6B7280] text-sm ml-9 mt-2">-{data?.description}</p>
                 </details>
               ))}
             </div>
@@ -283,25 +287,25 @@ const CourseDetails = () => {
     </div>
 
       {/* section-4  */}
-      <div className="w-11/12  max-w-maxContent mx-auto mt-10 mb-20">
-        <div className="flex flex-col gap-4 w-2/3 border-2 border-richblack-700 rounded-xl p-6">
-          <h1 className="text-richblack-5 text-3xl font-semibold">
+      <div className="w-11/12 max-w-maxContent mx-auto mt-10 mb-20">
+        <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md">
+          <h1 className="text-[#1F2937] text-3xl font-semibold">
             Author
           </h1>
           <div className="flex items-center gap-x-3">
             <Img src={courseDetails?.courseDetails?.instructor?.image} className="w-12 h-12 rounded-full" />
             <div>
-              <p className="text-richblack-50 text-sm">
+              <p className="text-[#374151] text-sm">
                 {courseDetails?.courseDetails?.instructor?.firstName}{" "}
                 {courseDetails?.courseDetails?.instructor?.lastName}
               </p>
             </div>
           </div>
           <div className="flex flex-col gap-2 mt-2">
-            <h1 className="text-richblack-5 lg ">
+            <h1 className="text-[#1F2937]">
               Instructions
             </h1>
-            <ul className="list-disc list-inside text-richblack-50 text-sm">
+            <ul className="list-disc list-inside text-[#374151] text-sm">
               {instructions.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}

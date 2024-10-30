@@ -117,14 +117,14 @@ export default function CourseBuilderForm() {
             text={editSectionName ? "Edit Section Name" : "Create Section"}
             outline={true}
           >
-            <IoAddCircleOutline size={20} className="text-yellow-50" />
+            <IoAddCircleOutline size={20} className="text-[#ff]" />
           </IconBtn>
           {/* if editSectionName mode is on */}
           {editSectionName && (
             <button
               type="button"
               onClick={cancelEdit}
-              className="text-sm text-richblack-300 underline"
+              className="text-sm text-[#422faf] bg-white rounded-md px-4 py-2 "
             >
               Cancel Edit
             </button>
@@ -141,7 +141,7 @@ export default function CourseBuilderForm() {
       <div className="flex justify-end gap-x-3">
         <button
           onClick={goBack}
-          className={`rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900`}
+          className={`rounded-md bg-richblack-200 py-[8px] px-[20px] font-semibold text-richblack-900`}
         >
           Back
         </button>

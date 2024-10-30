@@ -106,7 +106,7 @@ const ContactUsForm = () => {
             <select
               name="countrycode"
               id="countrycode"
-              className="bg-white border border-gray-300 p-3  px-5 rounded-lg placeholder:text-sm"
+              className="bg-white border border-gray-300 p-3  px-4 rounded-lg placeholder:text-sm"
               {...register("countrycode", { required: true })}
             >
               {CountryCode.map((ele, i) => {

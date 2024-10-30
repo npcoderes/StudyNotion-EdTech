@@ -17,12 +17,12 @@ const Dashboard = () => {
   }
 
   return (
-    <div className='relative flex min-h-[calc(100vh-3.5rem)] bg-[#fff] text-[#000] w-full mt-20'>
+    <div className='relative flex min-h-[calc(100vh-3.5rem)] bg-[#fff] text-[#000] w-full py-16'>
       <div className='fixed'>
         <SlideBar />
       </div>
       <div className='overflow-auto w-[calc(100%-222px)] lg:ml-[222px]'>
-        <div className='py-10 max-w-[1000px] w-11/12 mx-auto '>
+        <div className='py-10 max-w-[1000px] w-11/12 mx-auto h-full '>
           <Outlet />
         </div>
       </div>

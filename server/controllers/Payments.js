@@ -30,11 +30,14 @@ exports.capturePayment = async (req, res) => {
     console.log(coursesId.length)
     let totalAmount = 0;
 
-    for (const course_id of coursesId[0]) {
+    for (const course_id of coursesId) {
         let course;
         try {
             // valid course Details
-            course = await Course.findById(course_id);
+            console.log("course_id........... = ", course_id)
+            const courseId = new mongoose.Types.ObjectId(course_id); // Convert to ObjectId
+            console.log("courseId________________ = ", courseId)
+            course = await Course.findById(courseId); // Use the converted ObjectId
             if (!course) {
                 return res.status(404).json({ success: false, message: "Could not find the course" });
             }
@@ -117,7 +120,7 @@ const enrollStudents = async (courses, userId, res) => {
         return res.status(400).json({ success: false, message: "Please Provide data for Courses or UserId" });
     }
     console.log("Coursesssssss........",courses)
-    for (const courseId of courses[0]) {
+    for (const courseId of courses) {
         try {
             //find the course and enroll the student in it
             const enrolledCourse = await Course.findOneAndUpdate(

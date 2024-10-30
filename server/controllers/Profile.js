@@ -1,6 +1,8 @@
 const Profile = require("../models/Profile");
 const User = require("../models/User");
-
+const Course = require("../models/Course");
+const CourseProgress = require("../models/CourseProgress");
+const {convertSecondsToDuration} = require("../utils/secToDuration")
 const { uploadImageToCloudinary } = require("../utils/imageUploader");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -42,11 +44,6 @@ exports.updateProfile = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
 	try {
-		// TODO: Find More on Job Schedule
-		// const job = schedule.scheduleJob("10 * * * * *", function () {
-		// 	console.log("The answer to life, the universe, and everything!");
-		// });
-		// console.log(job);
 		console.log("Printing ID: ", req.user.id);
 		const id = req.user.id;
 		
@@ -57,9 +54,20 @@ exports.deleteAccount = async (req, res) => {
 				message: "User not found",
 			});
 		}
-		// Delete Assosiated Profile with the User
+
+		// Unenroll User From All the Enrolled Courses
+		if (user.courses && user.courses.length > 0) {
+			await Course.updateMany(
+				{ _id: { $in: user.courses } },
+				{ $pull: { studentsEnrolled: id } } 
+			);
+		}
+
+		// Delete Associated Profile with the User
 		await Profile.findByIdAndDelete({ _id: user.additionalDetails });
-		// TODO: Unenroll User From All the Enrolled Courses
+
+		// Delete Course Progress for the User
+		await CourseProgress.deleteMany({ userId: id });
 		// Now Delete User
 		await User.findByIdAndDelete({ _id: id });
 		res.status(200).json({
@@ -70,7 +78,7 @@ exports.deleteAccount = async (req, res) => {
 		console.log(error);
 		res
 			.status(500)
-			.json({ success: false, message: "User Cannot be deleted successfully" });
+			.json({ success: false, message: "User cannot be deleted successfully" });
 	}
 };
 
@@ -137,63 +145,68 @@ const formatDuration = (totalSeconds) => {
 };
 
 exports.getEnrolledCourses = async (req, res) => {
-    try {
-      const userId = req.user.id;
-
-      const userDetails = await User.findById(userId)
-        .populate({
-          path: "courses",
+  try {
+    const userId = req.user.id
+    let userDetails = await User.findOne({
+      _id: userId,
+    })
+      .populate({
+        path: "courses",
+        populate: {
+          path: "courseContent",
           populate: {
-            path: "courseContent",
-            populate: {
-              path: "subSection",
-            },
+            path: "subSection",
           },
-        })
-        .exec();
-
-      if (!userDetails) {
-        return res.status(404).json({
-          success: false,
-          message: `Could not find user with id: ${userId}`,
-        });
+        },
+      })
+      .exec()
+    userDetails = userDetails.toObject()
+    var SubsectionLength = 0
+    for (var i = 0; i < userDetails.courses.length; i++) {
+      let totalDurationInSeconds = 0
+      SubsectionLength = 0
+      for (var j = 0; j < userDetails.courses[i].courseContent.length; j++) {
+        totalDurationInSeconds += userDetails.courses[i].courseContent[
+          j
+        ].subSection.reduce((acc, curr) => acc + parseInt(curr.timeDuration), 0)
+        userDetails.courses[i].totalDuration = convertSecondsToDuration(
+          totalDurationInSeconds
+        )
+        SubsectionLength +=
+          userDetails.courses[i].courseContent[j].subSection.length
       }
-
-      const enrolledCourses = userDetails.courses.map(course => {
-        let totalDurationInSeconds = 0;
-        course.courseContent.forEach(content => {
-          content.subSection.forEach(subSection => {
-            let duration = parseFloat(subSection.timeDuration) || 0;
-            if (duration < 60) {
-              // Assume it's in minutes
-              duration *= 60;
-            } else if (duration >= 3600) {
-              // Assume it's in hours
-              duration *= 3600;
-            }
-            // If between 60 and 3600, assume it's already in seconds
-            totalDurationInSeconds += duration;
-          });
-        });
-
-        return {
-          ...course.toObject(),
-          totalDuration: formatDuration(totalDurationInSeconds),
-          totalDurationInSeconds: Math.round(totalDurationInSeconds)
-        };
-      });
-
-      return res.status(200).json({
-        success: true,
-        data: enrolledCourses,
-      });
-    } catch (error) {
-      console.error("Error fetching enrolled courses:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Error fetching enrolled courses",
-        error: error.message,
-      });
+      let courseProgressCount = await CourseProgress.findOne({
+        courseID: userDetails.courses[i]._id,
+        userId: userId,
+      })
+      courseProgressCount = courseProgressCount?.completedVideos.length
+      if (SubsectionLength === 0) {
+        userDetails.courses[i].progressPercentage = 100
+      } else {
+        // To make it up to 2 decimal point
+        const multiplier = Math.pow(10, 2)
+        userDetails.courses[i].progressPercentage =
+          Math.round(
+            (courseProgressCount / SubsectionLength) * 100 * multiplier
+          ) / multiplier
+      }
     }
-};
+
+    if (!userDetails) {
+      return res.status(400).json({
+        success: false,
+        message: `Could not find user with id: ${userDetails}`,
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      data: userDetails.courses,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    })
+  }
+}
 

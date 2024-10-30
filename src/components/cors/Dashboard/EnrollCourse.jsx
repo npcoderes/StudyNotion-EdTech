@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom"
 
 import { getUserEnrolledCourses } from "../../../services/operations/profileAPI"
 import Img from './../../common/Img';
+import toast from "react-hot-toast"
+import { apiConnector } from "../../../services/apiconnector"
+import CourseDetails from "../../../pages/CourseDetails"
 
 
 
@@ -25,8 +28,10 @@ export default function EnrolledCourses() {
     }
   };
 
+
   useEffect(() => {
     getEnrolledCourses();
+    
   }, [])
 
   // Loading Skeleton
@@ -51,7 +56,7 @@ export default function EnrolledCourses() {
   // return if data is null
   if (enrolledCourses?.length == 0) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-richblack-900">
+      <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] bg-richblack-900 rounded-lg">
         <p className="text-3xl text-richblack-5 font-semibold">
           You have not enrolled in any course yet.
         </p>
@@ -61,7 +66,7 @@ export default function EnrolledCourses() {
 
 
   return (
-    <div className="bg-richblack-900 min-h-screen py-8">
+    <div className="bg-richblack-900 min-h-screen py-8 rounded-lg">
       <div className="w-11/12 max-w-maxContent mx-auto">
         <h1 className="text-4xl font-boogaloo text-richblack-5 mb-8 text-center sm:text-left">
           Enrolled Courses

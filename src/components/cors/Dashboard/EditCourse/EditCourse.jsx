@@ -7,6 +7,7 @@ import { getFullDetailsOfCourse, } from "../../../../services/operations/courseD
 import { setCourse, setEditCourse } from "../../../../slices/courseSlice"
 import RenderSteps from "../AddCourse/RenderSteps"
 import toast from "react-hot-toast"
+import { FiEdit } from "react-icons/fi"
 
 
 export default function EditCourse() {
@@ -44,8 +45,8 @@ export default function EditCourse() {
     <div className="flex w-full items-start gap-x-6">
 
       <div className="flex flex-1 flex-col">
-        <h1 className="mb-14 text-3xl font-medium text-richblack-5 text-center sm:text-left">
-          Edit Course
+        <h1 className="mb-14 text-3xl font-medium text-richblack-900 text-center sm:text-left flex items-center j gap-x-4">
+          Edit Course <FiEdit className="text-richblack-900" />
         </h1>
 
         {loading ? <></>

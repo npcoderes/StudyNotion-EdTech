@@ -1,0 +1,88 @@
+/* ReviewSlider.css */
+.review-container {
+    background-color: #ffffff; /* Light background */
+    color: #333333; /* Dark text for contrast */
+    border: 1px solid #e0e0e0; /* Light border for separation */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the container */
+    width: 300px; /* Fixed width */
+    height: 200px; /* Fixed height */
+    display: flex; /* Flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: space-between; /* Space between items */
+    margin: 10px; /* Margin around each container */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  
+  .review-header {
+    display: flex; /* Flexbox for header layout */
+    align-items: center; /* Center items vertically */
+  }
+  
+  .review-image {
+    height: 40px; /* Fixed height for images */
+    width: 40px; /* Fixed width for images */
+    border-radius: 50%; /* Circular images */
+    object-fit: cover; /* Cover the area */
+    margin-right: 10px; /* Space between image and text */
+  }
+  
+  .review-content {
+    flex-grow: 1; /* Allow content to grow */
+  }
+  
+  .review-rating {
+    display: flex; /* Flexbox for rating layout */
+    align-items: center; /* Center items vertically */
+  }
+
+  .review-slider-wrapper {
+    transition: all 0.3s ease;
+  }
+
+  .review-card {
+    background: var(--richblack-800);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Light theme styles */
+  :root[data-theme="light"] .review-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+
+  :root[data-theme="light"] .review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Dark theme styles */
+  :root[data-theme="dark"] .review-card {
+    background: var(--richblack-800);
+  }
+
+  :root[data-theme="dark"] .review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Responsive styles */
+  @media (max-width: 1024px) {
+    .swiper-slide {
+      width: 300px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .swiper-slide {
+      width: 250px !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .swiper-slide {
+      width: 200px !important;
+    }
+  }

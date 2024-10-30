@@ -34,7 +34,7 @@ const handleSubmit=(e)=>{
   dispatch(signUp(accountType, firstName, lastName, email, password, confirmPassword, otp, navigate))
 
 }
-return <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center text-richblack-5 ">
+return <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center text-richblack-900 ">
      {
             loading ? (
                     toastid = toast.loading("Loading...") 
@@ -45,7 +45,7 @@ return <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center text-r
                     {toast.dismiss(toastid)}
                  <div className="space-y-2">
                     <h1 className="text-3xl font-semibold ">Verify Email</h1>
-                    <p className="text-lg text-richblack-300">A verification code has been sent to you. Enter the code below</p>
+                    <p className="text-lg text-richblack-700">A verification code has been sent to you. Enter the code below</p>
                  </div>
                  <form action="" onSubmit={handleSubmit}>
                     <OTPInput 
@@ -69,7 +69,7 @@ return <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center text-r
                          gap: "0 6px",
                      }}
                     />
-                    <button type="submit" className="bg-yellow-50 px-3 py-2 mt-4 rounded-lg  w-full text-black shadow-inner font-medium ">
+                    <button type="submit" className="bg-[#422faf] px-3 py-2 mt-4 rounded-lg  w-full text-black shadow-inner font-medium ">
                             Verify Email
  
                     </button>
@@ -78,7 +78,7 @@ return <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center text-r
                     <Link to={"/signup"}>
                         <p className="flex items-center gap-2 text-sm"> <BiArrowBack /> Back to Sign Up</p>
                     </Link>
-                    <button className="flex  items-center gap-2 text-yellow-5 text-sm" 
+                    <button className="flex  items-center gap-2 text-[#422faf] text-sm" 
                     onClick={() => dispatch(sendOtp(signup.email))}
                     > 
                             <RxCountdownTimer />

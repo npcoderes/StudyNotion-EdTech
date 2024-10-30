@@ -311,60 +311,66 @@ exports.getInstructorCourses = async (req, res) => {
 // ================ Delete the Course ================
 exports.deleteCourse = async (req, res) => {
     try {
-        const { courseId } = req.body
+        const { courseId } = req.body;
 
         // Find the course
-        const course = await Course.findById(courseId)
+        const course = await Course.findById(courseId);
         if (!course) {
-            return res.status(404).json({ message: "Course not found" })
+            return res.status(404).json({ message: "Course not found" });
         }
 
         // Unenroll students from the course
-        const studentsEnrolled = course.studentsEnrolled
+        const studentsEnrolled = course.studentsEnrolled;
         for (const studentId of studentsEnrolled) {
             await User.findByIdAndUpdate(studentId, {
                 $pull: { courses: courseId },
-            })
+            });
         }
 
-        // delete course thumbnail From Cloudinary
+        // Delete course thumbnail From Cloudinary
         await deleteResourceFromCloudinary(course?.thumbnail);
 
         // Delete sections and sub-sections
-        const courseSections = course.courseContent
+        const courseSections = course.courseContent;
         for (const sectionId of courseSections) {
             // Delete sub-sections of the section
-            const section = await Section.findById(sectionId)
+            const section = await Section.findById(sectionId);
             if (section) {
-                const subSections = section.subSection
+                const subSections = section.subSection;
                 for (const subSectionId of subSections) {
-                    const subSection = await SubSection.findById(subSectionId)
+                    const subSection = await SubSection.findById(subSectionId);
                     if (subSection) {
-                        await deleteResourceFromCloudinary(subSection.videoUrl) // delete course videos From Cloudinary
+                        await deleteResourceFromCloudinary(subSection.videoUrl); // delete course videos From Cloudinary
                     }
-                    await SubSection.findByIdAndDelete(subSectionId)
+                    await SubSection.findByIdAndDelete(subSectionId);
                 }
             }
 
             // Delete the section
-            await Section.findByIdAndDelete(sectionId)
+            await Section.findByIdAndDelete(sectionId);
         }
 
         // Delete the course
-        await Course.findByIdAndDelete(courseId)
+        await Course.findByIdAndDelete(courseId);
+
+        // Remove the course ID from the associated category
+        await Category.findOneAndUpdate(
+            { courses: courseId },
+            { $pull: { courses: courseId } }
+        );
 
         return res.status(200).json({
-            success: true,
+            success: true, 
             message: "Course deleted successfully",
-        })
+        });
 
     } catch (error) {
-        console.error(error)
+        console.error(error);
         return res.status(500).json({
             success: false,
             message: "Error while Deleting course",
             error: error.message,
-        })
+        });
     }
 }
 
@@ -442,4 +448,5 @@ exports.getFullCourseDetails = async (req, res) => {
         })
     }
 }
+
 

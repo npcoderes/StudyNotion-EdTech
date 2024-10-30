@@ -12,7 +12,7 @@ import Footer from "./../components/common/Footer";
 import ExploreSection from "../components/cors/homepage/ExploreSection";
 import { motion } from "framer-motion";
 import { fadeIn } from "../components/common/Motion";
-
+import ReviewSlider from "../components/common/ReviewSlider";
 const Home = () => {
   return (
     <motion.div
@@ -136,6 +136,7 @@ const Home = () => {
             codecolor={"text-[#422faf]"}
             codeblock={`import React from "react";\n import CTAButton from "./Button";\nimport TypeAnimation from "react-type";\nimport { FaArrowRight } from "react-icons/fa";\n\nconst Home = () => {\nreturn (\n<div>Home</div>\n)\n}\nexport default Home;`}
             backgroundgradint={"bg-gradient-to-r from-[#422faf] to-[#422faf]"}
+
           />
         </div>
         <ExploreSection />
@@ -196,9 +197,10 @@ const Home = () => {
         <InstructorSection />
 
         <h2 className="text-center text-4xl font-semibold mt-10">
-          {/* review from Other Learners */}
+          Review from other Learners
         </h2>
         {/* Review Slider here */}
+        <ReviewSlider />
       </div>
 
       {/* Footer  */}

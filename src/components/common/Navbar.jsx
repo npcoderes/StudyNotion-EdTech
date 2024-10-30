@@ -68,7 +68,7 @@ const Navbar = () => {
                       <div className="lg:w-[300px] flex flex-col bg-white shadow-lg text-black p-4 rounded-md gap-3 absolute top-[100%] left-1/2 transform -translate-x-1/2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 z-10">
                         {ssubLinks.map((link, index) => (
                           <Link key={index} to={`/catalog/${link.name}`}>
-                            <span className="hover:text-[#ffe83d] transition-colors duration-200">{link.name}</span>
+                            <span className="hover:text-[#422faf] transition-colors duration-200">{link.name}</span>
                           </Link>
                         ))}
                       </div>
