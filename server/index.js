@@ -23,7 +23,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-		origin:"https://studynotionelearning.vercel.app/",
+		origin:"https://studynotionelearning.vercel.app",
+		methods:["GET","POST","PUT","DELETE"],
 		credentials:true,
 	})
 )
