@@ -21,13 +21,13 @@ database.connect();
 //middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-	cors({
-		origin:"https://studynotionelearning.vercel.app",
-		methods:["GET","POST","PUT","DELETE"],
-		credentials:true,
-	})
-)
+app.use(cors({
+    origin: "https://studynotionelearning.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"], // Add headers as needed
+}));
+
 
 app.use(
 	fileUpload({
