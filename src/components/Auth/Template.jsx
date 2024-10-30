@@ -4,7 +4,7 @@ import { useSelector } from "react-redux"
 import frameImg from "../../assets/Images/frame.png"
 import LoginForm from "./LoginForm"
 import SignupForm from "./SignupForm"
-import OAuth from "./OAuth"
+// import OAuth from "./OAuth"
 
 function Template({ title, description1, description2, image, formType }) {
   const { loading } = useSelector((state) => state.auth)
@@ -26,7 +26,7 @@ function Template({ title, description1, description2, image, formType }) {
               </span>
             </p>
             {formType === "signup" ? <SignupForm /> : <LoginForm />}
-            <OAuth />
+            {/* <OAuth /> */}
           </div>
           <div className="relative mx-auto w-11/12 max-w-[500px] md:mx-0">
             <img
