@@ -26,9 +26,8 @@ export function sendOtp(email, navigate) {
         email,
         checkUserPresent: true,
       })
-      console.log("SENDOTP API RESPONSE............", response)
-
-      console.log(response.data.success)
+      // console.log("SENDOTP API RESPONSE............", response)
+      // console.log(response.data.success)
 
       if (!response.data.success) {
         toast.dismiss(toastId)
@@ -73,7 +72,7 @@ export function signUp(
         otp,
       })
 
-      console.log("SIGNUP API RESPONSE............", response)
+      // console.log("SIGNUP API RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -100,7 +99,7 @@ export function login(email, password, navigate) {
         password,
       })
 
-      console.log("LOGIN API RESPONSE............", response)
+      // console.log("LOGIN API RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -143,7 +142,7 @@ export function getPasswordResetToken(email, setemailsent) {
         email,
       })
 
-      console.log("RESETPASSTOKEN RESPONSE............", response)
+      // console.log("RESETPASSTOKEN RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -171,7 +170,7 @@ export function resetPassword(password, confirmPassword, token, navigate) {
         token,
       })
 
-      console.log("RESETPASSWORD RESPONSE............", response)
+      // console.log("RESETPASSWORD RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -211,7 +210,7 @@ export function googleLogin(email,navigate){
      
       })
 
-      console.log("LOGIN API RESPONSE............", response)
+      // console.log("LOGIN API RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
@@ -260,9 +259,8 @@ export function userquery(firstName,message,email) {
         message
       
       })
-      console.log("SENDUSERQUERY API RESPONSE............", response)
-
-      console.log(response.data.success)
+      // console.log("SENDUSERQUERY API RESPONSE............", response)
+      // console.log(response.data.success)
 
 
       toast(`Hello ${firstName} Thank You For Sending Query We Will Contact You Soon...!`,
