@@ -34,9 +34,9 @@ exports.capturePayment = async (req, res) => {
         let course;
         try {
             // valid course Details
-            console.log("course_id........... = ", course_id)
+            // console.log("course_id........... = ", course_id)
             const courseId = new mongoose.Types.ObjectId(course_id); // Convert to ObjectId
-            console.log("courseId________________ = ", courseId)
+            // console.log("courseId________________ = ", courseId)
             course = await Course.findById(courseId); // Use the converted ObjectId
             if (!course) {
                 return res.status(404).json({ success: false, message: "Could not find the course" });
@@ -49,10 +49,10 @@ exports.capturePayment = async (req, res) => {
             }
 
             totalAmount += course.price;
-            console.log(totalAmount)
+            // console.log(totalAmount)
         }
         catch (error) {
-            console.log(error);
+            // console.log(error);
             return res.status(500).json({ success: false, message: error.message });
         }
     }
@@ -75,7 +75,7 @@ exports.capturePayment = async (req, res) => {
         })
     }
     catch (error) {
-        console.log(error);
+        // console.log(error);
         return res.status(500).json({ success: false, mesage: "Could not Initiate Order" });
     }
 
@@ -119,7 +119,7 @@ const enrollStudents = async (courses, userId, res) => {
     if (!courses || !userId) {
         return res.status(400).json({ success: false, message: "Please Provide data for Courses or UserId" });
     }
-    console.log("Coursesssssss........",courses)
+    // console.log("Coursesssssss........",courses)
     for (const courseId of courses) {
         try {
             //find the course and enroll the student in it
@@ -193,7 +193,7 @@ exports.sendPaymentSuccessEmail = async (req, res) => {
         )
     }
     catch (error) {
-        console.log("error in sending mail", error)
+        // console.log("error in sending mail", error)
         return res.status(500).json({ success: false, message: "Could not send email" })
     }
 }

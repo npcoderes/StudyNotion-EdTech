@@ -70,7 +70,7 @@ exports.createCourse = async (req, res) => {
 			thumbnail,
 			process.env.FOLDER_NAME
 		);
-		console.log(thumbnailImage);
+		// console.log(thumbnailImage); // Commented out for security
 		// Create a new course with the given details
 		const newCourse = await Course.create({
 			courseName,
@@ -115,7 +115,7 @@ exports.createCourse = async (req, res) => {
 		});
 	} catch (error) {
 		// Handle any errors that occur during the creation of the course
-		console.error(error);
+		// console.error(error); // Commented out for security
 		res.status(500).json({
 			success: false,
 			message: "Failed to create course",
@@ -144,7 +144,7 @@ exports.getAllCourses = async (req, res) => {
 			data: allCourses,
 		});
 	} catch (error) {
-		console.log(error);
+		// console.log(error); // Commented out for security
 		return res.status(404).json({
 			success: false,
 			message: `Can't Fetch Course Data`,
@@ -195,7 +195,7 @@ exports.getCourseDetails = async (req, res) => {
 
     }
     catch(error) {
-        console.log(error);
+        // console.log(error); // Commented out for security
         return res.status(500).json({
             success:false,
             message:error.message,
@@ -268,7 +268,7 @@ exports.editCourse = async (req, res) => {
             data: updatedCourse,
         })
     } catch (error) {
-        console.error(error)
+        // console.error(error) // Commented out for security
         res.status(500).json({
             success: false,
             message: "Error while updating course",
@@ -297,7 +297,7 @@ exports.getInstructorCourses = async (req, res) => {
             message: 'Courses made by Instructor fetched successfully'
         })
     } catch (error) {
-        console.error(error)
+        // console.error(error) // Commented out for security
         res.status(500).json({
             success: false,
             message: "Failed to retrieve instructor courses",
@@ -365,7 +365,7 @@ exports.deleteCourse = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        // console.error(error); // Commented out for security
         return res.status(500).json({
             success: false,
             message: "Error while Deleting course",

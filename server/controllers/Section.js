@@ -83,8 +83,8 @@ exports.updateSection = async (req, res) => {
         });
     }
     catch (error) {
-        console.log('Error while updating section');
-        console.log(error);
+        // console.log('Error while updating section');
+        // console.log(error);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -122,7 +122,7 @@ exports.deleteSection = async (req, res) => {
 			data: updatedCourse
 		});
 	} catch (error) {
-		console.error("Error deleting section:", error);
+		// console.error("Error deleting section:", error);
 		res.status(500).json({
 			success: false,
 			message: "Internal server error",

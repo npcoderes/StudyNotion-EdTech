@@ -16,7 +16,7 @@ exports.createCategory = async (req, res) => {
 			name: name,
 			description: description,
 		});
-		console.log(CategorysDetails);
+		// console.log(CategorysDetails); // Commented out for security
 		return res.status(200).json({
 			success: true,
 			message: "Categorys Created Successfully",
@@ -31,7 +31,7 @@ exports.createCategory = async (req, res) => {
 
 exports.showAllCategories = async (req, res) => {
     try {
-        console.log("INSIDE SHOW ALL CATEGORIES");
+        // console.log("INSIDE SHOW ALL CATEGORIES"); // Commented out for security
 		const allCategorys = await Category.find({});
 		res.status(200).json({
 			success: true,

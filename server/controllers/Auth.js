@@ -8,7 +8,7 @@ const { passwordUpdated } = require("../mail/templates/passwordUpdate");
 const Profile = require("../models/Profile");
 require("dotenv").config();
 
-// Signup Controller for Registering USers
+// Signup Controller for Registering Users
 
 exports.signup = async (req, res) => {
 	try {
@@ -57,7 +57,7 @@ exports.signup = async (req, res) => {
 
 		// Find the most recent OTP for the email
 		const response = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-		console.log(response);
+		// console.log(response); // Commented out for security
 		if (response.length === 0) {
 			// OTP not found for the email
 			return res.status(400).json({
@@ -104,7 +104,7 @@ exports.signup = async (req, res) => {
 			message: "User registered successfully",
 		});
 	} catch (error) {
-		console.error(error);
+		// console.error(error); // Commented out for security
 		return res.status(500).json({
 			success: false,
 			message: "User cannot be registered. Please try again.",
@@ -170,7 +170,7 @@ exports.login = async (req, res) => {
 			});
 		}
 	} catch (error) {
-		console.error(error);
+		// console.error(error); // Commented out for security
 		// Return 500 Internal Server Error status code with error message
 		return res.status(500).json({
 			success: false,
@@ -203,9 +203,9 @@ exports.sendotp = async (req, res) => {
 			specialChars: false,
 		});
 		const result = await OTP.findOne({ otp: otp });
-		console.log("Result is Generate OTP Func");
-		console.log("OTP", otp);
-		console.log("Result", result);
+		// console.log("Result is Generate OTP Func"); // Commented out for security
+		// console.log("OTP", otp); // Commented out for security
+		// console.log("Result", result); // Commented out for security
 		while (result) {
 			otp = otpGenerator.generate(6, {
 				upperCaseAlphabets: false,
@@ -213,14 +213,14 @@ exports.sendotp = async (req, res) => {
 		}
 		const otpPayload = { email, otp };
 		const otpBody = await OTP.create(otpPayload);
-		console.log("OTP Body", otpBody);
+		// console.log("OTP Body", otpBody); // Commented out for security
 		res.status(200).json({
 			success: true,
 			message: `OTP Sent Successfully`,
 			otp,
 		});
 	} catch (error) {
-		console.log(error.message);
+		// console.log(error.message); // Commented out for security
 		return res.status(500).json({ success: false, error: error.message });
 	}
 };
@@ -272,10 +272,10 @@ exports.changePassword = async (req, res) => {
 					`Password updated successfully for ${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`
 				)
 			);
-			console.log("Email sent successfully:", emailResponse.response);
+			// console.log("Email sent successfully:", emailResponse.response); // Commented out for security
 		} catch (error) {
 			// If there's an error sending the email, log the error and return a 500 (Internal Server Error) error
-			console.error("Error occurred while sending email:", error);
+			// console.error("Error occurred while sending email:", error);
 			return res.status(500).json({
 				success: false,
 				message: "Error occurred while sending email",
@@ -289,7 +289,7 @@ exports.changePassword = async (req, res) => {
 			.json({ success: true, message: "Password updated successfully" });
 	} catch (error) {
 		// If there's an error updating the password, log the error and return a 500 (Internal Server Error) error
-		console.error("Error occurred while updating password:", error);
+		// console.error("Error occurred while updating password:", error); // Commented out for security
 		return res.status(500).json({
 			success: false,
 			message: "Error occurred while updating password",
@@ -298,19 +298,18 @@ exports.changePassword = async (req, res) => {
 	}
 };
 
-
-exports.signgoogle=async(req,res)=>{
-	try{
-           const email=req.body.email
-		   const user=await User.findOne({ email: email }).populate("additionalDetails");
-		   if(user){
+exports.signgoogle = async (req, res) => {
+	try {
+		const email = req.body.email;
+		const user = await User.findOne({ email: email }).populate("additionalDetails");
+		if (user) {
 			const token = jwt.sign(
 				{ email: user.email, id: user._id, accountType: user.accountType },
 				process.env.JWT_SECRET,
 				{
 					expiresIn: "24h",
-				})
-							// Save token to user document in database
+				});
+			// Save token to user document in database
 			user.token = token;
 			user.password = undefined;
 			// Set cookie for token and return success response
@@ -324,11 +323,10 @@ exports.signgoogle=async(req,res)=>{
 				user,
 				message: `User Login Success`,
 			});
-		   }  
-		
+		}
 
-	}catch(err){
-		console.error("Error occurred while updating password:", err);
+	} catch (err) {
+		// console.error("Error occurred while updating password:", err); // Commented out for security
 		return res.status(500).json({
 			success: false,
 			message: "Error occurred while updating password",
@@ -336,5 +334,4 @@ exports.signgoogle=async(req,res)=>{
 		});
 	}
 }
-	
 
