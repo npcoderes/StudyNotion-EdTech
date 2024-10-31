@@ -19,7 +19,7 @@ const About = () => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="min-h-[514px] mt-5"
+        className="min-h-[514px] "
       >
         <div className="relative w-11/12 max-w-maxContent flex flex-col items-center mx-auto">
           {/* sec-1 */}

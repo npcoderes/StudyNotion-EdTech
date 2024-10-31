@@ -123,7 +123,11 @@ const AnimatedRoutes = () => {
           )}
         </Route>
 
-        <Route path="/catalog/:catalogName" element={<Catelog />}></Route>
+        <Route path="/catalog/:catalogName" element={
+          
+            <Catelog />
+       
+        }></Route>
         <Route
           path="/courses/:courseId"
           element={

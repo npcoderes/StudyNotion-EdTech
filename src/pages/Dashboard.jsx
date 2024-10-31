@@ -17,7 +17,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className='relative flex min-h-[calc(100vh-3.5rem)] bg-[#fff] text-[#000] w-full py-16'>
+    <div className='relative flex min-h-[calc(100vh-3.5rem)] bg-[#fff] text-[#000] w-full py-14'>
       <div className='fixed'>
         <SlideBar />
       </div>

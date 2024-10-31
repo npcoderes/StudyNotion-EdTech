@@ -43,10 +43,10 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
               alt={`profile-${user?.firstName}`}
               className="aspect-square w-[30px] rounded-full object-cover"
             />
-            <AiOutlineCaretDown className={`text-sm text-richblack-5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+            <AiOutlineCaretDown className={`text-sm text-richblack-900 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
           </>
         ) : (
-          <span className="text-richblack-5">Menu</span>
+          <span className="text-richblack-900">Menu</span>
         )}
       </button>
       {open && (
@@ -55,13 +55,13 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
             {NavbarLinks && NavbarLinks.map((link, index) => (
               <div key={index} className="px-2 py-1">
                 {link.title === "Catalog" ? (
-                  <div className="rounded-md bg-richblack-900">
-                    <p className="font-semibold text-richblack-5 px-3 py-2 border-b border-richblack-700">{link.title}</p>
+                  <div className="rounded-md bg-richblack-200">
+                    <p className="font-semibold text-richblack-900 px-3 py-2 border-b border-richblack-700">{link.title}</p>
                     {subLinks.map((subLink, subIndex) => (
                       <Link
                         key={subIndex}
                         to={`/catalog/${subLink.name}`}
-                        className="block py-2 px-3 text-richblack-5 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200"
+                        className="block py-2 px-3 text-richblack-900 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200"
                         onClick={() => setOpen(false)}
                       >
                         {subLink.name}
@@ -71,7 +71,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
                 ) : (
                   <Link
                     to={link.path}
-                    className="block py-2 px-3 text-richblack-5 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-900"
+                    className="block py-2 px-3 text-richblack-900 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-200"
                     onClick={() => setOpen(false)}
                   >
                     {link.title}
@@ -84,7 +84,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
                 <hr className="my-2 border-richblack-700" />
                 <div className="px-2 py-1">
                   <Link to="/dashboard/my-profile" onClick={() => setOpen(false)}>
-                    <div className="flex items-center gap-x-1 py-2 px-3 text-richblack-5 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-900">
+                    <div className="flex items-center gap-x-1 py-2 px-3 text-richblack-900 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-200">
                       <VscDashboard className="text-lg" />
                       Dashboard
                     </div>
@@ -94,7 +94,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
                   <button
                     onClick={handleLogout}
                     disabled={loading}
-                    className="flex w-full items-center gap-x-1 py-2 px-3 text-richblack-5 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-900 cursor-pointer"
+                    className="flex w-full items-center gap-x-1 py-2 px-3 text-richblack-900 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-200 cursor-pointer"
                   >
                     <VscSignOut className="text-lg" />
                     {loading ? "Logging out..." : "Logout"}
@@ -106,7 +106,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
                 <div className="px-2 py-1">
                   <Link
                     to="/login"
-                    className="block py-2 px-3 text-richblack-5 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-900"
+                    className="block py-2 px-3 text-richblack-900 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-200"
                     onClick={() => setOpen(false)}
                   >
                     Log in
@@ -115,7 +115,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
                 <div className="px-2 py-1">
                   <Link
                     to="/signup"
-                    className="block py-2 px-3 text-richblack-5 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-900"
+                    className="block py-2 px-3 text-richblack-900 hover:bg-richblack-700 hover:text-yellow-50 transition-all duration-200 rounded-md bg-richblack-200"
                     onClick={() => setOpen(false)}
                   >
                     Sign up

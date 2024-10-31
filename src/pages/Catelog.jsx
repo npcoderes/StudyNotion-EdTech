@@ -13,6 +13,7 @@ import Footer from "../components/common/Footer";
 
 const Catelog = () => {
   const { catalogName } = useParams();
+  console.log(catalogName);
   const [catalogPageData, setCataLogPageData] = useState(null);
   const [categoryId, setCategoryId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -138,7 +139,7 @@ const Catelog = () => {
         </div>
 
         {/* courses  */}
-        <div>
+        <div className=""> 
           <Course_Slider Courses={catalogPageData?.selectedCategory?.courses}  objectFit={"object-cover"}/>
         </div>
 

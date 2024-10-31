@@ -16,7 +16,7 @@ const Course_Slider = ({Courses}) => {
     <Swiper
       slidesPerView={1}
       spaceBetween={25}
-      loop={true}
+      loop={false}
       modules={[Autoplay,Pagination,Navigation]}
       className="mySwiper"
       autoplay={{
@@ -31,12 +31,16 @@ const Course_Slider = ({Courses}) => {
       }}
     //   className="max-h-[30rem] pt-8 px-2"
     >
-        {
-            Courses.map((course,i)=>(
-                <SwiperSlide key={i}>
-                <Card course={course} Height={"h-[250px]"} />
-              </SwiperSlide>
-            ))
+        {<div className="flex gap-x-5 sm:flex-col">{
+                    Courses.map((course,i)=>(
+                      <SwiperSlide key={i}>
+                      <Card course={course} Height={"h-[250px]"} />
+                    </SwiperSlide>
+                  ))
+          }
+
+        </div>
+
         }
     </Swiper>
     </>
