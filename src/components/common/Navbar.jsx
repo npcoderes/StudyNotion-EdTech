@@ -84,7 +84,7 @@ const Navbar = () => {
 
 
     return (
-        <nav className={`z-[10] flex h-14 w-full items-center justify-center border-b-[1px] border-b-richblack-700 text-white translate-y-0 transition-all ${showNavbar} `}>
+        <nav className={`z-[10] flex h-14 w-full items-center justify-center border-b-[1px] border-b-richblack-700 text-black translate-y-0 transition-all ${showNavbar} `}>
              {/* <nav className={` fixed flex items-center justify-center w-full h-16 z-[10] translate-y-0 transition-all text-white ${showNavbar}`}> */}
             <div className='flex w-11/12 max-w-maxContent items-center justify-between '>
                 {/* logo */}
@@ -101,7 +101,7 @@ const Navbar = () => {
                                     link.title === "Catalog" ? (
                                         <div
                                             className={`group relative flex cursor-pointer items-center gap-1 ${matchRoute("/catalog/:catalogName")
-                                                ? "bg-yellow-25 text-black rounded-xl p-1 px-3"
+                                                ? "bg-[#4251f5] text-black rounded-xl p-1 px-3"
                                                 : "text-richblack-25 rounded-xl p-1 px-3"
                                                 }`}
                                         >
@@ -112,7 +112,7 @@ const Navbar = () => {
                                                     flex-col rounded-lg bg-richblack-5 p-4 text-richblack-900 opacity-0 transition-all duration-150 group-hover:visible 
                                                     group-hover:translate-y-[1.65em] group-hover:opacity-100 lg:w-[300px]"
                                             >
-                                                <div className="absolute left-[50%] top-0 z-[100] h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-5"></div>
+                                                <div className="absolute left-[50%] top-0 z-[100] h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-900"></div>
                                                 {loading ? (<p className="text-center ">Loading...</p>)
                                                     : subLinks.length ? (
                                                         <>
@@ -136,7 +136,7 @@ const Navbar = () => {
                                         </div>
                                     ) : (
                                         <Link to={link?.path}>
-                                            <p className={`${matchRoute(link?.path) ? "bg-yellow-25 text-black" : "text-richblack-25"} rounded-xl p-1 px-3 `}>
+                                            <p className={`${matchRoute(link?.path) ? "bg-yellow-25 text-black" : "text-richblack-900"} rounded-xl p-1 px-3 `}>
                                                 {link.title}
                                             </p>
                                         </Link>)
@@ -196,7 +196,9 @@ const Navbar = () => {
 
                     {/* for small devices */}
                     <>
-                        {token !== null && <MobileProfileDropDown NavbarLinks={NavbarLinks} ssubLinks={subLinks} isMobile={true} />}
+                        <div className='lg:hidden block'>
+                              {token !== null && <MobileProfileDropDown NavbarLinks={NavbarLinks} ssubLinks={subLinks} isMobile={true} />}
+                        </div>
                     </>
 
                 </div>
