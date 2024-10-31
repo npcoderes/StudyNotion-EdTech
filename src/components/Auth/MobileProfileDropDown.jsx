@@ -31,7 +31,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
   }
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative z-[1000]" ref={ref}>
       <button
         className="flex items-center gap-x-1 py-2 px-3 rounded-md hover:bg-richblack-700 transition-all duration-200"
         onClick={() => setOpen(!open)}
@@ -50,7 +50,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
         )}
       </button>
       {open && (
-        <div className="absolute right-0 top-[120%] mt-1 w-[250px] rounded-md border border-richblack-700 bg-richblack-800 shadow-lg z-[1000] overflow-hidden">
+        <div className="absolute right-0 top-[120%] mt-1 w-[250px] rounded-md border border-richblack-700 bg-richblack-50 shadow-lg z-[1000] overflow-hidden ">
           <div className="max-h-[calc(100vh-80px)] overflow-y-auto py-2">
             {NavbarLinks && NavbarLinks.map((link, index) => (
               <div key={index} className="px-2 py-1">

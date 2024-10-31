@@ -91,10 +91,10 @@ const Catelog = () => {
           <div className="stars3"></div>
         </div>
 
-        <div className="relative w-11/12 max-w-maxContent flex flex-col mx-auto text-gray-800 mt-3 z-10">
+        <div className="relative w-11/12 max-w-maxContent flex flex-col mx-auto text-gray-800 mt-3 ">
           {/* header part  */}
           <div className="flex flex-col lg:mt-10 mt-3 gap-3 ">
-            <p className="text-richblack-500 uppercase  text-sm justify-start">
+            <p className="text-richblack-500 uppercase  text-sm justify-start z-20">
               Home / catalog /{" "}
               <span className="text-[#422faf] font-bold">{catalogName}</span>
             </p>
