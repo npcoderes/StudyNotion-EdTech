@@ -120,8 +120,9 @@ export function login(email, password, navigate) {
         ? response.data.user.image
         : `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.firstName} ${response.data.user.lastName}`
       dispatch(setUser({ ...response.data.user, image: userImage }))
-      localStorage.setItem("user", JSON.stringify(response.data.user))
-      localStorage.setItem("token", JSON.stringify(response.data.token))
+      const expirationTime = new Date().getTime() + 1000 * 60 * 1; // 1 minute from now 
+      localStorage.setItem("user", JSON.stringify({ ...response.data.user, expirationTime }));
+      localStorage.setItem("token", JSON.stringify({...response.data.token,expirationTime}))
 
       navigate("/dashboard/my-profile")
     } catch (error) {
