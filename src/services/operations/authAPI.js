@@ -122,7 +122,8 @@ export function login(email, password, navigate) {
       dispatch(setUser({ ...response.data.user, image: userImage }))
       const expirationTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours in milliseconds
       localStorage.setItem("user", JSON.stringify({ ...response.data.user, expirationTime }));
-      localStorage.setItem("token", JSON.stringify({...response.data.token,expirationTime}))
+
+      localStorage.setItem("token", JSON.stringify({ token: response.data.token, expirationTime }))
 
       navigate("/dashboard/my-profile")
     } catch (error) {

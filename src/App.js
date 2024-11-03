@@ -11,7 +11,10 @@ import { setToken } from "./slices/authSlice";
 function App() {
  const {token} = useSelector(state=>state.auth)
  const dispatch = useDispatch()
- const expirationTime = localStorage.getItem("token")?.expirationTime
+ const tokenData = localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null;
+
+ const expirationTime = tokenData ? tokenData.expirationTime : null; // This will now correctly retrieve the expiration time
+ console.log(expirationTime)
  const currentTime = new Date().getTime()
  if(currentTime > expirationTime && token){
     localStorage.removeItem("token")
