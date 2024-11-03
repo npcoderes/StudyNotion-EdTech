@@ -17,16 +17,22 @@ const Course_Slider = ({Courses}) => {
       slidesPerView={1}
       spaceBetween={25}
       loop={false}
-      modules={[Autoplay,Pagination,Navigation]}
+      modules={[Pagination,Navigation]}
       className="mySwiper"
-      autoplay={{
-      delay: 1000,
-      disableOnInteraction: false,
-      }}
+      // autoplay={{
+      // delay: 1000,
+      // disableOnInteraction: false,
+      // }}
       navigation={true}
       breakpoints={{
         1024: {
           slidesPerView: 3,
+        },
+        768: {
+          slidesPerView: 2,
+        },
+        480: {
+          slidesPerView: 1,
         },
       }}
     //   className="max-h-[30rem] pt-8 px-2"

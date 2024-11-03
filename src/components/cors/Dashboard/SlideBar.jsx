@@ -8,16 +8,26 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { logout } from "../../../services/operations/authAPI"
 import { Link } from 'react-router-dom'
+import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
+
 const SlideBar = () => {
     const { user } = useSelector((state) => state.profile)
     const [confirmationModal, setConfirmationModal] = useState(null);
+    const [isOpen, setIsOpen] = useState(true);
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    };
     return (
         <div className='text-[#E0E0E0]'>
-            <div className='m-w-[222px] flex flex-col borde-r-[1px]  border-r-richblack-700
-        h-[calc(100vh-3.5rem)]  bg-[#1A1A1A] py-10'>
+            {/* Toggle Button for Small Screens */}
+            <button className="lg:hidden p-1  mt-14 absolute top-[-910px] left-6 z-10   " onClick={toggleSidebar}>
+                {isOpen ? <AiOutlineClose className="text-2xl text-white" /> : <AiOutlineMenu className="text-2xl text-black " />}
+            </button>
+            <div className={`fixed top-0 mt-14 left-0 h-full w-64 bg-[#1A1A1A] py-10 transition-transform duration-300 
+                ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:mt-14 lg:w-auto lg:h-full lg:block`}>
                 <div className='flex flex-col'>
                     {
 
