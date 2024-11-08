@@ -43,7 +43,7 @@ const TagInput = ({ label, name, placeholder, register, errors, setValue, }) => 
   return (
     <>
     <div className='flex flex-col space-y-2'>
-      <label htmlFor={name} className='label-form'>
+      <label htmlFor={name} className='label-form text-white'>
       {label} <sup className="text-pink-200">*</sup>
       </label>
       <div className='flex flex-wrap w-full gap-y-2'>

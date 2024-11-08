@@ -4,7 +4,7 @@ export default function GetAvgRating(ratingArr) {
   if (!Array.isArray(ratingArr) || ratingArr.length === 0) return 0;
 
   const totalReviewCount = ratingArr.reduce((acc, curr) => {
-    console.log("Current item:", curr);
+    console.log("Current item:", typeof(curr));
 
     if (typeof curr.rating === 'number') {
       acc += curr.rating;

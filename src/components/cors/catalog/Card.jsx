@@ -10,9 +10,11 @@ const Card = ({ course, Height, objectFit }) => {
   const [avgReviewCount, setAvgReviewCount] = useState(0);
 
   useEffect(() => {
+    console.log(course.ratingAndReviews);
     const count = GetAvgRating(course.ratingAndReviews);
+    console.log(count);
     setAvgReviewCount(count);
-    console.log(course);
+    
   }, [course]);
 
   return (
@@ -20,15 +22,15 @@ const Card = ({ course, Height, objectFit }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      whileHover={{ scale: 1.03, boxShadow: "0 4px 20px rgba(0, 123, 255, 0.2)" }} // Updated shadow on hover
+      whileHover={{ scale: 0.96, boxShadow: "0 4px 20px rgba(0, 123, 255, 0.2)" }} // Updated shadow on hover
     >
       <Link to={`/courses/${course._id}`} className="block">
-        <div className="bg-white rounded-xl overflow-hidden border border-gray-300 p-3">
-          <motion.div className="relative" whileHover={{ scale: 1.05 }}>
+        <div className="bg-black rounded-2xl overflow-hidden border border-gray-300 p-3 text-white py-5">
+          <motion.div className="relative" whileHover={{ scale: 1 }}>
             <img
               src={course?.thumbnail}
               alt={course?.courseName}
-              className={`w-full h-56 ${objectFit}`}
+              className={`w-[95%] mx-auto h-56 object-cover rounded-2xl`}
             />
 
             <motion.div
@@ -49,7 +51,7 @@ const Card = ({ course, Height, objectFit }) => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="text-[#422faf] font-bold text-lg">{avgReviewCount.toFixed(1)}</span>
+              <span className="text-[#fff] font-bold text-lg">{avgReviewCount.toFixed(1)}</span>
               <RatingStars Review_Count={avgReviewCount} />
               <span className="text-gray-500 text-sm">
                 ({course?.ratingAndReviews?.length} reviews)
@@ -62,15 +64,15 @@ const Card = ({ course, Height, objectFit }) => {
               transition={{ delay: 0.3 }}
             >
               <div className="flex items-center">
-                <FiClock className="mr-2 text-[#422faf]" />
+                <FiClock className="mr-2 text-[#fff]" />
                 {course?.duration}
               </div>
               <div className="flex items-center">
-                <FiBook className="mr-2 text-[#422faf]" />
+                <FiBook className="mr-2 text-[#fff]" />
                 {course?.courseContent.length} lectures
               </div>
               <div className="flex items-center">
-                <FiUser className="mr-2 text-[#422faf]" />
+                <FiUser className="mr-2 text-[#fff]" />
                 {course?.studentsEnrolled?.length || 0} students
               </div>
             </motion.div>
@@ -80,7 +82,7 @@ const Card = ({ course, Height, objectFit }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <p className="text-2xl font-bold text-black">₹{course?.price}</p>
+              <p className="text-2xl font-bold text-white">₹{course?.price}</p>
               <motion.button
                 className="bg-[#422faf] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#422faf] transition-colors duration-300 flex items-center"
                 whileHover={{ scale: 1.05 }}

@@ -84,7 +84,7 @@ const Navbar = () => {
 
 
     return (
-        <nav className={`z-[1000] flex h-14 w-full items-center justify-center border-b-[1px] border-b-richblack-700 text-black translate-y-0 transition-all ${showNavbar} fixed top-0 left-0 right-0 bg-white `}>
+        <nav className={`z-[1000] flex h-16 w-full items-center justify-center border-b-[0.5px] border-b-richblack-700 text-black translate-y-0 transition-all ${showNavbar} fixed top-0 left-0 right-0 bg-white p-2  `}>
              {/* <nav className={` fixed flex items-center justify-center w-full h-16 z-[10] translate-y-0 transition-all text-white ${showNavbar}`}> */}
             <div className='flex w-11/12 max-w-maxContent items-center justify-between '>
                 {/* logo */}
@@ -101,8 +101,8 @@ const Navbar = () => {
                                     link.title === "Catalog" ? (
                                         <div
                                             className={`group relative flex cursor-pointer items-center gap-1 ${matchRoute("/catalog/:catalogName")
-                                                ? "bg-[#4251f5] text-black rounded-xl p-1 px-3"
-                                                : "text-richblack-900 rounded-xl p-1 px-3"
+                                                ? "bg-[#4251f5] text-black rounded-xl p-2 px-3"
+                                                : "text-richblack-900 rounded-xl p-2 px-3"
                                                 }`}
                                         >
                                             <p>{link.title}</p>
@@ -133,7 +133,7 @@ const Navbar = () => {
                                         </div>
                                     ) : (
                                         <Link to={link?.path}>
-                                            <p className={`${matchRoute(link?.path) ? "bg-[#4251f5] text-white" : "text-richblack-900"} rounded-xl p-1 px-3 `}>
+                                            <p className={`${matchRoute(link?.path) ? "bg-[#422faf] text-white" : "text-richblack-900"} rounded-xl p-2 px-3 `}>
                                                 {link.title}
                                             </p>
                                         </Link>)

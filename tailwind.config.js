@@ -133,6 +133,12 @@ module.exports = {
         maxContentTab: "650px"
       },
     },
+
   },
-  plugins: [],
+  plugins: [
+    require('daisyui'),
+  ],
+  daisyui: {
+    themes: ["light", "dark", "cupcake","bumblebee","corporate","sunset","garden"],
+  },
 };

@@ -54,7 +54,7 @@ const About = () => {
           </div>
           {/* sec-2 */}
           <motion.div className="flex relative">
-            <div className="aboutgrd w-[400px] blur-[50px] h-12 shadow-xl drop-shadow-2xl bg-gradient-to-r from-[#4CAF50] via-[#81C784] to-[#4CAF50] absolute -translate-x-[200px] translate-y-[80px]"></div>
+            <div className="aboutgrd w-[400px] blur-[50px] h-12 shadow-xl drop-shadow-2xl bg-gradient-to-r from-[#4CAF50] via-[#81C784] to-[#4CAF50] absolute -translate-x-[400px] translate-y-[80px] left-[800px]"></div>
             <div className="relative left-[50%] grid w-[100%] translate-x-[-50%] translate-y-[10%] grid-cols-3 gap-3 lg:gap-5 max-sm:translate-y-[80px]">
               <img src={about1} alt="About1" className="" loading="lazy" />
               <img src={about2} alt="About2" className="" loading="lazy" />

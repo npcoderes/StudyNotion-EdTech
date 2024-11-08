@@ -8,7 +8,7 @@
 html,
 body {
   overflow-x: hidden;
-  user-select: none;
+  /* user-select: none; */
 }
 
 .gradient-custom {
@@ -21,6 +21,13 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+:root {
+  --primary-color: #1fa2ff;
+  --secondary-color: #12d8fa;
+  --tertiary-color: #a6ffcb;
+  --primary-text-color: #e6dbdb;
 }
 
 
@@ -46,7 +53,7 @@ body {
   }
 }
 
-@keyframes aurora {
+/* @keyframes aurora {
   0% {
     transform: rotate(0deg) scale(1);
     opacity: 0.3;
@@ -94,7 +101,7 @@ body {
   filter: blur(80px);
   opacity: 0.3;
   animation: aurora 20s infinite;
-}
+} */
 
 /* Customizing the scroll bar */
 ::-webkit-scrollbar {

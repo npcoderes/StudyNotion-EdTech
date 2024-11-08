@@ -18,7 +18,7 @@ const ConfirmationModal = ({ isOpen, onClose, modalData }) => {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.8, y: -50 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="w-11/12 max-w-[400px] rounded-lg border border-richblack-400 bg-richblack-800 p-6"
+            className="w-11/12 max-w-[400px] rounded-xl border border-richblack-400 bg-richblack-800 p-6"
             onClick={(e) => e.stopPropagation()} // Prevent click from closing the modal
           >
             <button
@@ -34,7 +34,7 @@ const ConfirmationModal = ({ isOpen, onClose, modalData }) => {
             <p className="mt-3 mb-5 leading-6 text-richblack-200">
               {modalData?.text2}
             </p>
-            <div className="flex items-center gap-x-14">
+            <div className="flex items-center gap-x-4 pt-4">
               <button
                 className="cursor-pointer rounded-md bg-[#BB86FC] py-[8px] px-[20px] font-semibold text-black transition-all duration-200 hover:bg-[#BB86FC]/60"
                 onClick={modalData?.btn1Handler}

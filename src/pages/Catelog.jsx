@@ -37,6 +37,7 @@ const Catelog = () => {
         const toastid = toast.loading("Loading...");
         try {
           const res = await getCatalogPageData(categoryId);
+          console.log("CATALOG PAGE DATA API RESPONSE............", res);
           setCataLogPageData(res);
           toast.dismiss(toastid);
         } catch (error) {
@@ -83,7 +84,7 @@ const Catelog = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.6, 0.01, 0.3, 0.9] }}
         exit={{ opacity: 0 }}
-        className="relative border-b-[1px] border-gray-300 pb-7 bg-white mt-10 overflow-hidden mb-3"
+        className="relative border-b-[1px] border-gray-300 pb-7 bg-[#080707] mt-10 overflow-hidden mb-3"
       >
         {/* Animated star background */}
         <div className="absolute inset-0">
@@ -95,13 +96,13 @@ const Catelog = () => {
         <div className="relative w-11/12 max-w-maxContent flex flex-col mx-auto text-gray-800 mt-3 ">
           {/* header part  */}
           <div className="flex flex-col lg:mt-10 mt-3 gap-3 ">
-            <p className="text-richblack-500 uppercase  text-sm justify-start z-20">
-              Home / catalog /{" "}
-              <span className="text-[#422faf] font-bold">{catalogName}</span>
+            <p className="text-richblack-400 uppercase  text-[12px] justify-start z-20">
+              Home / catalog /{"   "}
+              <span className="text-[#422faf] font-bold text-sm">{catalogName}</span>
             </p>
             <div className="flex flex-col gap-3">
-              <p className="text-3xl">
-                {catalogPageData?.selectedCategory?.name}
+              <p className="text-3xl text-pure-greys-50">
+                {catalogPageData?.selectedCategory?.name} 📚
               </p>
               <p className="text-richblack-800">{catalogPageData?.selectedCategory?.description}</p>
             </div>
@@ -114,9 +115,9 @@ const Catelog = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, ease: [0.6, 0.01, 0.3, 0.9] }}
         exit={{ opacity: 0 }}
-        className="w-11/12 lg:max-w-maxContent flex flex-col mx-auto gap-5 text-gray-800 mt-6 py-12"
+        className="w-11/12 lg:max-w-maxContent flex flex-col mx-auto gap-5 text-gray-800 mt-3 py-12"
       >
-        <p className="text-gray-600 text-3xl">
+        <p className="text-gray-600 text-3xl ">
           Courses to get you started
         </p>
         <div className="flex gap-x-5 text-gray-500 border-b-[1px] border-gray-300 pb-4 text-sm">
@@ -145,7 +146,7 @@ const Catelog = () => {
 
         {/* Section 2 */}
         <div className="mx-auto box-content w-full max-w-maxContentTab py-12 lg:max-w-maxContent">
-          <div className="text-gray-600 text-3xl">
+          <div className=" text-3xl py-3">
             Top courses in {catalogPageData?.differentCategory?.name}
           </div>
           <div>
@@ -157,9 +158,9 @@ const Catelog = () => {
 
         {/* section-3  */}
         <div className="mx-auto box-content w-full max-w-maxContentTab py-12 lg:max-w-maxContent ">
-          <div className="text-gray-600 text-3xl">Frequently Bought</div>
+          <div className="text-gray-600 text-3xl py-3">Frequently Bought</div>
           <div className="py-8">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               {catalogPageData?.mostSellingCourses
                 ?.slice(0, 4)
                 .map((course, i) => (

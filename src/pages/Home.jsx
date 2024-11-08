@@ -20,7 +20,7 @@ const Home = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: [0.6, 0.01, 0.3, 0.9] }}
       exit={{ opacity: 0 }}
-      className="bg-white text-black"
+      className="bg-white  text-black"
     >
       <div className="sec-2-bg">
         <div className="stars"></div>
@@ -52,7 +52,7 @@ const Home = () => {
           initial="hidden"
           whileInView={"show"}
           viewport={{ once: false, amount: 0.1 }}
-          className="mt-4 w-[90%] text-center text-base lg:text-base font-bold text-gray-700"
+          className="mt-4 w-[90%] text-center text-base lg:text-base text-pure-greys-500 italic "
         >
           With our online coding courses, you can learn at your own pace, from
           anywhere in the world, and get access to a wealth of resources,

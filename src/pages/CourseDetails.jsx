@@ -20,10 +20,11 @@ import { buyCourse } from "../services/operations/studentFeaturesAPI";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/common/Footer";
+import { logout } from "../services/operations/authAPI";
 const CourseDetails = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
-  const { token } = useSelector((state) => state.auth);
+  const { token } = useSelector(state => state.auth);
   const [courseDetails, setCourseDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [avgReviewCount, setAvgReviewCount] = useState(0);
@@ -31,6 +32,7 @@ const CourseDetails = () => {
   const {user}=useSelector(state=>state.profile)
   const dispatch = useDispatch();
   const [confirmationModal, setConfirmationModal] = useState(null);
+  const [er, setEr] = useState(false);
 
   const handleRemoveFromCart = () => {
     dispatch(removeItem(courseDetails?.courseDetails?._id));
@@ -43,12 +45,20 @@ const CourseDetails = () => {
         const result = await getFullDetailsOfCourse(courseId, token);
         if (result) {
           setCourseDetails(result);
-          console.log("courseDetails?.courseDetails?.ratingAndReviews............", result?.courseDetails?.ratingAndReviews);   
+          // console.log("courseDetails?.courseDetails?.ratingAndReviews............", result?.courseDetails?.ratingAndReviews);   
           const count = GetAvgRating(result?.courseDetails?.ratingAndReviews);
-          setAvgReviewCount(count); 
+          // setAvgReviewCount(count); 
           console.log("result............", result);
+          if(result.success===false)
+          {
+            setEr(true);
+            toast.error("Something went wrong please login again ")
+            dispatch(logout(navigate))
+          }
         }
-      } catch (error) {
+      } catch (error) 
+      {
+        
         console.error("Error fetching course details:", error);
 
         // Handle error (e.g., show error message to user)
@@ -72,8 +82,8 @@ const CourseDetails = () => {
   if (!courseDetails) {
     return <div>No course details available.</div>;
   }
-  let tags = JSON.parse(courseDetails?.courseDetails?.tag);
-  let instructions = JSON.parse(courseDetails?.courseDetails?.instructions);
+let tags = JSON.parse(courseDetails?.courseDetails?.tag || '[]');
+let instructions = JSON.parse(courseDetails?.courseDetails?.instructions || '[]');
 
 
 
