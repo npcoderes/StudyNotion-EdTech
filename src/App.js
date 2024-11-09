@@ -17,7 +17,7 @@ function App() {
 //  console.log(expirationTime)
 //  console.log("Token Data",tokenData.token)
  const currentTime = new Date().getTime()
- console.log("Current Time",currentTime)
+//  console.log("Current Time",currentTime)
  if(currentTime > expirationTime && token){
     localStorage.removeItem("token")
     toast.error("Session Expired, Please Login Again 🤖")
@@ -30,6 +30,7 @@ function App() {
       {/* Navbar  */}
       <Navbar />
       <AnimatedRoutes />
+      
 
     </div>
   );

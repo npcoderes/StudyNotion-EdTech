@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import rootReducer from "./reducer";
 import { Toaster } from "react-hot-toast";
 import { ReactLenis, useLenis } from 'lenis/react'
-
+import { Analytics } from "@vercel/analytics/react";
 const store = configureStore({
   reducer: rootReducer,
 })
@@ -22,6 +22,7 @@ root.render(
     <App />
     <Toaster />
     </Provider>
+    <Analytics />
   </BrowserRouter>
   </ReactLenis>
   

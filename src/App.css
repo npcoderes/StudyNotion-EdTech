@@ -11,6 +11,7 @@ body {
   /* user-select: none; */
 }
 
+
 .gradient-custom {
   background: linear-gradient(
     118.19deg,
@@ -24,10 +25,20 @@ body {
 }
 
 :root {
-  --primary-color: #1fa2ff;
+  --primary-color: #003357;
   --secondary-color: #12d8fa;
   --tertiary-color: #a6ffcb;
   --primary-text-color: #e6dbdb;
+}
+::selection {
+  background: var(--primary-color); /* Change this to your desired highlight color */
+  color: #ffffff; /* Change this to your desired text color */
+}
+
+/* For Firefox */
+::-moz-selection {
+  background: var(--primary-color); /* Change this to your desired highlight color */
+  color: #ffffff; /* Change this to your desired text color */
 }
 
 

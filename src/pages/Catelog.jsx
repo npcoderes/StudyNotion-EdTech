@@ -37,13 +37,13 @@ const Catelog = () => {
         const toastid = toast.loading("Loading...");
         try {
           const res = await getCatalogPageData(categoryId);
-          console.log("CATALOG PAGE DATA API RESPONSE............", res);
+          // console.log("CATALOG PAGE DATA API RESPONSE............", res);
           setCataLogPageData(res);
           toast.dismiss(toastid);
         } catch (error) {
           toast.dismiss(toastid);
           toast.error("Error fetching catalog page data");
-          console.log(error);
+          // console.log(error);
         }
         setLoading(false);
       })();

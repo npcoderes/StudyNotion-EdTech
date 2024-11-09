@@ -18,8 +18,9 @@ exports.capturePayment = async (req, res) => {
 
     // extract courseId & userId
     const { coursesId } = req.body;
-    console.log('coursesId = ', typeof (coursesId))
-    console.log('coursesId = ', coursesId)
+    // console.log('coursesId = ', typeof (coursesId))
+    // console.log('coursesId = ', coursesId)
+    const courses = coursesId.flat()
 
     const userId = req.user.id;
 
@@ -30,7 +31,7 @@ exports.capturePayment = async (req, res) => {
     console.log(coursesId.length)
     let totalAmount = 0;
 
-    for (const course_id of coursesId) {
+    for (const course_id of courses) {
         let course;
         try {
             // valid course Details
@@ -119,9 +120,11 @@ const enrollStudents = async (courses, userId, res) => {
     if (!courses || !userId) {
         return res.status(400).json({ success: false, message: "Please Provide data for Courses or UserId" });
     }
+    const coursesId= courses.flat()
     // console.log("Coursesssssss........",courses)
-    for (const courseId of courses) {
+    for (const courseid of coursesId) {
         try {
+            const courseId = new mongoose.Types.ObjectId(courseid);
             //find the course and enroll the student in it
             const enrolledCourse = await Course.findOneAndUpdate(
                 { _id: courseId },

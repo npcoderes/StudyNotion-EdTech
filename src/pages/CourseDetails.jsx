@@ -48,7 +48,7 @@ const CourseDetails = () => {
           // console.log("courseDetails?.courseDetails?.ratingAndReviews............", result?.courseDetails?.ratingAndReviews);   
           const count = GetAvgRating(result?.courseDetails?.ratingAndReviews);
           // setAvgReviewCount(count); 
-          console.log("result............", result);
+          // console.log("result............", result);
           if(result.success===false)
           {
             setEr(true);
@@ -59,7 +59,7 @@ const CourseDetails = () => {
       } catch (error) 
       {
         
-        console.error("Error fetching course details:", error);
+        // console.error("Error fetching course details:", error);
 
         // Handle error (e.g., show error message to user)
       } finally {
@@ -91,6 +91,7 @@ let instructions = JSON.parse(courseDetails?.courseDetails?.instructions || '[]'
   const handleBuyCourse = () => {
     if (token) {
       const coursesId = [courseId]
+      console.log("coursesId", coursesId)
       buyCourse(token, coursesId, user, navigate, dispatch)
       return
     }

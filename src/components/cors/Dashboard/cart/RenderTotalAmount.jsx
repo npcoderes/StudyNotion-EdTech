@@ -13,9 +13,13 @@ const RenderTotalAmount = () => {
     const handleBuyCourse = () => {
         const courses = cart.map((course) => course._id);
         console.log("printing courses id  ",courses)
+        // for(const courseid of courses)
+        // {
+        //   console.log("for   ",courseid)
+        // }
         if (token) {
           const coursesId = [courses]
-          console.log("printing courses id ......... ",courses)
+          // console.log("printing courses id ......... ",courses)
           buyCourse(token, coursesId, user, navigate, dispatch)
           return
         }
