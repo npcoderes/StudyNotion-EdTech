@@ -6,7 +6,7 @@ import { NavbarLinks } from "../../data/navbar-links";
 import studyNotionLogo from "../../assets/Logo/Logo-Full-Dark.png";
 import Logosmall from "../../assets/Logo/Logo-Small-Dark.png";
 import { fetchCourseCategories } from "./../../services/operations/courseDetailsAPI";
-
+import logo from "../../assets/Logo/logo.png"
 import ProfileDropDown from "../Auth/ProfileDropDown";
 import MobileProfileDropDown from "../Auth/MobileProfileDropDown";
 
@@ -96,7 +96,7 @@ const Navbar = () => {
       <div className="flex w-11/12 max-w-maxContent items-center justify-between ">
         {/* logo */}
         <Link to="/">
-          <img src={small ? Logosmall : studyNotionLogo} />
+          <span className="flex gap-x-3 items-center "> <img src={Logosmall} alt="" /> <span className="text-xl font-bold ">StudyNotion</span></span>
         </Link>
 
         {/* Nav Links - visible for only large devices*/}
