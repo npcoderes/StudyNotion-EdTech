@@ -34,7 +34,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
   return (
     <div className="relative z-[1000]" ref={ref}>
       <button
-        className="flex items-center gap-x-1 py-2 px-3 rounded-md hover:bg-richblack-5 transition-all duration-200"
+        className="flex items-center gap-x-1 py-2 px-3 rounded-md  transition-all duration-200"
         onClick={() => setOpen(!open)}
       >
         {user ? (
