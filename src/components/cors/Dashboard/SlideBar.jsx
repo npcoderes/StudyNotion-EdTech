@@ -21,13 +21,17 @@ const SlideBar = () => {
         setIsOpen(!isOpen);
     };
     return (
-        <div className='text-[#E0E0E0]'>
+        <div  className='relative lg:flex lg:flex-col text-[#E0E0E0]'>
             {/* Toggle Button for Small Screens */}
-            <button className="lg:hidden p-1  mt-14 absolute top-[-910px] left-6 z-10   " onClick={toggleSidebar}>
-                {isOpen ? <AiOutlineClose className="text-2xl text-white" /> : <AiOutlineMenu className="text-2xl text-black " />}
+            {/* Toggle button for sidebar */}
+            <button
+                className="fixed top-[70px] left-4 z-[60] lg:hidden text-2xl text-[#E0E0E0] bg-[#1A1A1A] p-2 rounded-md "
+                onClick={toggleSidebar}
+            >
+                {isOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
             </button>
-            <div className={`fixed top-0 mt-14 left-0 h-full w-64 bg-[#1A1A1A] py-10 transition-transform duration-300 
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:mt-14 lg:w-auto lg:h-full lg:block`}>
+            <div className={`fixed top-0 mt-16 left-0 h-full w-64 bg-[#1A1A1A] py-10 transition-transform duration-300 
+                ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:mt-14 lg:w-auto lg:h-full lg:block z-50 max-sm:pt-16`}>
                 <div className='flex flex-col'>
                     {
 

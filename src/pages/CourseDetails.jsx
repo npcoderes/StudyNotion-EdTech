@@ -131,120 +131,112 @@ let instructions = JSON.parse(courseDetails?.courseDetails?.instructions || '[]'
     <>
       {/* section 1  */}
       <div className="bg-[#121212] min-h-[300px] w-full mt-20 ">
-        <section className="w-11/12 max-w-maxContent mx-auto flex gap-2 py-10 relative">
-          <div className=" min-h-[100px] w-full ">
-            {/* heder part  */}
-            <div className="flex flex-col gap-2  ">
-              <p className="text-richblack-300 text-xs  tracking-widest">
-                {" "}
-                Course / Learning /{" "}
-                <span className="text-[#bb86fc] ">
-                  {" "}
-                  {courseDetails?.courseDetails?.category?.name}{" "}
-                </span>
-              </p>
-              <h1 className="text-richblack-25 text-4xl font-semibold tracking-wide">
-                {courseDetails?.courseDetails?.courseName}
-              </h1>
-              <p className="text-richblack-50 text-xs w-[630px] mt-3 line-clamp-2 tracking-wide font-inter">
-                {courseDetails?.courseDetails?.courseDescription}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-[#bb86fc] ">{avgReviewCount}</span>
-                <RatingStars Review_Count={avgReviewCount} />
-                <p className="text-richblack-50 text-sm">
-                  ( {courseDetails?.courseDetails?.ratingAndReviews?.length}{" "}
-                  ratings )
-                </p>
-                <p className="text-richblack-50 text-sm">
-                  {courseDetails?.courseDetails?.studentsEnrolled?.length}{" "}
-                  students enrolled
-                </p>
-              </div>
-              <p className="text-richblack-50 text-sm">
-                Created by {courseDetails?.courseDetails?.instructor?.firstName}{" "}
-                {courseDetails?.courseDetails?.instructor?.lastName}
-              </p>
-              <div className="flex items-center gap-2">
-                <p className="text-richblack-50 text-sm flex items-center gap-2">
-                  <RxInfoCircled className="text-richblack-5 text-base font-bold" />
-                  {new Date(
-                    courseDetails?.courseDetails?.createdAt
-                  ).toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-                <p className="text-richblack-50 text-sm flex items-center gap-2">
-                  <MdLanguage className="text-richblack-5 text-base font-bold" />
-                  English
-                </p>
-              </div>
-            </div>
-          </div>
-          {/* card part  */}
-          <div className="flex flex-col gap-2 p-4 bg-richblack-700 rounded-xl lg:absolute right-0 lg:max-w-[400px]  ">
-            <Img
-              src={courseDetails?.courseDetails?.thumbnail}
-              className="h-[200px] w-[350px] object-cover rounded-t-xl py-2 shadow-md shadow-richblack-800 "
-            />
-            <p className="text-richblack-5 text-2xl font-semibold">
-              Rs. {courseDetails?.courseDetails?.price}
-            </p>
-            <div>
-              {/* buttons  */}
-             {
-                user.accountType==="Student" && (<div className="flex  gap-3 flex-col ">
-              {isInCart ? (
-                <button onClick={handleRemoveFromCart} className="bg-white/60 text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
-                  <span >Remove from Cart</span>
-                </button>
-              ) : (
-                <button className="bg-white text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  " onClick={handleAddToCart}>
-                  <span >Add To Cart</span>
-                </button>
-              )}
-               <button onClick={handleBuyCourse} className="bg-[#422faf] text-white text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200  ">
-                Buy Now
-               </button>
-            </div>)
-
-             } 
-              <p className="text-[#DBDDEA] font-normal text-xs text-center py-3">
-                30-Day Money-Back Guarantee
-              </p>
-              {/* information data  */}
-              <div className="mt-4">
-                <h4 className="text-richblack-5 font-semibold mb-2">
-                  This course includes:
-                </h4>
-                <ul className="space-y-2">
-                  <li className="text-[#06D6A0] flex items-center gap-2">
-                    <FaClockRotateLeft className="text-xs" />
-                    <span className="text-sm">8 hours on-demand video</span>
-                  </li>
-                  <li className="text-[#06D6A0] flex items-center gap-2">
-                    <FaRegCaretSquareRight className="text-xs" />
-                    <span className="text-xs">Full Lifetime access</span>
-                  </li>
-                  <li className="text-[#06D6A0] flex items-center gap-2">
-                    <FaMobile className="text-xs" />
-                    <span className="text-xs">Access on Mobile and TV</span>
-                  </li>
-                  <li className="text-[#06D6A0] flex items-center gap-2">
-                    <GrCertificate className="text-xs" />
-                    <span className="text-xs">Certificate of completion</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          {/* end of card part  */}
-        </section>
+<section className="w-11/12 max-w-maxContent mx-auto flex flex-col sm:flex-row gap-4 py-10 relative">
+  <div className="min-h-[100px] w-full">
+    {/* Header part */}
+    <div className="flex flex-col gap-2">
+      <p className="text-richblack-300 text-xs tracking-widest">
+        Course / Learning /{" "}
+        <span className="text-[#bb86fc]">
+          {courseDetails?.courseDetails?.category?.name}
+        </span>
+      </p>
+      <h1 className="text-richblack-25 text-3xl sm:text-4xl font-semibold tracking-wide">
+        {courseDetails?.courseDetails?.courseName}
+      </h1>
+      <p className="text-richblack-50 text-xs sm:text-sm w-full sm:w-[630px] mt-3 line-clamp-2 tracking-wide font-inter">
+        {courseDetails?.courseDetails?.courseDescription}
+      </p>
+      <div className="flex items-center gap-2">
+        <span className="text-[#bb86fc]">{avgReviewCount}</span>
+        <RatingStars Review_Count={avgReviewCount} />
+        <p className="text-richblack-50 text-sm">
+          ( {courseDetails?.courseDetails?.ratingAndReviews?.length} ratings )
+        </p>
+        <p className="text-richblack-50 text-sm">
+          {courseDetails?.courseDetails?.studentsEnrolled?.length} students enrolled
+        </p>
+      </div>
+      <p className="text-richblack-50 text-sm">
+        Created by {courseDetails?.courseDetails?.instructor?.firstName} {courseDetails?.courseDetails?.instructor?.lastName}
+      </p>
+      <div className="flex items-center gap-2">
+        <p className="text-richblack-50 text-sm flex items-center gap-2">
+          <RxInfoCircled className="text-richblack-5 text-base font-bold" />
+          {new Date(courseDetails?.courseDetails?.createdAt).toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+          })}
+        </p>
+        <p className="text-richblack-50 text-sm flex items-center gap-2">
+          <MdLanguage className="text-richblack-5 text-base font-bold" />
+          English
+        </p>
+      </div>
+    </div>
+  </div>
+  {/* Card part */}
+  <div className="flex flex-col gap-4 p-4 bg-richblack-700 rounded-xl sm:max-w-[400px] w-full lg:absolute right-0">
+    <Img
+      src={courseDetails?.courseDetails?.thumbnail}
+      className="h-[200px] w-full object-cover rounded-t-xl shadow-md shadow-richblack-800"
+    />
+    <p className="text-richblack-5 text-2xl font-semibold">
+      Rs. {courseDetails?.courseDetails?.price}
+    </p>
+    <div>
+      {/* Buttons */}
+      {user.accountType === "Student" && (
+        <div className="flex gap-3 flex-col">
+          {isInCart ? (
+            <button onClick={handleRemoveFromCart} className="bg-white/60 text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200">
+              <span>Remove from Cart</span>
+            </button>
+          ) : (
+            <button className="bg-white text-richblack-900 text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200" onClick={handleAddToCart}>
+              <span>Add To Cart</span>
+            </button>
+          )}
+          <button onClick={handleBuyCourse} className="bg-[#422faf] text-white text-center text-[13px] px-6 py-3 rounded-md font-bold hover:scale-95 transition-all w-full duration-200">
+            Buy Now
+          </button>
+        </div>
+      )}
+      <p className="text-[#DBDDEA] font-normal text-xs text-center py-3">
+        30-Day Money-Back Guarantee
+      </p>
+      {/* Information data */}
+      <div className="mt-4">
+        <h4 className="text-richblack-5 font-semibold mb-2">
+          This course includes:
+        </h4>
+        < ul className="space-y-2">
+          <li className="text-[#06D6A0] flex items-center gap-2">
+            <FaClockRotateLeft className="text-xs" />
+            <span className="text-sm">8 hours on-demand video</span>
+          </li>
+          <li className="text-[#06D6A0] flex items-center gap-2">
+            <FaRegCaretSquareRight className="text-xs" />
+            <span className="text-xs">Full Lifetime access</span>
+          </li>
+          <li className="text-[#06D6A0] flex items-center gap-2">
+            <FaMobile className="text-xs" />
+            <span className="text-xs">Access on Mobile and TV</span>
+          </li>
+          <li className="text-[#06D6A0] flex items-center gap-2">
+            <GrCertificate className="text-xs" />
+            <span className="text-xs">Certificate of completion</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  {/* End of card part */}
+</section>
       </div>
       {/* section 2  */}
-      <div className="w-11/12 max-w-maxContent mx-auto mt-10">
-        <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md">
+      <div className="w-11/12 max-w-maxContent mx-auto mt-10 sm:w-full">
+        <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md max-sm:w-full">
           <h1 className="text-[#1F2937] text-3xl font-semibold">
             What you'll learn
           </h1>
@@ -259,47 +251,45 @@ let instructions = JSON.parse(courseDetails?.courseDetails?.instructions || '[]'
       </div>
 {/* section-3 */}
 <div className="w-11/12 max-w-maxContent mx-auto mt-10">
-      <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md">
-        {courseDetails?.courseDetails?.courseContent?.map((item, index) => (
-          <details key={index} open className="transition-all duration-300 ease-in-out">
-            <summary className="flex cursor-pointer items-center justify-between border-b-2 border-b-[#D1D5DB] py-3 bg-[#F9FAFB] rounded-md transition-colors duration-200 p-3">
-              {/* sectionName */}
-              <div className="flex items-center justify-between gap-x-3">
-                <RxDropdownMenu className="text-2xl text-[#4B5563]" />
-                <p className="font-semibold text-[#1F2937]">
-                  {item.sectionName}
-                </p>
-              </div>
-              <div className="flex items-center justify-between gap-x-3">
-                <p className="text-[#4B5563] text-sm">
-                  {item.subSection.length} lecture
-                </p>
-                <p className="text-[#6B7280] text-sm">{courseDetails?.totalDuration}</p>
-              </div>
-            </summary>
-            {/* render all sub-sections */}
-            <div className="px-6 pb-4 bg-[#F9FAFB] rounded-md transition-all duration-300 ease-in-out">
-              {item.subSection.map((data, index) => (
-                <details key={index} className="pt-2 transition-all duration-300 ease-in-out" >
-                  <summary className="flex items-center gap-x-3 cursor-pointer justify-between bg-[#ffffff] hrounded-md transition-colors duration-200 p-4">
-                    <div className="flex items-center gap-x-3">
-                      <RxDropdownMenu className="text-xl text-[#4B5563]" />
-                      <p className="text-[#1F2937] text-sm">{data.title}</p>
-                    </div>
-                    <p className="text-[#6B7280] text-sm">{data?.timeDuration}</p>
-                  </summary>
-                  <p className="text-[#6B7280] text-sm ml-9 mt-2">-{data?.description}</p>
-                </details>
-              ))}
-            </div>
-          </details>
-        ))}
-      </div>
-    </div>
+  <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md max-sm:w-full">
+    {courseDetails?.courseDetails?.courseContent?.map((item, index) => (
+      <details key={index} open className="transition-all duration-300 ease-in-out">
+        <summary className="flex cursor-pointer items-center justify-between border-b-2 border-b-[#D1D5DB] py-3 bg-[#E5E7EB] rounded-md transition-all duration-700 p-3 hover:bg-[#D1D5DB]">
+          <div className="flex items-center justify-between gap-x-3">
+            <RxDropdownMenu className="text-2xl text-[#4B5563]" />
+            <p className="font-semibold text-[#1F2937]">
+              {item.sectionName}
+            </p>
+          </div>
+          <div className="flex items-center justify-between gap-x-3">
+            <p className="text-[#4B5563] text-sm">
+              {item.subSection.length} lecture
+            </p>
+            <p className="text-[#6B7280] text-sm">{courseDetails?.totalDuration}</p>
+          </div>
+        </summary>
+        <div className="px-6 pb-4 bg-[#F9FAFB] rounded-md transition-all duration-300 ease-in-out">
+          {item.subSection.map((data, index) => (
+            <details key={index} className="pt-2 transition-all duration-300 ease-in-out">
+              <summary className="flex items-center gap-x-3 cursor-pointer justify-between bg-[#ffffff] rounded-md transition-colors duration-200 p-4 hover:bg-[#F3F4F6]">
+                <div className="flex items-center gap-x-3">
+                  <RxDropdownMenu className="text-xl text-[#4B5563]" />
+                  <p className="text-[#1F2937] text-sm">{data.title}</p>
+                </div>
+                <p className="text-[#6B7280] text-sm">{data?.timeDuration}</p>
+              </summary>
+              <p className="text-[#6B7280] text-sm ml-9 mt-2">-{data?.description}</p>
+            </details>
+          ))}
+        </div>
+      </details>
+    ))}
+  </div>
+</div>
 
       {/* section-4  */}
       <div className="w-11/12 max-w-maxContent mx-auto mt-10 mb-20">
-        <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md">
+        <div className="flex flex-col gap-4 w-2/3 border-2 border-[#D1D5DB] rounded-xl p-6 bg-[#FFFFFF] shadow-md max-sm:w-full">
           <h1 className="text-[#1F2937] text-3xl font-semibold">
             Author
           </h1>

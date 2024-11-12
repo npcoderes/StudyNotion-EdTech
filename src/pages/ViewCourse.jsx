@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Outlet, useParams } from "react-router-dom"
-
+import Footer from "../components/common/Footer"
 import CourseReviewModal from "../components/cors/ViewCourse/CourseReviewModal"
 import VideoDetailsSidebar from "../components/cors/ViewCourse/VideoDetailsSidebar"
 import { getFullDetailsOfCourse } from "../services/operations/courseDetailsAPI"
@@ -38,12 +38,14 @@ export default function ViewCourse() {
     <>
       <div className="relative flex min-h-[calc(100vh-3.5rem)] pt-16">
         <VideoDetailsSidebar setReviewModal={setReviewModal} />
-        <div className="h-[calc(100vh-3.5rem)] flex-1 overflow-auto">
-          <div className="mx-6">
+        <div className="h-full flex-1 overflow-auto">
+          <div className="mx-6 ">
             <Outlet />
           </div>
         </div>
       </div>
+      <Footer/>
+
       {reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
     </>
   )

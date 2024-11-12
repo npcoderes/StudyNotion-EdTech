@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom"
 
 import useOnClickOutside from "../../hooks/useOnClickOutside"
 import { logout } from "../../services/operations/authAPI"
+import { MdMenuOpen } from "react-icons/md"
 
 export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = [] }) {
   const { user } = useSelector((state) => state.profile)
@@ -46,11 +47,14 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
             <AiOutlineCaretDown className={`text-sm text-richblack-900 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
           </>
         ) : (
-          <span className="text-richblack-900">Menu</span>
+          <>
+           <MdMenuOpen className="text-2xl" />  <AiOutlineCaretDown className={`text-sm text-richblack-900 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+
+          </>
         )}
       </button>
       {open && (
-        <div className="absolute right-0 top-[120%] mt-1 w-[250px] rounded-md border border-richblack-700 bg-richblack-5 shadow-lg z-[1000] overflow-hidden ">
+        <div className="absolute right-0 top-[120%] mt-1 w-[250px] rounded-md  bg-white shadow-lg z-[1000] overflow-hidden ">
           <div className="max-h-[calc(100vh-80px)] overflow-y-auto py-2">
             {NavbarLinks && NavbarLinks.map((link, index) => (
               <div key={index} className="px-2 py-1">

@@ -1,56 +1,52 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 
 // Import Swiper styles
-import "swiper/css"
-import "swiper/css/free-mode"
-import "swiper/css/pagination"
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/pagination";
 // Import Swiper React components
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
 
-import Card from "./Card"
+import Card from "./Card";
 
-const Course_Slider = ({Courses}) => {
+const Course_Slider = ({ Courses }) => {
+
+  const [smallScreen, setSmallScreen] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSmallScreen(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
     <>
-    <Swiper
-      slidesPerView={1}
-      spaceBetween={25}
-      loop={false}
-      modules={[Pagination,Navigation]}
-      className="mySwiper"
-      // autoplay={{
-      // delay: 1000,
-      // disableOnInteraction: false,
-      // }}
-      navigation={true}
-      breakpoints={{
-        1024: {
-          slidesPerView: 3,
-        },
-        768: {
-          slidesPerView: 2,
-        },
-        480: {
-          slidesPerView: 1,
-        },
-      }}
-    //   className="max-h-[30rem] pt-8 px-2"
-    >
-        {<div className="flex gap-x-5 sm:flex-col">{
-                    Courses.map((course,i)=>(
-                      <SwiperSlide key={i}>
-                      <Card course={course} Height={"h-[250px]"} />
-                    </SwiperSlide>
-                  ))
-          }
-
-        </div>
-
-        }
-    </Swiper>
+      <Swiper
+        slidesPerView={3} // default value for larger screens
+        spaceBetween={25}
+        loop={false}
+        modules={Navigation}
+        navigation={true}
+      >
+        {Courses.map((course, i) =>
+          smallScreen ? (
+            <Card course={course} Height={"h-[250px]"} />
+          ) : (
+            <SwiperSlide key={i}>
+              <Card course={course} Height={"h-[250px]"} />
+            </SwiperSlide>
+          )
+        )}
+      </Swiper>
     </>
-  )
-}
+  );
+};
 
-export default Course_Slider
+export default Course_Slider;

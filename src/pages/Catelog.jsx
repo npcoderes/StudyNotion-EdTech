@@ -84,7 +84,7 @@ const Catelog = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.6, 0.01, 0.3, 0.9] }}
         exit={{ opacity: 0 }}
-        className="relative border-b-[1px] border-gray-300 pb-7 bg-[#080707] mt-10 overflow-hidden mb-3"
+        className="relative border-b-[1px] border-gray-300 pb-7 bg-[#080707] mt-16 overflow-hidden mb-3"
       >
         {/* Animated star background */}
         <div className="absolute inset-0">
