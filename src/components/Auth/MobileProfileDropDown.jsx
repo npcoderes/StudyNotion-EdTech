@@ -44,7 +44,7 @@ export default function MobileProfileDropDown({ NavbarLinks = [], ssubLinks = []
               alt={`profile-${user?.firstName}`}
               className="aspect-square w-[30px] rounded-full object-cover"
             />
-            <AiOutlineCaretDown className={`text-sm text-richblack-900 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+            <AiOutlineCaretDown className={`text-sm text-richblack-5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
           </>
         ) : (
           <>
