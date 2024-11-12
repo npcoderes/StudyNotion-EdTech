@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { apiConnector } from "../../../../services/apiconnector";
 import { profileEndpoints } from "../../../../services/apis";
 import toast from "react-hot-toast";
-import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { FaCheck } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { HiClock } from "react-icons/hi";
@@ -16,7 +14,7 @@ import { deleteCourse } from "../../../../services/operations/courseDetailsAPI";
 import { useNavigate } from "react-router-dom";
 
 const RenderInstructorCourses = () => {
-  const TRUNCATE_LENGTH = 25;
+  const trUNCATE_LENGth = 25;
   const { token } = useSelector((state) => state.auth);
   const [EnrollCourse, setEnrollCourse] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -61,50 +59,50 @@ const RenderInstructorCourses = () => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatdate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString(); // Improved date formatting
   };
 
   return (
     <>
-      <Table className="rounded-2xl  mt-5 shadow-lg">
-        <Thead>
-          <Tr className="flex gap-x-6 rounded-t-3xl border-b border-b-[#4B5563] bg-[#1F2937] text-white px-6 py-4">
-            <Th className="flex-1 text-left text-lg font-medium uppercase">Courses</Th>
-            <Th className="text-left text-lg font-medium uppercase">Duration</Th>
-            <Th className="text-left text-lg font-medium uppercase">Price</Th>
-            <Th className="text-left text-lg font-medium uppercase">Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
+      <table className="rounded-2xl  mt-5 shadow-lg">
+        <thead>
+          <tr className="flex gap-x-6 rounded-t-3xl border-b border-b-[#4B5563] bg-[#1F2937] text-white px-6 py-4">
+            <th className="flex-1 text-left text-lg font-medium uppercase">Courses</th>
+            <th className="text-left text-lg font-medium uppercase">Duration</th>
+            <th className="text-left text-lg font-medium uppercase">Price</th>
+            <th className="text-left text-lg font-medium uppercase">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
           {!EnrollCourse || EnrollCourse.length === 0 ? (
-            <Tr>
-              <Td className="py-10 text-center text-2xl font-medium text-[#D1D5DB]">No courses found</Td>
-            </Tr>
+            <tr>
+              <td className="py-10 text-center text-2xl font-medium text-[#D1D5DB]">No courses found</td>
+            </tr>
           ) : (
             EnrollCourse.map((course) => (
-              <Tr key={course._id} className="flex gap-x-10 border-b border-[#4B5563] px-6 py-8 transition-colors duration-300">
-                <Td className="flex flex-1 gap-x-7 relative">
+              <tr key={course._id} className="flex gap-x-10 border-b border-[#4B5563] px-6 py-8 transition-colors duration-300">
+                <td className="flex flex-1 gap-x-7 ">
                   <img src={course?.thumbnail} alt={course?.courseName} className="h-[148px] min-w-[270px] max-w-[270px] rounded-lg object-cover shadow-md" />
                   <div className="flex flex-col gap-1">
                     <p className="text-lg font-semibold text-[#000] capitalize">{course.courseName}</p>
                     <p className="text-xs text-[#000]">
-                      {course.courseDescription.split(" ").length > TRUNCATE_LENGTH
-                        ? `${course.courseDescription.split(" ").slice(0, TRUNCATE_LENGTH).join(" ")}...`
+                      {course.courseDescription.split(" ").length > trUNCATE_LENGth
+                        ? `${course.courseDescription.split(" ").slice(0, trUNCATE_LENGth).join(" ")}...`
                         : course.courseDescription}
                     </p>
-                    <p className="text-[12px] text-[#000] mt-4">Created: {formatDate(course?.createdAt)}</p>
-                    <p className="text-[12px] text-[#000]">Updated: {formatDate(course?.updatedAt)}</p>
+                    <p className="text-[12px] text-[#000] mt-4">Created: {formatdate(course?.createdAt)}</p>
+                    <p className="text-[12px] text-[#000]">Updated: {formatdate(course?.updatedAt)}</p>
                     <p className={`mt-2 flex w-fit flex-row items-center gap-2 rounded-full px-2 py-[2px] text-[12px] font-medium ${course.status === COURSE_STATUS.DRAFT ? 'bg-[#D53F8C] text-white' : 'bg-[#FBBF24] text-white'}`}>
                       {course.status === COURSE_STATUS.DRAFT ? <HiClock size={14} /> : <FaCheck size={8} />}
                       {course.status === COURSE_STATUS.DRAFT ? 'Drafted' : 'Published'}
                     </p>
                   </div>
-                </Td>
-                <Td className="text-sm font-medium text-[#000]">{course?.totalDuration}</Td>
-                <Td className="text-sm font-medium text-[#000]">₹{course.price}</Td>
-                <Td className="text-sm font-medium text-[#000] flex gap-2">
+                </td>
+                <td className="text-sm font-medium text-[#000]">{course?.totalDuration}</td>
+                <td className="text-sm font-medium text-[#000]">₹{course.price}</td>
+                <td className="text-sm font-medium text-[#000] flex gap-2">
                   <button
                     disabled={loading}
                     onClick={() => navigate(`/dashboard/edit-course/${course._id}`)}
@@ -130,12 +128,12 @@ const RenderInstructorCourses = () => {
                   >
                     <RiDeleteBin6Line size={20} />
                   </button>
-                </Td>
-              </Tr>
+                </td>
+              </tr>
             ))
           )}
-        </Tbody>
-      </Table>
+        </tbody>
+      </table>
       {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
     </>
   );

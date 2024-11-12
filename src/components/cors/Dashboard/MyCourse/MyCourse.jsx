@@ -8,7 +8,7 @@ import RenderInstructorCourses from './RenderInstructorCourses';
 
 const MyCourse = () => {
   return (
-    <div>
+    <div className='z-0'>
         <div className='flex justify-between'>
         <h1 className='text-3xl font-medium tracking-wide'>
             My Courses

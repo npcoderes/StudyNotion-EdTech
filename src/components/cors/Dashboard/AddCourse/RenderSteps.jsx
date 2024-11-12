@@ -31,7 +31,7 @@ export default function RenderSteps() {
 
   return (
     <>
-      <div className="relative mb-2 flex w-full select-none justify-center ">
+      <div className=" mb-2 flex w-full select-none justify-center ">
         {steps.map((item) => (
           <React.Fragment key={item.id}>
             <div

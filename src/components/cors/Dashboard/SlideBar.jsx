@@ -21,7 +21,7 @@ const SlideBar = () => {
         setIsOpen(!isOpen);
     };
     return (
-        <div  className='relative lg:flex lg:flex-col text-[#E0E0E0]'>
+        <div  className=' lg:flex lg:flex-col text-[#E0E0E0]'>
             {/* Toggle Button for Small Screens */}
             {/* Toggle button for sidebar */}
             <button

@@ -4,7 +4,7 @@ import RenderSteps from './RenderSteps'
 const AddCourses = () => {
   return (
     <>
-    <div className='flex w-full  items-start gap-x-6 h-full relative'>
+    <div className='flex w-full  items-start gap-x-6 h-full '>
         <div className='flex flex-1 flex-col '>
             <h1 className='mb-14 text-3xl font-medium text-richblack-900 font-boogaloo text-center lg:text-left'>Add Course 📚</h1>
             <div className='flex-1 overflow-auto h-full'>
