@@ -90,13 +90,13 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`z-[1000] flex h-16 w-full items-center justify-center border-b-[0.5px] border-b-richblack-700 text-white translate-y-0 transition-all ${showNavbar} fixed top-0 left-0 right-0 bg-[#1a1a1a] p-2  `}
+      className={`z-[1000] flex h-16 w-full items-center justify-center border-b-[0.5px] border-b-richblack-700 text-white translate-y-0 transition-all ${showNavbar} fixed top-0 left-0 right-0 bg-[#000] p-2  text-sm `}
     >
       {/* <nav className={` fixed flex items-center justify-center w-full h-16 z-[10] translate-y-0 transition-all text-white ${showNavbar}`}> */}
       <div className="flex w-11/12 max-w-maxContent items-center justify-between ">
         {/* logo */}
         <Link to="/">
-          <span className="flex gap-x-3 items-center "> <img src={Logosmall} alt="" /> <span className="text-xl font-bold ">StudyNotion</span></span>
+          <span className="flex gap-x-3 items-center "> <img src={Logosmall} alt="" /> <span className="text-xl max-sm:text-sm font-bold ">StudyNotion</span></span>
         </Link>
 
         {/* Nav Links - visible for only large devices*/}
@@ -112,7 +112,7 @@ const Navbar = () => {
                   }`}
                 >
                   <p>{link.title}</p>
-                  {/* <MdKeyboardArrowDown /> */}
+                  <MdKeyboardArrowDown />
                   {/* drop down menu */}
                   <div
                     className="invisible absolute left-[50%] top-[50%] z-[1000] flex w-[200px] translate-x-[-50%] translate-y-[3em] 
@@ -172,7 +172,7 @@ const Navbar = () => {
             <Link to="/login">
               {/* <button className='border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md focus:outline-8 outline-yellow-50'> */}
               <button
-                className={` px-[12px] py-[8px] text-[#4251f5] rounded-md border-[#4251f5] border hidden lg:block`}
+                className={` px-[16px] py-[8px] text-[#fff] rounded-3xl border-[#6236a8] border hidden lg:block`}
               >
                 Log in
               </button>
@@ -182,7 +182,7 @@ const Navbar = () => {
             <Link to="/signup">
               {/* <button className='border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md'> */}
               <button
-                className={`  px-[12px] py-[8px] text-[#fff] rounded-md border-[#4251f5] bg-[#4251f5] border hidden lg:block `}
+                className={`  px-[16px] py-[8px] text-[#fff] rounded-3xl bg-[#6236a8]  hidden lg:block `}
               >
                 Sign Up
               </button>

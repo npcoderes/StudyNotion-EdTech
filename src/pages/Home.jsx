@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { fadeIn } from "../components/common/Motion";
 import ReviewSlider from "../components/common/ReviewSlider";
 const Home = () => {
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -61,7 +62,7 @@ const Home = () => {
         </motion.div>
 
         <div className="flex flex-row gap-7 mt-8">
-          <HButton active={true} linkto={"/signup"}>
+          <HButton active={true} linkto={"/catalog/Web-Dev"}>
             Learn More
           </HButton>
           <HButton active={false} linkto={"/login"}>
@@ -73,6 +74,7 @@ const Home = () => {
             <source src={Banner} type="video/mp4" />
           </video>
         </div>
+        
 
         {/* Code Section 1 */}
         <div>
@@ -93,12 +95,12 @@ const Home = () => {
             }
             ctabtn1={{
               btnText: "Try it yourself",
-              linkto: "/signup",
+              linkto: "/catalog/Web-Dev",
               active: true,
             }}
             ctabtn2={{
               btnText: "Learn more",
-              linkto: "/login",
+              linkto: "/catalog/Web-Dev",
               active: false,
             }}
             codeblock={`<<!DOCTYPE html>\n<html>\n<head><title>Example</title><linkrel="stylesheet"href="styles.css">\n</head>\n`}
@@ -152,7 +154,7 @@ const Home = () => {
           <div className="relative z-10 w-11/12 max-w-maxContent flex flex-col items-center justify-between gap-5 mx-auto">
             <div className="h-[150px]"></div>
             <div className="flex flex-row gap-7 text-black lg:mt-4">
-              <HButton active={true} linkto={"/signup"}>
+              <HButton active={true} linkto={"/catalog/Web-Dev"}>
                 <div className="flex flex-row gap-3 items-center">
                   Explore Full Catalog
                   <FaArrowRight />

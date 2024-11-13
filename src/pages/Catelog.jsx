@@ -70,7 +70,7 @@ const Catelog = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, ease: [0.6, 0.01, 0.3, 0.9] }}
         exit={{ opacity: 0 }}
-        className="text-gray-700 text-4xl flex justify-center items-center mt-[20%]"
+        className="text-gray-700 text-4xl flex justify-center items-center mt-[20%] max-sm:text-sm"
       >
         No Courses found for selected Category 😓
       </motion.div>
