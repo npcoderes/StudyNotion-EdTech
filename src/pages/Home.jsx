@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import HighlightText from "../components/cors/homepage/HighlightText";
@@ -13,7 +13,28 @@ import ExploreSection from "../components/cors/homepage/ExploreSection";
 import { motion } from "framer-motion";
 import { fadeIn } from "../components/common/Motion";
 import ReviewSlider from "../components/common/ReviewSlider";
+import { apiConnector } from "../services/apiconnector";
+import { useState } from "react";
+import Course_Slider from "../components/cors/catalog/Course_Slider";
+
 const Home = () => {
+  const [courses,setCourses] = useState([]);
+  const BASE_URL=process.env.REACT_APP_BASE_URL;
+  useEffect(()=>{
+    const fetchCourses = async () => {
+      try{
+        const res = await apiConnector("GET",BASE_URL+"/course/getAllCourses")
+        console.log("courses",res.data.data)
+        setCourses(res.data.data)
+
+      }catch(error)
+      {
+        console.log("error",error);
+      }
+    }
+    fetchCourses();
+
+  },[])
   
   return (
     <motion.div
@@ -73,6 +94,20 @@ const Home = () => {
           <video muted loop autoPlay>
             <source src={Banner} type="video/mp4" />
           </video>
+        </div>
+
+        <div className="mx-auto box-content w-full max-w-maxContentTab py-12 lg:max-w-maxContent">
+          <p className="text-xl font-edu-sa tracking-wide  font-semibold">
+            Study Notion | <span className="font-edu-sa font-bold italic text-[#422faf]">Learn to code online with our coding courses</span>
+          </p>
+          <meta
+            name="description"
+            content="Study Notion offers online coding courses for beginners and experts. Learn to code with our hands-on projects, quizzes, and personalized feedback from instructors."
+          />
+          <div className="py-4">
+            <Course_Slider Courses={courses}/>
+          </div>
+
         </div>
         
 

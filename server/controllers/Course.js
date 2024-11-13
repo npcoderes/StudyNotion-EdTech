@@ -126,17 +126,7 @@ exports.createCourse = async (req, res) => {
 
 exports.getAllCourses = async (req, res) => {
 	try {
-		const allCourses = await Course.find(
-			{},
-			{
-				courseName: true,
-				price: true,
-				thumbnail: true,
-				instructor: true,
-				ratingAndReviews: true,
-				studentsEnroled: true,
-			}
-		)
+		const allCourses = await Course.find()
 			.populate("instructor")
 			.exec();
 		return res.status(200).json({

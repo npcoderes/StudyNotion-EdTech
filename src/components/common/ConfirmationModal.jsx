@@ -10,13 +10,13 @@ const ConfirmationModal = ({ isOpen, onClose, modalData }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[1000] grid place-items-center overflow-auto bg-black bg-opacity-50 backdrop-blur-sm"
+          className="fixed inset-1 z-[1000] grid place-items-center overflow-auto bg-black bg-opacity-50 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.8, y: -50 }}
+            initial={{ scale: 0.5, y: -50 }}
             animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.8, y: -50 }}
+            exit={{ scale: 0.5, y: -50 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="w-11/12 max-w-[400px] rounded-xl border border-richblack-400 bg-richblack-800 p-6"
             onClick={(e) => e.stopPropagation()} // Prevent click from closing the modal

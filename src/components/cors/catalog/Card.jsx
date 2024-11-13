@@ -25,7 +25,7 @@ const Card = ({ course, Height, objectFit }) => {
       whileHover={{ scale: 0.96, boxShadow: "0 4px 20px rgba(0, 123, 255, 0.2)" }} // Updated shadow on hover
     >
       <Link to={`/courses/${course._id}`} className="block">
-        <div className="bg-black rounded-2xl overflow-hidden border border-gray-300 p-3 text-white py-5">
+        <div className="bg-black rounded-2xl overflow-hidden border border-gray-300 p-3 text-white max-sm:py-7">
           <motion.div className="relative" whileHover={{ scale: 1 }}>
             <img
               src={course?.thumbnail}

@@ -6,7 +6,7 @@ import "swiper/css/free-mode";
 import "swiper/css/pagination";
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import { Navigation, Pagination, Mousewheel, Keyboard } from "swiper/modules";
 
 import Card from "./Card";
 
@@ -31,9 +31,14 @@ const Course_Slider = ({ Courses }) => {
       <Swiper
         slidesPerView={3} // default value for larger screens
         spaceBetween={25}
-        loop={false}
-        modules={Navigation}
+        loop={true}
+
         navigation={true}
+        pagination={{ clickable: true }}
+
+        mousewheel={true}
+        keyboard={true}
+        modules={[Navigation, Mousewheel, Keyboard]}
       >
         {Courses.map((course, i) =>
           smallScreen ? (
