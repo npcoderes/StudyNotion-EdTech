@@ -199,13 +199,13 @@ const Navbar = () => {
           {/* for small devices */}
           <>
             <div className="lg:hidden block">
-              {showMobileMenu && (
+              
                 <MobileProfileDropDown
                   NavbarLinks={NavbarLinks}
                   ssubLinks={subLinks}
                   isMobile={true}
                 />
-              )}
+      
             </div>
           </>
         </div>
