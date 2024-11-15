@@ -16,25 +16,34 @@ import ReviewSlider from "../components/common/ReviewSlider";
 import { apiConnector } from "../services/apiconnector";
 import { useState } from "react";
 import Course_Slider from "../components/cors/catalog/Course_Slider";
-
+import SkeletonCourse from "../components/cors/homepage/SkeletonCourse";
 const Home = () => {
   const [courses,setCourses] = useState([]);
   const BASE_URL=process.env.REACT_APP_BASE_URL;
+  const[loading,setLoading]=useState(false);
   useEffect(()=>{
     const fetchCourses = async () => {
+      setLoading(true);
       try{
         const res = await apiConnector("GET",BASE_URL+"/course/getAllCourses")
         console.log("courses",res.data.data)
         setCourses(res.data.data)
+        setLoading(false);
 
       }catch(error)
       {
+        setLoading(false);
         console.log("error",error);
+      }
+      finally{
+        setLoading(false);
       }
     }
     fetchCourses();
 
   },[])
+
+
   
   return (
     <motion.div
@@ -44,10 +53,7 @@ const Home = () => {
       exit={{ opacity: 0 }}
       className="bg-white  text-black"
     >
-      <div className="sec-2-bg">
-        <div className="stars"></div>
-        <div className="aurora"></div>
-      </div>
+      
       {/* Section-1 */}
       <div className="relative w-11/12 mx-auto flex flex-col max-w-maxContent items-center justify-between mt-5">
         <Link to="/signup">
@@ -90,11 +96,17 @@ const Home = () => {
             Book a Demo
           </HButton>
         </div>
-        <div className="mx-3 my-12 shadow-[#FFCC00] drop-video">
+        <motion.div
+          variants={fadeIn("left", 0.2)}
+          initial="hidden"
+          whileInView={"show"}
+          viewport={{ once: false, amount: 0.1 }}
+
+        className="mx-3 my-12 shadow-[#FFCC00] drop-video">
           <video muted loop autoPlay>
             <source src={Banner} type="video/mp4" />
           </video>
-        </div>
+        </motion.div>
 
         <div className="mx-auto box-content w-full max-w-maxContentTab py-12 lg:max-w-maxContent">
           <p className="text-xl font-edu-sa tracking-wide  font-semibold">
@@ -105,14 +117,28 @@ const Home = () => {
             content="Study Notion offers online coding courses for beginners and experts. Learn to code with our hands-on projects, quizzes, and personalized feedback from instructors."
           />
           <div className="py-4">
-            <Course_Slider Courses={courses}/>
+           {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, index) => (
+            <SkeletonCourse key={index} />
+          ))}
+        </div>
+      ) : (
+        <Course_Slider Courses={courses} />
+      )}
           </div>
 
         </div>
         
 
         {/* Code Section 1 */}
-        <div>
+        <motion.div
+          variants={fadeIn("right", 0.1)}
+          initial="hidden"
+          whileInView={"show"}
+          viewport={{ once: false, amount: 0.6 }}
+          // className="w-11/12 mx-auto max-w-maxContent flex flex-col items-center justify-between gap-7 mt-10"
+        >
           <CodeBlocks
             position={"lg:flex-row max-sm:flex-col"}
             heading={
@@ -142,10 +168,14 @@ const Home = () => {
             codecolor={"text-[#422faf]"}
             backgroundgradint={"bg-gradient-to-r from-[#422faf] to-[#422faf]"}
           />
-        </div>
+        </motion.div>
 
         {/* Code Section 2 */}
-        <div>
+        <motion.div
+                 variants={fadeIn("left", 0.1)}
+                 initial="hidden"
+                 whileInView={"show"}
+                 viewport={{ once: false, amount: 0.6 }}>
           <CodeBlocks
             position={"lg:flex-row-reverse max-sm:flex-col"}
             heading={
@@ -175,17 +205,17 @@ const Home = () => {
             backgroundgradint={"bg-gradient-to-r from-[#422faf] to-[#422faf]"}
 
           />
-        </div>
+        </motion.div>
         <ExploreSection />
       </div>
 
       {/* section-2  */}
       <div className="bg-[#F9F9F9] text-black">
         <div className="relative h-[320px] overflow-hidden">
-          <div className="sec-2-bg">
+          {/* <div className="sec-2-bg">
             <div className="stars"></div>
             <div className="aurora"></div>
-          </div>
+          </div> */}
           <div className="relative z-10 w-11/12 max-w-maxContent flex flex-col items-center justify-between gap-5 mx-auto">
             <div className="h-[150px]"></div>
             <div className="flex flex-row gap-7 text-black lg:mt-4">

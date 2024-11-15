@@ -56,7 +56,7 @@ const ContactUsForm = () => {
             {...register("firstname", { required: true })}
           />
           {errors.firstname && (
-            <span className="-mt-1 text-[12px] text-red-500">
+            <span className="-mt-1 text-[12px] text-[#f11d1d] ">
               Please enter your name.
             </span>
           )}
@@ -90,7 +90,7 @@ const ContactUsForm = () => {
           {...register("email", { required: true })}
         />
         {errors.email && (
-          <span className="-mt-1 text-[12px] text-red-500">
+          <span className="-mt-1 text-[12px] text-[#f11d1d]">
             Please enter your Email address.
           </span>
         )}
@@ -138,7 +138,7 @@ const ContactUsForm = () => {
           </div>
         </div>
         {errors.phoneNo && (
-          <span className="-mt-1 text-[12px] text-red-500">
+          <span className="-mt-1 text-[12px] text-[#f11d1d] ">
             {errors.phoneNo.message}
           </span>
         )}
@@ -158,7 +158,7 @@ const ContactUsForm = () => {
           {...register("message", { required: true })}
         />
         {errors.message && (
-          <span className="-mt-1 text-[12px] text-red-500">
+          <span className="-mt-1 text-[12px] text-[#f11d1d] ">
             Please enter your Message.
           </span>
         )}
