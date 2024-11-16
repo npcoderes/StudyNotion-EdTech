@@ -136,7 +136,7 @@ const Home = () => {
           variants={fadeIn("right", 0.1)}
           initial="hidden"
           whileInView={"show"}
-          viewport={{ once: false, amount: 0.6 }}
+          viewport={{ once: false, amount: 0.1 }}
           // className="w-11/12 mx-auto max-w-maxContent flex flex-col items-center justify-between gap-7 mt-10"
         >
           <CodeBlocks
@@ -175,7 +175,7 @@ const Home = () => {
                  variants={fadeIn("left", 0.1)}
                  initial="hidden"
                  whileInView={"show"}
-                 viewport={{ once: false, amount: 0.6 }}>
+                 viewport={{ once: false, amount: 0.1 }}>
           <CodeBlocks
             position={"lg:flex-row-reverse max-sm:flex-col"}
             heading={
