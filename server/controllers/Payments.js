@@ -8,7 +8,7 @@ require('dotenv').config();
 const User = require('../models/User');
 const Course = require('../models/Course');
 const CourseProgress = require("../models/CourseProgress")
-
+const Invoice = require("../models/Invoice"); // Ensure the correct path to the Invoice model
 
 const { default: mongoose } = require('mongoose')
 
@@ -104,8 +104,10 @@ exports.verifyPayment = async (req, res) => {
         .digest("hex");
 
     if (expectedSignature === razorpay_signature) {
-        //enroll student
-        await enrollStudents(courses, userId, res);
+
+
+        //enroll student and create invoice
+        await enrollStudentsAndCreateInvoice(courses, userId, razorpay_payment_id, res);
         //return res
         return res.status(200).json({ success: true, message: "Payment Verified" });
     }
@@ -115,34 +117,35 @@ exports.verifyPayment = async (req, res) => {
 
 
 // ================ enroll Students to course after payment ================
-const enrollStudents = async (courses, userId, res) => {
-
+const enrollStudentsAndCreateInvoice = async (courses, userId, paymentId, res) => {
     if (!courses || !userId) {
-        return res.status(400).json({ success: false, message: "Please Provide data for Courses or UserId" });
+        return res.status(400).json({ success: false, message: "Please provide data for courses or userId" });
     }
-    const coursesId= courses.flat()
-    // console.log("Coursesssssss........",courses)
+
+    const coursesId = courses.flat();
+
     for (const courseid of coursesId) {
         try {
             const courseId = new mongoose.Types.ObjectId(courseid);
-            //find the course and enroll the student in it
+
+            // Find the course and enroll the student in it
             const enrolledCourse = await Course.findOneAndUpdate(
                 { _id: courseId },
                 { $push: { studentsEnrolled: userId } },
-                { new: true },
-            )
+                { new: true }
+            );
 
             if (!enrolledCourse) {
-                return res.status(500).json({ success: false, message: "Course not Found" });
+                return res.status(500).json({ success: false, message: "Course not found" });
             }
-            // console.log("Updated course: ", enrolledCourse)
 
-            // Initialize course preogres with 0 percent
+            // Initialize course progress with 0 percent
             const courseProgress = await CourseProgress.create({
                 courseID: courseId,
                 userId: userId,
                 completedVideos: [],
-            })
+                expireTime: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),         //1 year from now
+            });
 
             // Find the student and add the course to their list of enrolled courses
             const enrolledStudent = await User.findByIdAndUpdate(
@@ -154,25 +157,63 @@ const enrollStudents = async (courses, userId, res) => {
                     },
                 },
                 { new: true }
-            )
+            );
 
-            // console.log("Enrolled student: ", enrolledStudent)
+            if (!enrolledStudent) {
+                return res.status(500).json({ success: false, message: "User not found" });
+            }
+
+            // Distribute revenue
+            const coursePrice = enrolledCourse.price;
+            const instructorRevenue = (coursePrice * 80) / 100; // 80% to instructor
+            const adminRevenue = (coursePrice * 20) / 100; // 20% to admin
+
+            // Update instructor's revenue
+            const updatedInstructor = await User.findByIdAndUpdate(
+                enrolledCourse.instructor, // Assuming the course has an `instructor` field
+                { $inc: { Revenue: instructorRevenue } },
+                { new: true }
+            );
+
+            if (!updatedInstructor) {
+                return res.status(500).json({ success: false, message: "Instructor not found" });
+            }
+
+            // Update admin's revenue
+            const updatedAdmin = await User.findOneAndUpdate(
+                { accountType: "Admin" }, // Assuming there is one admin user
+                { $inc: { Revenue: adminRevenue } },
+                { new: true }
+            );
+
+            if (!updatedAdmin) {
+                return res.status(500).json({ success: false, message: "Admin not found" });
+            }
+
+            // Create an invoice for the payment
+            const invoice = await Invoice.create({
+                user: userId,
+                course: courseId,
+                amount: coursePrice,
+                paymentMethod: "UPI", // Assuming UPI as the default payment method
+                paymentId: paymentId,
+            });
+
+            console.log("Invoice created: ", invoice);
 
             // Send an email notification to the enrolled student
             const emailResponse = await mailSender(
                 enrolledStudent.email,
                 `Successfully Enrolled into ${enrolledCourse.courseName}`,
                 courseEnrollmentEmail(enrolledCourse.courseName, `${enrolledStudent.firstName}`)
-            )
-            // console.log("Email Sent Successfully", emailResponse);
-        }
-        catch (error) {
+            );
+            console.log("Email sent successfully", emailResponse);
+        } catch (error) {
             console.log(error);
             return res.status(500).json({ success: false, message: error.message });
         }
     }
-
-}
+};
 
 
 

@@ -22,6 +22,7 @@ function SignupForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    reason : "",
   })
 
   const [showPassword, setShowPassword] = useState(false)
@@ -197,6 +198,32 @@ function SignupForm() {
             </span>
           </label>
         </div>
+        {/* add reson why you want to join */}
+        {
+          accountType === ACCOUNT_TYPE.INSTRUCTOR && (        <div className="mt-">
+            <label className="relative">
+              <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-900">
+                Reason <sup className="text-pink-200">*</sup>
+              </p>
+  
+              <textarea 
+              required
+              name="reason"
+              value={formData.reason}
+              onChange={handleOnChange}
+              placeholder="Why you want to join this community"
+              style={{
+                boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
+              }}
+              rows={4}
+              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5"
+              />
+              
+            </label>
+          </div>)
+        }
+
+
         <button
           type="submit"
           className="mt-6 rounded-3xl bg-[#422faf] py-[15px] px-[12px] font-medium text-richblack-5 "

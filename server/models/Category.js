@@ -13,6 +13,10 @@ const categorySchema = new mongoose.Schema({
 			ref: "Course",
 		},
 	],
+	Active: {
+		type: Boolean,
+		default: true,
+	},
 });
 
 // Export the Tags model

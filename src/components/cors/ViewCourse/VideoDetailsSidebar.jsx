@@ -3,10 +3,13 @@ import { BsChevronDown } from "react-icons/bs"
 import { IoIosArrowBack } from "react-icons/io"
 import { useSelector } from "react-redux"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { FaDownload } from "react-icons/fa"
 
 import IconBtn from "../../common/IconBtn"
+import axios from "axios"
 
 export default function VideoDetailsSidebar({ setReviewModal }) {
+  const BASE_URL = process.env.REACT_APP_BASE_URL
   const [activeStatus, setActiveStatus] = useState("")
   const [videoBarActive, setVideoBarActive] = useState("")
   const navigate = useNavigate()
@@ -18,9 +21,11 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
     totalNoOfLectures,
     completedLectures,
   } = useSelector((state) => state.viewCourse)
+  const { token } = useSelector(state => state.auth)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    ;(() => {
+    ; (() => {
       if (!courseSectionData.length) return
       const currentSectionIndx = courseSectionData.findIndex(
         (data) => data._id === sectionId
@@ -37,6 +42,50 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseSectionData, courseEntireData, location.pathname])
+
+  // console.log("courseEntireData", courseEntireData)
+  let courseId = courseEntireData?._id
+  const [certificate, setCertificate] = useState(() => {
+    return localStorage.getItem(`certificate_${courseId}`) || null
+  })
+
+  const checkCourseCompleted = async () => {
+    try {
+      setIsLoading(true)
+      const res = await axios.post(
+        `${BASE_URL}/course/checkCourseCompleted`,
+        { courseId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      if (res.data.certificateURL) {
+        setCertificate(res.data.certificateURL)
+        localStorage.setItem(`certificate_${courseId}`, res.data.certificateURL)
+      }
+    } catch (err) {
+      console.error("Error:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (courseId) {
+      // Clear previous certificate when course changes
+      setCertificate(null)
+      localStorage.removeItem(`certificate_${courseId}`)
+      checkCourseCompleted()
+    }
+    
+    return () => {
+      // Cleanup when component unmounts
+      setIsLoading(false)
+    }
+  }, [courseId, token,location.pathname,completedLectures])
+
 
   return (
     <>
@@ -63,6 +112,16 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
             <p className="text-sm font-semibold text-richblack-500">
               {completedLectures?.length} / {totalNoOfLectures}
             </p>
+            {/* Certificate Download Button */}
+            {certificate  && (
+              <button
+                onClick={() => window.open(certificate, "_blank")}
+                className="flex items-center gap-2 rounded-md bg-yellow-50 px-4 py-2 text-sm font-semibold text-richblack-900 hover:scale-95 transition-all duration-200"
+              >
+                <FaDownload className="text-lg" />
+                Certificate
+              </button>
+            )}
           </div>
         </div>
 
@@ -83,11 +142,10 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
                     Lession {course?.subSection.length}
                   </span> */}
                   <span
-                    className={`${
-                      activeStatus === course?.sectionName
-                        ? "rotate-0"
-                        : "rotate-180"
-                    } transition-all duration-500`}
+                    className={`${activeStatus === course?.sectionName
+                      ? "rotate-0"
+                      : "rotate-180"
+                      } transition-all duration-500`}
                   >
                     <BsChevronDown />
                   </span>
@@ -99,11 +157,10 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
                 <div className="transition-[height] duration-500 ease-in-out">
                   {course.subSection.map((topic, i) => (
                     <div
-                      className={`flex gap-3  px-5 py-2 ${
-                        videoBarActive === topic._id
-                          ? "bg-yellow-200 font-semibold text-richblack-800"
-                          : "hover:bg-richblack-900"
-                      } `}
+                      className={`flex gap-3  px-5 py-2 ${videoBarActive === topic._id
+                        ? "bg-yellow-200 font-semibold text-richblack-800"
+                        : "hover:bg-richblack-900"
+                        } `}
                       key={i}
                       onClick={() => {
                         navigate(
@@ -115,7 +172,7 @@ export default function VideoDetailsSidebar({ setReviewModal }) {
                       <input
                         type="checkbox"
                         checked={completedLectures.includes(topic?._id)}
-                        onChange={() => {}}
+                        onChange={() => { }}
                       />
                       {topic.title}
                     </div>

@@ -27,9 +27,14 @@ import ViewCourse from "../../pages/ViewCourse";
 import { useSelector } from "react-redux";
 import { ACCOUNT_TYPE } from "../../utils/constants";
 import VideoDetails from "../cors/ViewCourse/VideoDetails"
+import AdminReport from "../admin/AdminReport";
+import AdminCourseReport from "../admin/AdminCourseReport";
+import Instructor from "../cors/Dashboard/Instructor"
+import AdminInstructoreManagement from "../admin/AdminInstructoreManagement";
+import InstructorAnalytics from "../admin/InstructorAnalytics";
 const AnimatedRoutes = () => {
   const { user } = useSelector((state) => state.profile);
- 
+
   const location = useLocation();
   return (
     <AnimatePresence>
@@ -102,7 +107,18 @@ const AnimatedRoutes = () => {
             path="/dashboard/edit-course/:courseId"
             element={<EditCourse />}
           />
+          <Route path="dashboard/instructor" element={<Instructor />} />
           <Route path="/manage-category" element={<ManageCategory />} />
+          {user?.accountType == ACCOUNT_TYPE.ADMIN && (
+            <>
+              <Route path="/admin/report" element={<AdminReport />} />
+              <Route path="/admin/report/courses" element={<AdminCourseReport />} />
+              <Route path="/admin/users" element={<AdminInstructoreManagement />} />
+              <Route path="/admin/analytics" element={<InstructorAnalytics />} /> 
+
+            </>
+
+          )}
         </Route>
 
         {/* For the watching course lectures */}
@@ -124,9 +140,9 @@ const AnimatedRoutes = () => {
         </Route>
 
         <Route path="/catalog/:catalogName" element={
-          
-            <Catelog />
-       
+
+          <Catelog />
+
         }></Route>
         <Route
           path="/courses/:courseId"

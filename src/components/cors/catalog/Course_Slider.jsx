@@ -36,7 +36,7 @@ const Course_Slider = ({ Courses }) => {
         navigation={true}
         pagination={{ clickable: true }}
 
-        mousewheel={true}
+        mousewheel={false}
         keyboard={true}
         modules={[Navigation, Mousewheel, Keyboard]}
       >

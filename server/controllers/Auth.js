@@ -22,6 +22,7 @@ exports.signup = async (req, res) => {
 			accountType,
 			contactNumber,
 			otp,
+			reason
 		} = req.body;
 		// Check if All Details are there or not
 		if (
@@ -76,7 +77,7 @@ exports.signup = async (req, res) => {
 		const hashedPassword = await bcrypt.hash(password, 10);
 
 		// Create the user
-		let approved = "";
+		let approved = accountType;
 		approved === "Instructor" ? (approved = false) : (approved = true);
 
 		// Create the Additional Profile For User
@@ -96,7 +97,44 @@ exports.signup = async (req, res) => {
 			approved: approved,
 			additionalDetails: profileDetails._id,
 			image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+			reason: reason,
 		});
+
+		if(accountType === "Instructor"){
+			await mailSender(
+				user.email,
+				"Instructor Account Created",
+				`
+				<html>
+				  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+					<div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+					  <header style="text-align: center; padding-bottom: 20px;">
+						<h1 style="color: #4CAF50;">StudyNotion</h1>
+					  </header>
+					  <main>
+						<h2>Hello ${user.firstName} ${user.lastName},</h2>
+						<p>We are excited to inform you that your Instructor account has been created successfully. Please wait for approval from our team.</p>
+						<p>In the meantime, you can explore our platform and get familiar with the features available to instructors.</p>
+						<div style="text-align: center; margin: 20px 0;">
+						  <a href="https://studynotion.com/login" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Login to Your Account</a>
+						</div>
+					  </main>
+					  <footer style="text-align: center; padding-top: 20px; border-top: 1px solid #ddd;">
+						<p style="font-size: 0.9em; color: #777;">&copy; 2023 StudyNotion. All rights reserved.</p>
+					  </footer>
+					</div>
+				  </body>
+				</html>
+				`
+			  );
+
+          return res.status(201).json({
+			success: true,
+			user,
+			message: "Your Account is Created Successfully, Please Wait for Approval",
+		});
+
+		}
 
 		return res.status(200).json({
 			success: true,
@@ -127,8 +165,14 @@ exports.login = async (req, res) => {
 			});
 		}
 
+
+
 		// Find user with provided email
 		const user = await User.findOne({ email }).populate("additionalDetails").exec();
+		console.log("user......", user); // Commented out for security
+
+
+
 
 		// If user not found with provided email
 		if (!user) {
@@ -136,6 +180,18 @@ exports.login = async (req, res) => {
 			return res.status(401).json({
 				success: false,
 				message: `User is not Registered with Us Please SignUp to Continue`,
+			});
+		}
+		if (user.approved === false) {
+			return res.status(401).json({
+				success: false,
+				message: `Your Account is not Approved Yet`,
+			});
+		}
+		if(user.active === false){
+			return res.status(401).json({
+				success: false,
+				message: `Your Account is Deactivated`,
 			});
 		}
 
@@ -330,6 +386,21 @@ exports.signgoogle = async (req, res) => {
 		return res.status(500).json({
 			success: false,
 			message: "Error occurred while updating password",
+			error: err.message,
+		});
+	}
+}
+
+
+// get not approve user
+exports.getNotApprovedUser = async (req, res) => {
+	try {
+		const users = await User.find({ approved: false }).populate("additionalDetails");
+		res.status(200).json(users);
+	} catch (err) {
+		return res.status(500).json({
+			success: false,
+			message: "Error occurred while getting users",
 			error: err.message,
 		});
 	}

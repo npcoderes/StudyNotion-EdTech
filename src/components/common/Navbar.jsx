@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import { NavbarLinks } from "../../data/navbar-links";
 import studyNotionLogo from "../../assets/Logo/Logo-Full-Dark.png";
-import Logosmall from "../../assets/Logo/Logo-Small-Light.png";
+import Logosmall from "../../assets/Logo/Logo-Small-Dark.png";
 import { fetchCourseCategories } from "./../../services/operations/courseDetailsAPI";
 import logo from "../../assets/Logo/logo.png"
 import ProfileDropDown from "../Auth/ProfileDropDown";
@@ -90,7 +90,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`z-[1000] flex h-16 w-full items-center justify-center border-b-[0.5px] border-b-richblack-700 text-white translate-y-0 transition-all ${showNavbar} fixed top-0 left-0 right-0 bg-[#000] p-2  text-sm `}
+      className={`z-[1000] flex h-16 w-full items-center justify-center border-b-[0.5px] border-b-myborder text-mytext translate-y-0 transition-all ${showNavbar} fixed top-0 left-0 right-0 bg-mybg p-2  text-sm `}
     >
       {/* <nav className={` fixed flex items-center justify-center w-full h-16 z-[10] translate-y-0 transition-all text-white ${showNavbar}`}> */}
       <div className="flex w-11/12 max-w-maxContent items-center justify-between ">
@@ -100,7 +100,7 @@ const Navbar = () => {
         </Link>
 
         {/* Nav Links - visible for only large devices*/}
-        <ul className="hidden sm:flex gap-x-6 text-richblack-25">
+        <ul className="hidden sm:flex gap-x-6 text-mytext">
           {NavbarLinks.map((link, index) => (
             <li key={index}>
               {link.title === "Catalog" ? (
@@ -108,7 +108,7 @@ const Navbar = () => {
                   className={`group relative flex cursor-pointer items-center gap-1 ${
                     matchRoute("/catalog/:catalogName")
                       ? "bg-[#4251f5] text-white rounded-xl p-2 px-3"
-                      : "text-richblack-5 rounded-xl p-2 px-3"
+                      : "text-mytext rounded-xl p-2 px-3 font-semibold"
                   }`}
                 >
                   <p>{link.title}</p>
@@ -145,7 +145,7 @@ const Navbar = () => {
                     className={`${
                       matchRoute(link?.path)
                         ? "bg-[#422faf] text-white"
-                        : "text-richblack-5"
+                        : "text-mytext font-semibold"
                     } rounded-xl p-2 px-3 `}
                   >
                     {link.title}
@@ -172,7 +172,7 @@ const Navbar = () => {
             <Link to="/login">
               {/* <button className='border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md focus:outline-8 outline-yellow-50'> */}
               <button
-                className={` px-[16px] py-[8px] text-[#fff] rounded-3xl border-[#6236a8] border hidden lg:block`}
+                className={` px-[16px] py-[8px] text-[#6236a8] font-semibold rounded-3xl border-[#6236a8] border hidden lg:block`}
               >
                 Log in
               </button>
@@ -182,7 +182,7 @@ const Navbar = () => {
             <Link to="/signup">
               {/* <button className='border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md'> */}
               <button
-                className={`  px-[16px] py-[8px] text-[#fff] rounded-3xl bg-[#6236a8]  hidden lg:block `}
+                className={`  px-[16px] py-[8px] text-[#fff] font-semibold rounded-3xl bg-[#6236a8]  hidden lg:block `}
               >
                 Sign Up
               </button>

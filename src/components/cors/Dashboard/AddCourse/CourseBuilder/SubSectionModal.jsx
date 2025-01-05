@@ -110,7 +110,7 @@ const SubSectionModal = ({
 
   }
   return(
-    <div className="fixed inset-0 z-50 !mt-0 grid w-screen h-screen place-items-center backdrop-blur-sm overflow-auto bg-white bg-opacity-10">
+    <div className=" fixed w-screen h-screen inset-0 z-[10000] !mt-0 grid place-items-center backdrop-blur-sm overflow-auto bg-white bg-opacity-10">
         <div className="my-10 w-11/12 max-w-[700px] rounded-lg border border-richblack-400 bg-richblack-800">
             {/* modal heder  */}
             <div className="flex justify-between items-center rounded-t-lg bg-richblack-700 p-5">

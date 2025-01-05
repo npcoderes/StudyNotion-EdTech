@@ -22,6 +22,8 @@ const {
   showAllCategories,
   createCategory,
   categoryPageDetails,
+  deactiveCategory,
+  updateCategory
 } = require("../controllers/Category")
 
 // Sections Controllers Import
@@ -47,6 +49,7 @@ const {
 const {
   updateCourseProgress,
   getProgressPercentage,
+  checkCourseCompleted
 } = require("../controllers/courseProgress")
 
 // Importing Middlewares
@@ -79,6 +82,9 @@ router.post("/updateCourseProgress", auth, isStudent, updateCourseProgress)
 
 // To get Course Progress
 router.post("/getProgressPercentage", auth, isStudent, getProgressPercentage)
+
+// To check if course is completed
+router.post("/checkCourseCompleted",auth,checkCourseCompleted)
 // Delete a Course
 
 // ********************************************************************************************************
@@ -89,6 +95,8 @@ router.post("/getProgressPercentage", auth, isStudent, getProgressPercentage)
 router.post("/createCategory", auth, isAdmin, createCategory)
 router.get("/showAllCategories", showAllCategories)
 router.post("/getCategoryPageDetails", categoryPageDetails)
+router.post("/deactiveCategory", auth, isAdmin, deactiveCategory)
+router.post("/updateCategory", auth, isAdmin, updateCategory)
 
 // ********************************************************************************************************
 //                                      Rating and Review

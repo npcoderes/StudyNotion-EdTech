@@ -17,6 +17,7 @@ import { apiConnector } from "../services/apiconnector";
 import { useState } from "react";
 import Course_Slider from "../components/cors/catalog/Course_Slider";
 import SkeletonCourse from "../components/cors/homepage/SkeletonCourse";
+import { IosShareOutlined } from "@mui/icons-material";
 const Home = () => {
   const [courses,setCourses] = useState([]);
   const BASE_URL=process.env.REACT_APP_BASE_URL;
@@ -24,6 +25,7 @@ const Home = () => {
   useEffect(()=>{
     const fetchCourses = async () => {
       setLoading(true);
+      
       try{
         const res = await apiConnector("GET",BASE_URL+"/course/getAllCourses")
         console.log("courses",res.data.data)
@@ -58,10 +60,10 @@ const Home = () => {
       <div className="relative w-11/12 mx-auto flex flex-col max-w-maxContent items-center justify-between mt-5">
         <Link to="/signup">
           <div className="group mt-16 p-1 mx-auto rounded-full bg-gradient-to-r from-[#c1bed3] to-[#422faf] font-bold text-black transition-all duration-200 hover:scale-95 shadow-md">
-            <div className="flex items-center gap-4 flex-row px-10 rounded-full py-[5px] transition-all duration-200 group-hover:bg-[#422faf]/70">
+            <iv className="flex items-center gap-4 flex-row px-10 rounded-full py-[5px] transition-all duration-200 group-hover:bg-[#422faf]/70">
               <p>Become an Instructor</p>
               <FaArrowRight />
-            </div>
+            </iv>
           </div>
         </Link>
         <motion.div

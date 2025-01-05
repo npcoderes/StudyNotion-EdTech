@@ -49,7 +49,7 @@ exports.userQueryEmail = (userName, userEmail, queryMessage) => {
     <body>
         <div class="container">
      			<a href=""><img class="logo"
-					src="https://i.ibb.co/7Xyj3PC/logo.png" alt="StudyNotion Logo"></a>
+					src="https://res.cloudinary.com/da72q7tvb/image/upload/v1735809127/StudyNotion/k1jsxgxsmzxbzc6zdu9h.png" alt="StudyNotion Logo"></a>
             <div class="message">User Query Received</div>
             <div class="body">
                 <p>Dear Admin,</p>

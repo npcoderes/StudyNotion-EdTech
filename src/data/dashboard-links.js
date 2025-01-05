@@ -34,13 +34,13 @@ export const sidebarLinks = [
     type: ACCOUNT_TYPE.STUDENT,
     icon: "VscMortarBoard",
   },
-  // {
-  //   id: 6,
-  //   name: "Purchase History",
-  //   path: "/dashboard/purchase-history",
-  //   type: ACCOUNT_TYPE.STUDENT,
-  //   icon: "VscHistory",
-  // },
+  {
+    id: 6,
+    name: "User Report",
+    path: "/admin/report",
+    type: ACCOUNT_TYPE.ADMIN,
+    icon: "VscHistory",
+  },
   {
     id: 7,
     name: "Cart",
@@ -55,5 +55,26 @@ export const sidebarLinks = [
     type: ACCOUNT_TYPE.ADMIN,
     icon: "IoCartOutline",
   },
+  {
+    id: 9,
+    name: "Course Report",
+    path: "/admin/report/courses",
+    type: ACCOUNT_TYPE.ADMIN,
+    icon: "VscHistory",
+  },
+  {
+    id: 10,
+    name: "Instructor Management",
+    path: "/admin/users",
+    type: ACCOUNT_TYPE.ADMIN,
+    icon: "VscAccount",
+  },
+  {
+    id: 11,
+    name: "Instructor Analytics",
+    path: "/admin/analytics",
+    type: ACCOUNT_TYPE.ADMIN,
+    icon: "VscGraph",
+  }
   
 ];

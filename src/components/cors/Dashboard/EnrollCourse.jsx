@@ -25,10 +25,115 @@ export default function EnrolledCourses() {
       console.log("Could not fetch enrolled courses.");
     }
   };
+  // Add helper function at the top
+  const getExpiryStatus = (expiryDate) => {
+    if (!expiryDate) return { status: 'INVALID', text: 'No expiry date' };
+    console.log("expiryDate", expiryDate);
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+    console.log("daysLeft", daysLeft);
 
+    if (daysLeft < 0) return { status: 'EXPIRED', text: 'Expired' };
+    if (daysLeft < 7) return { status: 'EXPIRING', text: `${daysLeft} days left` };
+    return { status: 'ACTIVE', text: `Expires in ${daysLeft} days` };
+  };
   useEffect(() => {
     getEnrolledCourses();
   }, []);
+  // Add new components at top
+  const CourseCard = ({ course, navigate }) => (
+    <div className="grid grid-cols-12 gap-4 p-4 items-center border-b border-richblack-700 hover:bg-richblack-700/50 transition-all duration-200">
+      {/* Thumbnail and Course Details */}
+      <div className="col-span-3 flex items-center gap-4">
+        <div 
+          className="relative h-14 w-14 rounded-lg overflow-hidden cursor-pointer"
+          onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}
+        >
+          <img
+            src={course.thumbnail}
+            alt={course.courseName}
+            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-200"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p 
+            className="font-semibold text-richblack-5 cursor-pointer hover:text-yellow-50 transition-colors duration-200"
+            onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}
+          >
+            {course.courseName}
+          </p>
+          <p className="text-sm text-richblack-300 truncate">
+            {course.courseDescription}
+          </p>
+        </div>
+      </div>
+  
+      {/* Total Duration */}
+      <div className="col-span-2 text-richblack-50 flex justify-center items-center">
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{course.totalDuration || 'N/A'}</span>
+        </div>
+      </div>
+  
+      {/* Progress Bar */}
+      <div className="col-span-4 flex items-center">
+        <div className="w-full">
+          <div className="flex justify-between text-xs sm:text-sm text-richblack-50 mb-1">
+            <span>Progress</span>
+            <span className="font-medium">{course.progressPercentage || 0}%</span>
+          </div>
+          <ProgressBar
+            completed={course.progressPercentage || 0}
+            height="8px"
+            isLabelVisible={false}
+            bgColor="#FFD60A"
+            baseBgColor="#2C333F"
+            transitionDuration="0.3s"
+            className="rounded-full overflow-hidden"
+          />
+        </div>
+      </div>
+  
+      {/* Expiry Status */}
+      <div className="col-span-3 text-center">
+        <ExpiryStatus expireTime={course.expireTime} />
+      </div>
+    </div>
+  );
+  
+
+const statusConfig = {
+  EXPIRED: { bg: '#FEE2E2', text: '#EF4444', dot: '#DC2626' }, // Red shades
+  EXPIRING: { bg: '#FEF3C7', text: '#F59E0B', dot: '#D97706' }, // Yellow shades
+  ACTIVE: { bg: '#D1FAE5', text: '#10B981', dot: '#059669' },   // Green shades
+  INVALID: { bg: '#E5E7EB', text: '#6B7280', dot: '#374151' },  // Gray shades
+};
+
+// Updated ExpiryStatus component with inline styles
+const ExpiryStatus = ({ expireTime }) => {
+  const { status, text } = getExpiryStatus(expireTime);
+
+  // Fallback for invalid status
+  const config = statusConfig[status] || statusConfig.INVALID;
+
+  return (
+    <div
+      className="px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center justify-center"
+      style={{ backgroundColor: config.bg, color: config.text }}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full mr-1.5"
+        style={{ backgroundColor: config.dot }}
+      ></span>
+      {text}
+    </div>
+  );
+};
+
 
   // Loading Skeleton
   const sklItem = () => {
@@ -61,75 +166,34 @@ export default function EnrolledCourses() {
   }
 
   return (
-    <div className="bg-richblack-900 min-h-screen py-8 rounded-lg">
-      <div className="w-11/12 max-w-maxContent mx-auto">
-        <h1 className="text-4xl font-boogaloo text-richblack-5 mb-8 text-center sm:text-left">
+    <div className="bg-richblack-900 min-h-screen py-8">
+    <div className="w-11/12 max-w-maxContent mx-auto space-y-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-boogaloo text-richblack-5">
           Enrolled Courses
         </h1>
-        <div className="bg-richblack-800 rounded-xl overflow-hidden">
-          <div className="grid grid-cols-12 gap-4 p-4 font-semibold text-richblack-50 border-b border-richblack-700 text-sm sm:text-base">
-            <div className="col-span-12 sm:col-span-6 md:col-span-5">Course Name</div>
-            <div className="col-span-6 sm:col-span-3 md:col-span-2">Duration</div>
-            <div className="col-span-6 sm:col-span-4">Progress</div>
+        {enrolledCourses && (
+          <div className="text-sm text-richblack-300">
+            {enrolledCourses.length} {enrolledCourses.length === 1 ? 'Course' : 'Courses'} Enrolled
           </div>
-          {!enrolledCourses ? (
-            <div className="space-y-4 p-4">
-              {[...Array(5)].map((_, index) => (
-                <div key={index}>{sklItem()}</div>
-              ))}
-            </div>
-          ) : (
-            <div>
-              {enrolledCourses.map((course, index) => (
-                <div
-                  key={course._id}
-                  className="grid grid-cols-12 gap-4 p-4 items-center border-b border-richblack-700 hover:bg-richblack-700 transition-colors duration-200 text-sm sm:text-base z-0"
-                >
-                  <div
-                    className="col-span-12 sm:col-span-6 md:col-span-5 flex items-center gap-4 cursor-pointer"
-                    onClick={() =>
-                      navigate(
-                        `/view-course/${course._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`
-                      )
-                    }
-                  >
-                    <img
-                      src={course.thumbnail}
-                      alt={course.courseName}
-                      className="h-14 w-14 rounded-lg object-cover  "
-                    />
-                    <div>
-                      <p className="font-semibold text-richblack-5">
-                        {course.courseName}
-                      </p>
-                      <p className="text-xs text-richblack-300 mt-1">
-                        {course.courseDescription.length > 50
-                          ? `${course.courseDescription.slice(0, 50)}...`
-                          : course.courseDescription}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="col-span-6 sm:col-span-3 md:col-span-2 text-richblack-50">
-                    {course?.totalDuration}
-                  </div>
-                  <div className="col-span-6 sm:col-span-4">
-                    <p className="text-xs sm:text-sm text-richblack-50 mb-2">
-                      Progress: {course.progressPercentage || 0}%
-                    </p>
-                    <ProgressBar
-                      completed={course.progressPercentage || 0}
-                      height="8px"
-                      isLabelVisible={false}
-                      bgColor="#FFD60A"
-                      baseBgColor="#2C333F"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
+      </div>
+
+      <div className="bg-richblack-800 rounded-xl overflow-hidden shadow-lg">
+        {/* ...existing header code... */}
+        
+        {!enrolledCourses ? (
+          <sklItem />
+        )
+        : (
+          <div className="divide-y divide-richblack-700">
+            {enrolledCourses.map(course => (
+              <CourseCard key={course._id} course={course} navigate={navigate} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
+  </div>
   );
 }

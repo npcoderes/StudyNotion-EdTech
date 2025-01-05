@@ -26,3 +26,11 @@ exports.deleteResourceFromCloudinary = async (url) => {
         throw error;
     }
 };
+
+// upload pdf to cloudinary
+exports.uploadPdfToCloudinary = async (file, folder) => {
+    const options = {folder};
+    options.resource_type = "raw";
+
+    return await cloudinary.uploader.upload(file, options);
+}

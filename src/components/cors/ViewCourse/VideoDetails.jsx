@@ -162,6 +162,7 @@ const VideoDetails = () => {
       { courseId: courseId, subsectionId: subSectionId },
       token
     )
+    
     if (res) {
       dispatch(updateCompletedLectures(subSectionId))
     }

@@ -68,6 +68,12 @@ const userSchema = new mongoose.Schema(
 				ref: "courseProgress",
 			},
 		],
+		reason: {
+			type: String,
+		},
+		Revenue: {
+			type: Number,
+		},
 
 		// Add timestamps for when the document is created and last modified
 	},

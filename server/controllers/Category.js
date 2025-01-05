@@ -23,7 +23,7 @@ exports.createCategory = async (req, res) => {
 		});
 	} catch (error) {
 		return res.status(500).json({
-			success: true,
+			
 			message: error.message,
 		});
 	}
@@ -32,7 +32,9 @@ exports.createCategory = async (req, res) => {
 exports.showAllCategories = async (req, res) => {
     try {
         // console.log("INSIDE SHOW ALL CATEGORIES"); // Commented out for security
-		const allCategorys = await Category.find({});
+		const allCategorys = await Category.find({
+     
+        });
 		res.status(200).json({
 			success: true,
 			data: allCategorys,
@@ -142,3 +144,77 @@ exports.categoryPageDetails = async (req, res) => {
         })
     }
 }
+
+// deactive category 
+
+exports.deactiveCategory = async (req, res) => {
+    try {
+        const {categoryId} = req.body
+        const category = await Category
+        .findById(categoryId)
+        .exec()
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found",
+            })
+        }
+        category.Active = false
+        await category.save()
+        res.status(200).json({
+            success: true,
+            message: "Category deactivated successfully",
+        })
+    }
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+        })
+    }
+}
+
+// update category
+exports.updateCategory = async (req, res) => {
+    try {
+        const {categoryId} = req.body
+        const category = await Category
+        .findById(categoryId)
+        .exec()
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found",
+            })
+        }
+        const { name, description,Active } = req.body
+        if (name)
+        {
+            category.name = name
+        }
+        if (description)
+        {
+            category.description = description
+        }
+        if (Active)
+        {
+            category.Active = Active
+        }
+
+        await category.save()
+        res.status(200).json({
+            success: true,
+            message: "Category updated successfully",
+        })
+    }
+
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+        })
+    }
+}
+

@@ -126,6 +126,10 @@ module.exports = {
       'highlight-blue': '#0d9edf',
       customPurple: '#BB86FC', // Soft Purple
       customGray: '#E0E0E0',   // Light Gray
+      mybg:'#FFFFFF',
+      mytext:'#333333',
+      card:'#F7F7F7',
+      myborder:'#E0E0E0'
     },
     extend: {
       maxWidth: {

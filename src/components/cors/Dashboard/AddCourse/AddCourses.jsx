@@ -1,8 +1,20 @@
 import React from 'react'
 import RenderSteps from './RenderSteps'
+import { useEffect } from 'react'
+import { setCourse, setEditCourse,setStep } from '../../../../slices/courseSlice'
+import { useDispatch } from 'react-redux'
+
 
 const AddCourses = () => {
-  return (
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+       dispatch(setEditCourse(false)) 
+       dispatch(setStep(1))
+       dispatch(setCourse(null))
+    }, [])
+
+  return    (
     <>
     <div className='flex w-full  items-start gap-x-6 h-full '>
         <div className='flex flex-1 flex-col '>

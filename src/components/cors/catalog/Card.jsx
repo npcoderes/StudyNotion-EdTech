@@ -10,6 +10,7 @@ const Card = ({ course, Height, objectFit }) => {
   const [avgReviewCount, setAvgReviewCount] = useState(0);
 
   useEffect(() => {
+    console.log("course",course)
     console.log(course.ratingAndReviews);
     const count = GetAvgRating(course.ratingAndReviews);
     console.log(count);

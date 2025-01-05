@@ -30,8 +30,9 @@ const handleSubmit=(e)=>{
         email,
         password,
         confirmPassword,
+        reason
     }=signup
-  dispatch(signUp(accountType, firstName, lastName, email, password, confirmPassword, otp, navigate))
+  dispatch(signUp(accountType, firstName, lastName, email, password, confirmPassword, otp,reason, navigate))
 
 }
 return <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center text-richblack-900 ">

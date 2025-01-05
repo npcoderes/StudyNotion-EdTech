@@ -7,16 +7,13 @@ export const endpoints = {
   LOGIN_API: BASE_URL + "/auth/login",
   RESETPASSTOKEN_API: BASE_URL + "/auth/reset-password-token",
   RESETPASSWORD_API: BASE_URL + "/auth/reset-password",
-  GOOGLE_LOGIN_API: BASE_URL + "/auth/googlelogin",
-  USER_QUERY_API: BASE_URL + "/auth/senduserquery",
-  
 }
 
 // PROFILE ENDPOINTS
 export const profileEndpoints = {
   GET_USER_DETAILS_API: BASE_URL + "/profile/getUserDetails",
   GET_USER_ENROLLED_COURSES_API: BASE_URL + "/profile/getEnrolledCourses",
-
+  GET_INSTRUCTOR_DATA_API: BASE_URL + "/profile/instructorDashboard",
 }
 
 // STUDENTS ENDPOINTS
@@ -45,7 +42,6 @@ export const courseEndpoints = {
     BASE_URL + "/course/getFullCourseDetails",
   LECTURE_COMPLETION_API: BASE_URL + "/course/updateCourseProgress",
   CREATE_RATING_API: BASE_URL + "/course/createRating",
-
 }
 
 // RATINGS AND REVIEWS

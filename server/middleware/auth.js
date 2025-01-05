@@ -10,11 +10,12 @@ exports.auth = async (req, res, next) => {
                         || req.body.token 
                         || req.header("Authorization").replace("Bearer ", "");
 
+
         //if token missing, then return response
         if(!token) {
             return res.status(401).json({
                 success:false,
-                message:'TOken is missing',
+                message:'Token is missing',
             });
         }
 
@@ -23,6 +24,7 @@ exports.auth = async (req, res, next) => {
             const decode =  jwt.verify(token, process.env.JWT_SECRET);
             // console.log(decode);
             req.user = decode;
+            
         }
         catch(err) {
             //verification - issue

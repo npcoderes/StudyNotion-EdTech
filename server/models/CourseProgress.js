@@ -1,20 +1,30 @@
 const mongoose = require("mongoose");
 
-const courseProgress = new mongoose.Schema({
-	courseID: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "Course",
-	},
-	userId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
-	},
-	completedVideos: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "SubSection",
-		},
-	],
+const courseProgressSchema = new mongoose.Schema({
+  courseID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+    required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  completedVideos: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubSection",
+    },
+  ],
+  expireTime: {
+    type: Date,
+    required: true, // Mark this as required if every course should have an expiration time
+  },
+  certificateURL: {
+    type: String,
+  }
 });
 
-module.exports = mongoose.model("courseProgress", courseProgress);
+// Export the model
+module.exports = mongoose.model("CourseProgress", courseProgressSchema);
