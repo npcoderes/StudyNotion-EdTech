@@ -9,6 +9,10 @@ import { BigPlayButton, Player } from "video-react"
 import { markLectureAsComplete } from "../../../services/operations/courseDetailsAPI"
 import { updateCompletedLectures } from "../../../slices/viewCourseSlice"
 import IconBtn from "../../common/IconBtn"
+import DoubtList from "../Doubt/DoubtList"
+import CreateDoubt from "../Doubt/CreateDoubt "
+import { getDoubtsByCourse } from "../../../services/operations/doubtService"
+
 
 const VideoDetails = () => {
   const { courseId, sectionId, subSectionId } = useParams()
@@ -24,6 +28,24 @@ const VideoDetails = () => {
   const [previewSource, setPreviewSource] = useState("")
   const [videoEnded, setVideoEnded] = useState(false)
   const [loading, setLoading] = useState(false)
+  const {user} =useSelector(state=>state.profile)
+  const [showDoubtForm, setShowDoubtForm] = useState(false);
+  const [doubts, setDoubts] = useState([]);
+
+  const fetchDoubts = async () => {
+    try {
+      const response = await getDoubtsByCourse(courseId);
+      console.log("doubts", response.data);
+      setDoubts(response.data.doubts);
+    } catch (error) {
+      console.error("Error fetching doubts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDoubts();
+  }, [courseId]);
+  // console.log(user)
 
   useEffect(() => {
     ;(async () => {
@@ -242,6 +264,34 @@ const VideoDetails = () => {
 
       <h1 className="mt-4 text-3xl font-semibold">{videoData?.title}</h1>
       <p className="pt-2 pb-6">{videoData?.description}</p>
+
+      <>
+      <div className="my-7">
+      <button
+        onClick={() => setShowDoubtForm(true)}
+        className="bg-yellow-50 text-richblack-900 px-4 py-2 rounded-md hover:bg-yellow-100 transition-all duration-200"
+      >
+        Ask a Doubt
+      </button>
+
+      {showDoubtForm && (
+        <CreateDoubt 
+          courseId={courseId} 
+          onDoubtCreated={fetchDoubts} 
+          onClose={() => setShowDoubtForm(false)}
+        />
+      )}
+
+     {
+      
+     }    <DoubtList 
+        doubts={doubts} 
+        isInstructor={false} 
+        onUpdate={fetchDoubts} 
+      />
+    </div>
+
+      </>
     </div>
   )
 }

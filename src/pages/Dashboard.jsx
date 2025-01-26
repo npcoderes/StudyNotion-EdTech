@@ -22,7 +22,7 @@ const Dashboard = () => {
     <SlideBar />
   </div>
   <div className='overflow-auto flex-grow '>
-    <div className='py-10 max-w-[1000px] w-11/12 mx-auto h-full max-sm:mx-10px '>
+    <div className='py-10 max-w-[1000px] w-11/12 mx-auto h-full max-sm:mx-10px lg:pl-[40px] '>
       <Outlet />
     </div>
   </div>

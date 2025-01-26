@@ -161,7 +161,24 @@ router.post('/deapproveuser', async (req, res) => {
   }
 });
 
+router.post('/activeUser', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    console.log('Approving user:', userId);
+    const user = await User.findByIdAndUpdate(userId, { active: true }, { new: true });
+    res.json({
+      success: true,
+      message: "User activated successfully",
+      user: user
+    });
+  } catch (err) {
+    console.error('Error approving user:', err);
+    res.status(500).send('Server Error');
+  }
+}
+);
+
 router.get("/instructor-analytics",  getInstructorAnalytics)
 router.post("/deactivate-instructor", auth, isAdmin, deactivateInstructor)
 
-module.exports = router;
+module.exports = router;          

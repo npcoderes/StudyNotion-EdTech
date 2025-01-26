@@ -75,6 +75,13 @@ export const sidebarLinks = [
     path: "/admin/analytics",
     type: ACCOUNT_TYPE.ADMIN,
     icon: "VscGraph",
+  },
+  {
+    id: 12,
+    name: "Student Doubts",
+    path: "/doubt-list",
+    type: ACCOUNT_TYPE.INSTRUCTOR,
+    icon: "VscQuestion"
   }
   
 ];

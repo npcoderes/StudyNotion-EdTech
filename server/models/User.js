@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema(
 				ref: "courseProgress",
 			},
 		],
-		reason: {
+		documents: {
 			type: String,
 		},
 		Revenue: {

@@ -32,6 +32,9 @@ import AdminCourseReport from "../admin/AdminCourseReport";
 import Instructor from "../cors/Dashboard/Instructor"
 import AdminInstructoreManagement from "../admin/AdminInstructoreManagement";
 import InstructorAnalytics from "../admin/InstructorAnalytics";
+import PrivacyPolicy from "../../pages/PrivacyPolicy";
+import InstructorCourses from "../cors/Doubt/InstructorCourses";
+
 const AnimatedRoutes = () => {
   const { user } = useSelector((state) => state.profile);
 
@@ -109,6 +112,7 @@ const AnimatedRoutes = () => {
           />
           <Route path="dashboard/instructor" element={<Instructor />} />
           <Route path="/manage-category" element={<ManageCategory />} />
+          <Route path="/doubt-list" element={<InstructorCourses />} />
           {user?.accountType == ACCOUNT_TYPE.ADMIN && (
             <>
               <Route path="/admin/report" element={<AdminReport />} />
@@ -152,7 +156,8 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
-        {/* admin  */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </AnimatePresence>

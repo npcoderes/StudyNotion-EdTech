@@ -46,6 +46,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { PieChart, Pie, Cell, LabelList } from 'recharts';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -114,31 +115,181 @@ const AdminReport = () => {
     setFilteredUsers(filtered);
   };
 
+  const processUserDistributionData = (users) => {
+    return [
+      { name: 'Students', value: users.filter(u => u.accountType === 'Student').length },
+      { name: 'Instructors', value: users.filter(u => u.accountType === 'Instructor').length }
+    ];
+  };
+
+  // Enhanced PDF generation
   const downloadPDF = () => {
-    const doc = new jsPDF();
-    doc.text('User Report', 20, 10);
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Brand Colors
+    const colors = {
+      primary: [255, 214, 10],     // yellow-50
+      secondary: [33, 33, 33],     // richblack-900
+      accent: [255, 255, 255],     // white
+      table: {
+        header: [33, 33, 33],
+        odd: [242, 242, 242],
+        even: [255, 255, 255]
+      }
+    };
+
+    // Calculate stats first 
+    const userStats = {
+      totalUsers: filteredUsers.length,
+      students: filteredUsers.filter(u => u.accountType === 'Student').length,
+      instructors: filteredUsers.filter(u => u.accountType === 'Instructor').length,
+      newUsersThisMonth: filteredUsers.filter(u => {
+        const userDate = new Date(u.createdAt);
+        const today = new Date();
+        return userDate.getMonth() === today.getMonth() &&
+          userDate.getFullYear() === today.getFullYear();
+      }).length
+    };
+
+    const statsData = [
+      ['Total Users', 'Students', 'Instructors', 'New Users this Month'],
+      [
+        userStats.totalUsers.toString(),
+        userStats.students.toString(),
+        userStats.instructors.toString(),
+        userStats.newUsersThisMonth.toString()
+      ]
+    ];
+
+    // Header Section
+    doc.setFillColor(...colors.secondary);
+    doc.rect(0, 0, doc.internal.pageSize.width, 40, 'F');
+
+    // Main Title
+    doc.setFontSize(28);
+    doc.setTextColor(...colors.primary);
+    doc.text('StudyNotion', 20, 20);
+
+    // Report Title
+    doc.setFontSize(18);
+    doc.setTextColor(...colors.accent);
+    doc.text('User Analysis Report', 20, 32);
+
+    // Date on right
+    const dateText = new Date().toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    doc.setFontSize(12);
+    const dateWidth = doc.getTextWidth(dateText);
+    doc.text(dateText, doc.internal.pageSize.width - dateWidth - 20, 20);
+
+    // Stats Grid
+    const statsY = 50;
+    doc.setFillColor(245, 245, 245);
+    doc.roundedRect(15, statsY, doc.internal.pageSize.width - 30, 35, 3, 3, 'F');
+
+    const colWidth = (doc.internal.pageSize.width - 60) / 4;
+    statsData[0].forEach((label, i) => {
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(0);
+      doc.text(label, 25 + (i * colWidth), statsY + 15);
+      doc.setFont(undefined, 'normal');
+      doc.text(statsData[1][i], 25 + (i * colWidth), statsY + 25);
+    });
+    // Add Table
     doc.autoTable({
-      head: [['Name', 'Email', 'Account Type', 'Join Date']],
+      startY: statsY + 45,
+      head: [['Name', 'Email', 'Account Type', 'Join Date', 'Status']],
       body: filteredUsers.map(user => [
         `${user.firstName} ${user.lastName}`,
         user.email,
         user.accountType,
-        new Date(user.createdAt).toLocaleDateString()
-      ])
+        new Date(user.createdAt).toLocaleDateString(),
+        user.active ? 'Active' : 'Inactive'
+      ]),
+      styles: {
+        fontSize: 10,
+        cellPadding: 5,
+        lineColor: [200, 200, 200],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: colors.table.header,
+        textColor: colors.accent,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: colors.table.odd
+      },
+      bodyStyles: {
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { halign: 'left' },
+        1: { halign: 'left' }
+      },
+      margin: { top: 10 }
     });
-    doc.save('user_report.pdf');
-  };
 
+    // Add page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+    // Rest of your PDF generation code...
+    doc.save('user_analysis_report.pdf');
+  };
   const downloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredUsers.map(user => ({
+    const workbook = XLSX.utils.book_new();
+
+    // Summary Sheet
+    const summaryData = [
+      ['StudyNotion User Report'],
+      ['Generated on:', new Date().toLocaleString()],
+      [''],
+      ['Summary Statistics'],
+      ['Total Users:', stats.totalUsers],
+      ['Students:', stats.students],
+      ['Instructors:', stats.instructors],
+      ['New Users This Month:', stats.newUsersThisMonth]
+    ];
+
+    const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+
+    // Users Sheet
+    const usersData = filteredUsers.map(user => ({
       'First Name': user.firstName,
       'Last Name': user.lastName,
       'Email': user.email,
       'Account Type': user.accountType,
-      'Join Date': new Date(user.createdAt).toLocaleDateString()
-    })));
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+      'Join Date': new Date(user.createdAt).toLocaleDateString(),
+      'Status': 'Active'
+    }));
+
+    const usersWS = XLSX.utils.json_to_sheet(usersData);
+
+    // Add sheets to workbook
+    XLSX.utils.book_append_sheet(workbook, summaryWS, 'Summary');
+    XLSX.utils.book_append_sheet(workbook, usersWS, 'User Details');
+
+    // Generate Excel file
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     saveAs(new Blob([excelBuffer]), 'user_report.xlsx');
   };
@@ -301,7 +452,9 @@ const AdminReport = () => {
         {/* Export Buttons */}
         <Box sx={{ mb: 3 }}>
           <Button
-            variant="outlined"
+            
+           variant='contained'
+            color='primary'
             startIcon={<PictureAsPdf />}
             onClick={downloadPDF}
             sx={{ mr: 2 }}
@@ -309,7 +462,8 @@ const AdminReport = () => {
             Export PDF
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
+            color="success"
             startIcon={<TableChart />}
             onClick={downloadExcel}
           >
@@ -337,23 +491,56 @@ const AdminReport = () => {
           )}
         </Paper>
 
-        {/* Charts */}
+        
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={8}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 User Registration Trend
               </Typography>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={processChartData(filteredUsers)}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <RechartsTooltip />
+                  <RechartsTooltip
+                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none' }}
+                    cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+                  />
                   <Legend />
-                  <Bar dataKey="Student" fill="#2196f3" name="Students" />
-                  <Bar dataKey="Instructor" fill="#f50057" name="Instructors" />
+                  <Bar dataKey="Student" fill="#2196f3" radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey="Student" position="top" />
+                  </Bar>
+                  <Bar dataKey="Instructor" fill="#f50057" radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey="Instructor" position="top" />
+                  </Bar>
                 </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                User Distribution
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={processUserDistributionData(filteredUsers)}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {processUserDistributionData(filteredUsers).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? '#2196f3' : '#f50057'} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
               </ResponsiveContainer>
             </Paper>
           </Grid>

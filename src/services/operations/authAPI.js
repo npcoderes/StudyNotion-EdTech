@@ -5,6 +5,7 @@ import { resetCart } from "../../slices/cartSlice"
 import { setUser } from "../../slices/profileSlice"
 import { apiConnector } from "../apiconnector"
 import { endpoints } from "../apis"
+import axios from "axios"
 
 
 const {
@@ -26,7 +27,7 @@ export function sendOtp(email, navigate) {
         email,
         checkUserPresent: true,
       })
-      // console.log("SENDOTP API RESPONSE............", response)
+      console.log("SENDOTP API RESPONSE............", response)
       // console.log(response.data.success)
 
       if (!response.data.success) {
@@ -49,37 +50,26 @@ export function sendOtp(email, navigate) {
 }
 
 export function signUp(
-  accountType,
-  firstName,
-  lastName,
-  email,
-  password,
-  confirmPassword,
-  otp,
-  reason,
+  formData,
   navigate
 ) {
   return async (dispatch) => {
     const toastId = toast.loading("Loading...")
     dispatch(setLoading(true))
     try {
-      const response = await apiConnector("POST", SIGNUP_API, {
-        accountType,
-        firstName,
-        lastName,
-        email,
-        password,
-        confirmPassword,
-        otp,
-        reason,
+      const response = await axios.post(SIGNUP_API, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       })
+      
 
-      // console.log("SIGNUP API RESPONSE............", response)
+      console.log("SIGNUP API RESPONSE............", response)
 
       if (!response.data.success) {
         throw new Error(response.data.message)
       }
-      toast.success("Signup Successful")
+      toast.success(response.data.message)
       navigate("/login")
     } catch (error) {
       console.log("SIGNUP API ERROR............", error)
@@ -203,15 +193,15 @@ export function logout(navigate) {
   }
 }
 
-export function googleLogin(email,navigate){
-  return async (dispatch)=>{
-   
+export function googleLogin(email, navigate) {
+  return async (dispatch) => {
+
     const toastId = toast.loading("Loading...")
     dispatch(setLoading(true))
     try {
-      const response = await apiConnector("POST", GOOGLE_LOGIN_API,  {
+      const response = await apiConnector("POST", GOOGLE_LOGIN_API, {
         email,
-     
+
       })
 
       // console.log("LOGIN API RESPONSE............", response)
@@ -239,20 +229,20 @@ export function googleLogin(email,navigate){
       localStorage.setItem("token", JSON.stringify(response.data.token))
 
       navigate("/dashboard/my-profile")
-    
-     
-   }catch(error){
+
+
+    } catch (error) {
+      toast.dismiss(toastId)
+      console.log("Error in google login", error)
+      toast.error(error.response.data.message)
+    }
+    dispatch(setLoading(false))
     toast.dismiss(toastId)
-     console.log("Error in google login",error)
-     toast.error(error.response.data.message)
   }
-  dispatch(setLoading(false))
-  toast.dismiss(toastId)
-}
 }
 
 
-export function userquery(firstName,message,email) {
+export function userquery(firstName, message, email) {
   return async (dispatch) => {
     const toastId = toast.loading("Loading...")
     dispatch(setLoading(true))
@@ -261,7 +251,7 @@ export function userquery(firstName,message,email) {
         firstName,
         email,
         message
-      
+
       })
       // console.log("SENDUSERQUERY API RESPONSE............", response)
       // console.log(response.data.success)
@@ -277,7 +267,7 @@ export function userquery(firstName,message,email) {
           },
         }
       );
-    
+
     } catch (error) {
       console.log("USERQUERY API ERROR............", error)
       toast.error(error.message)

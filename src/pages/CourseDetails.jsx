@@ -51,6 +51,8 @@ import {
   Schedule as ScheduleIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import ReviewSlider from "../components/common/ReviewSlider";
+
 const CourseDetails = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
@@ -414,8 +416,16 @@ const CourseDetails = () => {
             </List>
           </Card>
         </motion.div>
+
+     
       </Box>
       {confirmationModal && <ConfirmationModal confirmationModal={confirmationModal} />}
+
+     <div className="w-screen">
+     <ReviewSlider courseID={courseId} />
+
+     </div>
+      
       <Footer />
     </>
   );

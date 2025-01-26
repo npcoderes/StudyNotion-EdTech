@@ -6,6 +6,7 @@ const otpGenerator = require("otp-generator");
 const mailSender = require("../utils/mailSender");
 const { passwordUpdated } = require("../mail/templates/passwordUpdate");
 const Profile = require("../models/Profile");
+const {uploadPdfToCloudinary,uploadImageToCloudinary}=require("../utils/imageUploader")
 require("dotenv").config();
 
 // Signup Controller for Registering Users
@@ -21,9 +22,23 @@ exports.signup = async (req, res) => {
 			confirmPassword,
 			accountType,
 			contactNumber,
-			otp,
-			reason
+			otp
 		} = req.body;
+		 console.log("req.body",req.body)
+		//  console.log("req.file",req.file)
+        //  let documents = req.file;
+		//  if (!documents) {
+		// 	return res.status(400).json({ success: false, message: "Documents are required" });
+		//   }
+
+		if (!req.files || !req.files.file) {
+			return res.status(400).send({ message: "No file uploaded." });
+		  }
+
+		console.log("req.files",req.files)
+
+		let documents=req.files.file
+		
 		// Check if All Details are there or not
 		if (
 			!firstName ||
@@ -31,7 +46,8 @@ exports.signup = async (req, res) => {
 			!email ||
 			!password ||
 			!confirmPassword ||
-			!otp
+			!otp 
+		
 		) {
 			return res.status(403).send({
 				success: false,
@@ -79,6 +95,13 @@ exports.signup = async (req, res) => {
 		// Create the user
 		let approved = accountType;
 		approved === "Instructor" ? (approved = false) : (approved = true);
+		let active=accountType
+		active === "Instructor" ? (active = false) : (active = true);
+        let documentUrl
+		if(documents){
+			 documentUrl = await uploadImageToCloudinary(documents,process.env.FOLDER_NAME);
+			console.log("Document Url", documentUrl.secure_url);
+		}
 
 		// Create the Additional Profile For User
 		const profileDetails = await Profile.create({
@@ -87,6 +110,7 @@ exports.signup = async (req, res) => {
 			about: null,
 			contactNumber: null,
 		});
+
 		const user = await User.create({
 			firstName,
 			lastName,
@@ -97,7 +121,7 @@ exports.signup = async (req, res) => {
 			approved: approved,
 			additionalDetails: profileDetails._id,
 			image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
-			reason: reason,
+			documents: documentUrl.secure_url,
 		});
 
 		if(accountType === "Instructor"){
@@ -145,7 +169,7 @@ exports.signup = async (req, res) => {
 		// console.error(error); // Commented out for security
 		return res.status(500).json({
 			success: false,
-			message: "User cannot be registered. Please try again.",
+			message: error,
 		});
 	}
 };
@@ -199,10 +223,7 @@ exports.login = async (req, res) => {
 		if (await bcrypt.compare(password, user.password)) {
 			const token = jwt.sign(
 				{ email: user.email, id: user._id, accountType: user.accountType },
-				process.env.JWT_SECRET,
-				{
-					expiresIn: "24h",
-				}
+				process.env.JWT_SECRET
 			);
 
 			// Save token to user document in database

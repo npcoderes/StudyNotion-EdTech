@@ -18,12 +18,12 @@ const InstructorAnalytics = () => {
     const fetchInstructors = async () => {
         try {
             setLoading(true);
-    
+
             // Get all instructors
             const { data: instructors } = await axios.get(`${BASE_URL}/admin/instructors`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-    
+
             // Get analytics for each instructor
             const instructorsWithAnalytics = await Promise.all(
                 instructors.map(async (instructor) => {
@@ -34,14 +34,14 @@ const InstructorAnalytics = () => {
                                 headers: { Authorization: `Bearer ${token}` },
                             }
                         );
-    
+
                         return {
                             ...instructor,
                             performance: analyticsResponse.data,
                         };
                     } catch (error) {
                         console.error(`Error fetching analytics for instructor ${instructor._id}:`, error.message);
-    
+
                         return {
                             ...instructor,
                             performance: {
@@ -54,8 +54,9 @@ const InstructorAnalytics = () => {
                     }
                 })
             );
-    
+
             setInstructors(instructorsWithAnalytics);
+            console.log("Instructors with analytics:", instructorsWithAnalytics);
         } catch (error) {
             console.error("Failed to fetch instructors:", error.message);
             toast.error("Failed to fetch instructors data");
@@ -63,8 +64,8 @@ const InstructorAnalytics = () => {
             setLoading(false);
         }
     };
-    
-    
+
+
     const handleDeactivate = async (instructorId) => {
         try {
             const response = await axios.post(
@@ -77,7 +78,7 @@ const InstructorAnalytics = () => {
                     }
                 }
             )
-            
+
             if (response.data.success) {
                 toast.success('Instructor deactivated successfully')
                 fetchInstructors()
@@ -86,6 +87,30 @@ const InstructorAnalytics = () => {
             toast.error(error.response?.data?.message || 'Failed to deactivate instructor')
         }
     }
+
+    const handleActivate = async (instructorId) => {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/admin/activeUser`,
+                { userId :instructorId },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+
+            if (response.data.success) {
+                toast.success('Instructor activated successfully')
+                fetchInstructors()
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to activate instructor')
+        }
+    }
+     
+
 
     useEffect(() => {
         fetchInstructors()
@@ -122,8 +147,8 @@ const InstructorAnalytics = () => {
             accessor: 'performance.averageSentiment',
             cell: (row) => (
                 <div className={`px-2 py-1 rounded ${row.performance.averageSentiment >= 0
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
                     }`}>
                     {row.performance.averageSentiment.toFixed(2)}
                 </div>
@@ -134,8 +159,8 @@ const InstructorAnalytics = () => {
             accessor: 'performance.isPerformanceCritical',
             cell: (row) => (
                 <div className={`px-2 py-1 rounded ${row.performance.isPerformanceCritical
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-green-100 text-green-800'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-green-100 text-green-800'
                     }`}>
                     {row.performance.isPerformanceCritical ? 'Critical' : 'Good'}
                 </div>
@@ -145,13 +170,34 @@ const InstructorAnalytics = () => {
             header: 'Actions',
             cell: (row) => (
                 row.performance.isPerformanceCritical && (
-                    <button
-                        onClick={() => handleDeactivate(row._id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                    >
-                        <FaUserSlash className="inline mr-1" /> Deactivate
-                    </button>
+                    <div className='flex gap-2'>
+                       {
+                        row?.active ? (
+                            <button 
+                                onClick={() => handleDeactivate(row._id)}
+                                className='btn btn-error'
+                            >
+                                Deactivate
+                            </button>
+                        ) : (
+                            <button 
+                                onClick={() => handleActivate(row._id)}
+                                className='btn btn-primary'
+                            >
+                                Activate
+                            </button>
+                        )
+                       }
+                        <button 
+                            onClick={() => window.location.href = `mailto:${row?.email}`}
+                            className='btn btn-error'
+                        >
+                            Send Warning Email
+                        </button>
+                    </div>
+
                 )
+                
             )
         }
     ]

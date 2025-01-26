@@ -8,10 +8,13 @@ import { sendOtp } from "../../services/operations/authAPI"
 import { setSignupData } from "../../slices/authSlice"
 import { ACCOUNT_TYPE } from "../../utils/constants"
 import Tab from "../common/Tab"
+import { Link } from "react-router-dom"
+import { useSignup } from "../../context/SignupContext"
 
 function SignupForm() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const { document, setDocument } = useSignup()
 
   // student or instructor
   const [accountType, setAccountType] = useState(ACCOUNT_TYPE.STUDENT)
@@ -22,7 +25,7 @@ function SignupForm() {
     email: "",
     password: "",
     confirmPassword: "",
-    reason : "",
+    file: null,
   })
 
   const [showPassword, setShowPassword] = useState(false)
@@ -32,31 +35,56 @@ function SignupForm() {
 
   // Handle input fields, when some value changes
   const handleOnChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
-    }))
-  }
+    const { name, value, files } = e.target;
+    if (name === 'file') {
+      const file = files[0];
+
+      // Validate file
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("File size should be less than 5MB");
+        return;
+      }
+
+      if (file.type !== 'application/pdf') {
+        toast.error("Only PDF files are allowed");
+        return;
+      }
+
+      try {
+        // Convert to base64
+           setFormData({ ...formData, [name]: file });
+         
+         toast.success("Document uploaded successfully");
+      } catch (error) {
+        console.error("File handling error:", error);
+        toast.error("Error uploading document");
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
   // Handle Form Submission
-  const handleOnSubmit = (e) => {
+  const handleOnSubmit = async(e) => {
     e.preventDefault()
-    
+
     if (password !== confirmPassword) {
       toast.error("Passwords Do Not Match")
       return
     }
-    
+
     const signup = {
       ...formData,
       accountType,
     }
-
+    console.log("signup.....", signup)
+    setDocument(signup)
+    
     // Setting signup data to state
     // To be used after otp verification
-    dispatch(setSignupData(signup))
+    // dispatch(setSignupData(signup))
     // Send OTP to user for verification
-    dispatch(sendOtp(formData.email, navigate))
+    dispatch(sendOtp(signup.email, navigate))
 
     // Reset
     setFormData({
@@ -199,28 +227,43 @@ function SignupForm() {
           </label>
         </div>
         {/* add reson why you want to join */}
-        {
-          accountType === ACCOUNT_TYPE.INSTRUCTOR && (        <div className="mt-">
+        {accountType === ACCOUNT_TYPE.INSTRUCTOR && (
+          <div className="mt-2">
             <label className="relative">
               <p className="mb-1 text-[0.875rem] leading-[1.375rem] text-richblack-900">
-                Reason <sup className="text-pink-200">*</sup>
+                Upload a single pdf file containg all certificates <sup className="text-pink-200">*</sup>
               </p>
-  
-              <textarea 
-              required
-              name="reason"
-              value={formData.reason}
-              onChange={handleOnChange}
-              placeholder="Why you want to join this community"
-              style={{
-                boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",
-              }}
-              rows={4}
-              className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5"
+              <input
+                type="file"
+                name="file"
+                accept="application/pdf"
+                onChange={handleOnChange}
+                required
+                className="w-full rounded-[0.5rem] bg-richblack-800 p-[12px] text-richblack-5"
               />
-              
             </label>
-          </div>)
+          </div>
+        )}
+        {/* checkbox for privacy-policy  */}
+        {
+          accountType === ACCOUNT_TYPE.INSTRUCTOR && (
+            <div className="mt-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  required
+                  name="privacyPolicy"
+                  className="mr-2"
+                />
+                <p className="text-[0.875rem] leading-[1.375rem] text-richblack-900">
+                  I agree to the <Link to={"/privacy-policy"}> <span className="text-blue-500 cursor-pointer">Privacy Policy</span> </Link>
+                </p>
+
+
+
+              </label>
+            </div>
+          )
         }
 
 

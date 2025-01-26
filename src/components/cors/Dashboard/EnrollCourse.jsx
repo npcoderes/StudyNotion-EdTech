@@ -43,64 +43,68 @@ export default function EnrolledCourses() {
   }, []);
   // Add new components at top
   const CourseCard = ({ course, navigate }) => (
-    <div className="grid grid-cols-12 gap-4 p-4 items-center border-b border-richblack-700 hover:bg-richblack-700/50 transition-all duration-200">
-      {/* Thumbnail and Course Details */}
-      <div className="col-span-3 flex items-center gap-4">
-        <div 
-          className="relative h-14 w-14 rounded-lg overflow-hidden cursor-pointer"
-          onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}
-        >
-          <img
-            src={course.thumbnail}
-            alt={course.courseName}
-            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-200"
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p 
-            className="font-semibold text-richblack-5 cursor-pointer hover:text-yellow-50 transition-colors duration-200"
+    <div className="group p-4 transition-all duration-200 hover:bg-richblack-700/50">
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-4 items-start lg:items-center">
+        {/* Course Info */}
+        <div className="w-full lg:col-span-4 flex items-start gap-4">
+          {/* Thumbnail */}
+          <div 
             onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}
+            className="relative h-20 w-20 lg:h-16 lg:w-16 rounded-lg overflow-hidden cursor-pointer flex-shrink-0"
           >
-            {course.courseName}
-          </p>
-          <p className="text-sm text-richblack-300 truncate">
-            {course.courseDescription}
-          </p>
-        </div>
-      </div>
-  
-      {/* Total Duration */}
-      <div className="col-span-2 text-richblack-50 flex justify-center items-center">
-        <div className="flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{course.totalDuration || 'N/A'}</span>
-        </div>
-      </div>
-  
-      {/* Progress Bar */}
-      <div className="col-span-4 flex items-center">
-        <div className="w-full">
-          <div className="flex justify-between text-xs sm:text-sm text-richblack-50 mb-1">
-            <span>Progress</span>
-            <span className="font-medium">{course.progressPercentage || 0}%</span>
+            <img
+              src={course.thumbnail}
+              alt={course.courseName}
+              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-110"
+            />
           </div>
-          <ProgressBar
-            completed={course.progressPercentage || 0}
-            height="8px"
-            isLabelVisible={false}
-            bgColor="#FFD60A"
-            baseBgColor="#2C333F"
-            transitionDuration="0.3s"
-            className="rounded-full overflow-hidden"
-          />
-        </div>
-      </div>
   
-      {/* Expiry Status */}
-      <div className="col-span-3 text-center">
-        <ExpiryStatus expireTime={course.expireTime} />
+          {/* Course Details */}
+          <div className="flex-1 min-w-0">
+            <h3 
+              onClick={() => navigate(`/view-course/${course._id}/section/${course.courseContent?.[0]?._id}/sub-section/${course.courseContent?.[0]?.subSection?.[0]?._id}`)}
+              className="font-semibold text-lg lg:text-base text-richblack-5 cursor-pointer hover:text-yellow-50 transition-colors duration-200 line-clamp-2"
+            >
+              {course.courseName}
+            </h3>
+            <p className="text-sm text-richblack-300 mt-1 line-clamp-1">
+              {course.courseDescription}
+            </p>
+          </div>
+        </div>
+  
+        {/* Stats Section */}
+        <div className="w-full lg:col-span-8 grid grid-cols-3 lg:grid-cols-12 gap-2 lg:gap-4 items-center">
+          {/* Duration */}
+          <div className="col-span-1 lg:col-span-3 text-richblack-50 flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm whitespace-nowrap">{course.totalDuration || 'N/A'}</span>
+          </div>
+  
+          {/* Progress Bar */}
+          <div className="col-span-2 lg:col-span-6">
+            <div className="flex justify-between text-xs text-richblack-50 mb-1">
+              <span>Progress</span>
+              <span className="font-medium">{course.progressPercentage || 0}%</span>
+            </div>
+            <ProgressBar
+              completed={course.progressPercentage || 0}
+              height="8px"
+              isLabelVisible={false}
+              bgColor="#FFD60A"
+              baseBgColor="#2C333F"
+              transitionDuration="0.3s"
+              className="rounded-full overflow-hidden"
+            />
+          </div>
+  
+          {/* Expiry Status */}
+          <div className="col-span-3 lg:col-span-3 flex justify-end lg:justify-center">
+            <ExpiryStatus expireTime={course.expireTime} />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -116,24 +120,21 @@ const statusConfig = {
 // Updated ExpiryStatus component with inline styles
 const ExpiryStatus = ({ expireTime }) => {
   const { status, text } = getExpiryStatus(expireTime);
-
-  // Fallback for invalid status
   const config = statusConfig[status] || statusConfig.INVALID;
 
   return (
     <div
-      className="px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center justify-center"
+      className="px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center justify-center w-fit"
       style={{ backgroundColor: config.bg, color: config.text }}
     >
       <span
-        className="w-1.5 h-1.5 rounded-full mr-1.5"
+        className="w-1.5 h-1.5 rounded-full mr-1.5 hidden sm:inline-block"
         style={{ backgroundColor: config.dot }}
       ></span>
       {text}
     </div>
   );
 };
-
 
   // Loading Skeleton
   const sklItem = () => {
@@ -166,10 +167,10 @@ const ExpiryStatus = ({ expireTime }) => {
   }
 
   return (
-    <div className="bg-richblack-900 min-h-screen py-8">
-    <div className="w-11/12 max-w-maxContent mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-boogaloo text-richblack-5">
+    <div className="bg-richblack-900 min-h-screen py-4 sm:py-8">
+    <div className="w-11/12 max-w-maxContent mx-auto space-y-4 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+        <h1 className="text-3xl sm:text-4xl font-boogaloo text-richblack-5">
           Enrolled Courses
         </h1>
         {enrolledCourses && (
@@ -180,12 +181,9 @@ const ExpiryStatus = ({ expireTime }) => {
       </div>
 
       <div className="bg-richblack-800 rounded-xl overflow-hidden shadow-lg">
-        {/* ...existing header code... */}
-        
         {!enrolledCourses ? (
           <sklItem />
-        )
-        : (
+        ) : (
           <div className="divide-y divide-richblack-700">
             {enrolledCourses.map(course => (
               <CourseCard key={course._id} course={course} navigate={navigate} />

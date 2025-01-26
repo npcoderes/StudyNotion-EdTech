@@ -17,6 +17,7 @@ const {
 const {senduserquery}=require("../controllers/Contactus")
 
 const { auth } = require("../middleware/auth")
+const {uploadSingleFile}=require("../config/multer-config")
 
 // Routes for Login, Signup, and Authentication
 

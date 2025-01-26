@@ -4,6 +4,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { FaIndianRupeeSign } from "react-icons/fa6";
 import {
   Container,
   Paper,
@@ -178,58 +179,106 @@ const AdminCourseReport = () => {
       unit: 'mm',
       format: 'a3',
     });
-  
-    // Enhanced Header
-    const addHeader = () => {
-      doc.setFillColor(41, 128, 185);
-      doc.rect(0, 0, doc.internal.pageSize.width, 25, 'F');
-      doc.setFontSize(24);
-      doc.setTextColor(255, 255, 255);
-      doc.text('StudyNotion Course Report', 15, 15);
-      doc.setFontSize(14);
-      doc.text('Generated Report', 15, 22);
+
+    // Brand Colors
+    const colors = {
+      primary: [255, 214, 10],     // yellow-50
+      secondary: [78, 78, 78],     // richblack-900
+      accent: [255, 255, 255],     // white
+      table: {
+        header: [78, 78, 78],      // richblack-900
+        odd: [242, 242, 242],      // gray-100
+        even: [255, 255, 255]      // white
+      }
     };
   
-    // Filter Summary Section
+    const addHeader = () => {
+      // Main header background
+      doc.setFillColor(...colors.secondary);
+      doc.rect(0, 0, doc.internal.pageSize.width, 35, 'F');
+
+      // StudyNotion title
+      doc.setFontSize(30);
+      doc.setTextColor(...colors.primary);
+      doc.text('StudyNotion', 15, 15);
+
+      // Report type subtitle
+      doc.setFontSize(20);
+      doc.setTextColor(...colors.accent);
+      doc.text('Course Analysis Report', 15, 28);
+
+      // Add date on right
+      const dateText = `Generated on: ${new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })}`;
+      doc.setFontSize(12);
+      const dateWidth = doc.getTextWidth(dateText);
+      doc.text(dateText, doc.internal.pageSize.width - dateWidth - 15, 15);
+    };
+  
     const addFilterSummary = (y) => {
+      // Section title background
+      doc.setFillColor(...colors.primary);
+      doc.rect(10, y, doc.internal.pageSize.width - 20, 8, 'F');
+      
+      // Section title
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.secondary);
+      doc.text('Report Parameters', 15, y + 6);
+
+      y += 15;
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
-      doc.text('Report Filters:', 15, y);
-      y += 8;
-      if (startDate) doc.text(`Date Range: ${dayjs(startDate).format('DD/MM/YYYY')} - ${dayjs(endDate).format('DD/MM/YYYY')}`, 20, y);
-      y += 7;
-      if (status) doc.text(`Status: ${status}`, 20, y);
-      y += 7;
-      if (category) {
-        const categoryName = categories.find(c => c._id === category)?.name;
-        doc.text(`Category: ${categoryName}`, 20, y);
-      }
-      y += 7;
-      if (popularityFilter) doc.text(`Sorted by: ${popularityFilter}`, 20, y);
-      return y + 15;
+
+      // Filter details with bullet points
+      const filters = [];
+      if (startDate) filters.push(`• Date Range: ${dayjs(startDate).format('DD/MM/YYYY')} - ${dayjs(endDate).format('DD/MM/YYYY')}`);
+      if (status) filters.push(`• Status: ${status}`);
+      if (category) filters.push(`• Category: ${categories.find(c => c._id === category)?.name}`);
+      if (popularityFilter) filters.push(`• Sorted by: ${popularityFilter}`);
+
+      doc.text(filters, 20, y);
+      return y + (filters.length * 8) + 10;
     };
   
-    // Statistics Summary
     const addStatistics = (y) => {
       const totalRevenue = filteredCourses.reduce((sum, course) => 
         sum + (course.price * course.studentsEnrolledCount), 0);
       const totalStudents = filteredCourses.reduce((sum, course) => 
         sum + course.studentsEnrolledCount, 0);
-  
-      doc.setFillColor(230, 230, 230);
-      doc.rect(15, y, doc.internal.pageSize.width - 30, 30, 'F');
+      const activeCount = filteredCourses.filter(c => c.status === 'Published').length;
+
+      // Stats box
+      doc.setFillColor(245, 245, 245);
+      doc.roundedRect(15, y, doc.internal.pageSize.width - 30, 40, 3, 3, 'F');
+
+      // Stats grid
       doc.setFontSize(12);
-      doc.text([
-        `Total Courses: ${filteredCourses.length}`,
-        `Total Students: ${totalStudents}`,
-        `Total Revenue: ₹${totalRevenue.toLocaleString()}`,
-        `Active Courses: ${filteredCourses.filter(c => c.status === 'Published').length}`
-      ], 20, y + 8);
-  
-      return y + 40;
+      doc.setTextColor(0, 0, 0);
+
+      const stats = [
+        ['Total Courses', 'Active Courses', 'Total Students', 'Total Revenue'],
+        [
+          filteredCourses.length.toString(),
+          activeCount.toString(),
+          totalStudents.toString(),
+        ` Rs. ${totalRevenue.toLocaleString()}`
+        ]
+      ];
+
+      const colWidth = (doc.internal.pageSize.width - 60) / 4;
+      stats[0].forEach((label, i) => {
+        doc.setFont(undefined, 'bold');
+        doc.text(label, 25 + (i * colWidth), y + 15);
+        doc.setFont(undefined, 'normal');
+        doc.text(stats[1][i], 25 + (i * colWidth), y + 25);
+      });
+
+      return y + 50;
     };
   
-    // Course Table
     const addCourseTable = (y) => {
       doc.autoTable({
         startY: y,
@@ -238,28 +287,61 @@ const AdminCourseReport = () => {
           course.courseName,
           `${course.instructor.firstName} ${course.instructor.lastName}`,
           course.category.name,
-          `₹${course.price}`,
+          `Rs. ${course.price}`,
           course.status,
           course.studentsEnrolledCount,
-          `₹${(course.price * course.studentsEnrolledCount).toLocaleString()}`
+          `Rs. ${(course.price * course.studentsEnrolledCount).toLocaleString()}`
         ]),
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] },
-        alternateRowStyles: { fillColor: [240, 240, 240] },
-        footStyles: { fillColor: [220, 220, 220] },
+        styles: { 
+          fontSize: 10, 
+          cellPadding: 5,
+          lineColor: [200, 200, 200],
+          lineWidth: 0.1
+        },
+        headStyles: { 
+          fillColor: colors.table.header,
+          textColor: colors.accent,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        alternateRowStyles: { 
+          fillColor: colors.table.odd
+        },
+        bodyStyles: {
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { halign: 'left' },
+          1: { halign: 'left' },
+          2: { halign: 'left' }
+        },
+        margin: { top: 10 }
       });
     };
   
     // Generate PDF
     addHeader();
-    let yPos = 35;
+    let yPos = 45;
     yPos = addFilterSummary(yPos);
     yPos = addStatistics(yPos);
     addCourseTable(yPos);
   
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 15, doc.internal.pageSize.height - 10);
+    // Footer with page numbers
+    const pageCount = doc.internal.getNumberOfPages();
+    for(let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        `Page ${i} of ${pageCount}`, 
+        doc.internal.pageSize.width/2, 
+        doc.internal.pageSize.height - 10, 
+        { align: 'center' }
+      );
+    }
+    
     doc.save('course_report.pdf');
-  };
+};
   
   
   const downloadExcel = () => {

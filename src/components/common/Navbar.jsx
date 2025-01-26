@@ -172,7 +172,7 @@ const Navbar = () => {
             <Link to="/login">
               {/* <button className='border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md focus:outline-8 outline-yellow-50'> */}
               <button
-                className={` px-[16px] py-[8px] text-[#6236a8] font-semibold rounded-3xl border-[#6236a8] border hidden lg:block`}
+                className={`btn btn-outline btn-primary hidden lg:block rounded-full`}
               >
                 Log in
               </button>
@@ -180,9 +180,8 @@ const Navbar = () => {
           )}
           {token === null && (
             <Link to="/signup">
-              {/* <button className='border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100 rounded-md'> */}
               <button
-                className={`  px-[16px] py-[8px] text-[#fff] font-semibold rounded-3xl bg-[#6236a8]  hidden lg:block `}
+                className={'btn btn-primary hidden lg:block rounded-full'}
               >
                 Sign Up
               </button>

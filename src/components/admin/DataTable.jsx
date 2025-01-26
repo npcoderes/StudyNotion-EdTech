@@ -1,15 +1,16 @@
 import { FaSort,FaStar } from 'react-icons/fa'
 
 const DataTable = ({ data, columns, sortField, sortOrder, onSort }) => {
+  const getNestedValue = (obj, path) => {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj)
+  }
     const sortedData = [...data].sort((a, b) => {
       const aVal = getNestedValue(a, sortField)
       const bVal = getNestedValue(b, sortField)
       return sortOrder === 'asc' ? aVal - bVal : bVal - aVal
     })
   
-    const getNestedValue = (obj, path) => {
-      return path.split('.').reduce((acc, part) => acc && acc[part], obj)
-    }
+
   
     return (
       <div className="overflow-x-auto">

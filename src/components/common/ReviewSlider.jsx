@@ -20,7 +20,7 @@ import { ratingsEndpoints } from "../../services/apis"
 // Add this import at the top of the file
 import "./ReviewSlider.css"
 
-function ReviewSlider() {
+function ReviewSlider({courseID}) {
   const [reviews, setReviews] = useState([])
   const truncateWords = 15
 
@@ -33,6 +33,9 @@ function ReviewSlider() {
       if (data?.success) {
         setReviews(data?.data)
       }
+      if(courseID){
+        setReviews(data?.data.filter((review) => review.course._id === courseID))
+      }
     })()
   }, [])
 
@@ -40,7 +43,7 @@ function ReviewSlider() {
 
   return (
     <div className="review-slider-wrapper">
-      <div className="my-[50px] h-[184px] max-w-maxContentTab lg:max-w-maxContent">
+      <div className="my-[50px] h-[184px] max-w-maxContentTab lg:max-w-maxContent mx-auto">
         <Swiper
           slidesPerView={4}
           spaceBetween={25}
@@ -68,13 +71,13 @@ function ReviewSlider() {
                       className="h-9 w-9 rounded-full object-cover"
                     />
                     <div className="flex flex-col">
-                      <h1 className="font-semibold text-richblack-5 dark:text-richblack-900 light:text-richblack-800">{`${review?.user?.firstName} ${review?.user?.lastName}`}</h1>
+                      <h1 className="font-semibold   dark:text-richblack-900 light:text-richblack-900">{`${review?.user?.firstName} ${review?.user?.lastName}`}</h1>
                       <h2 className="text-[12px] font-medium text-richblack-900">
                         {review?.course?.courseName}
                       </h2>
                     </div>
                   </div>
-                  <p className="font-medium text-richblack-25 dark:text-richblack-500 light:text-richblack-600">
+                  <p className="font-medium  dark:text-richblack-500 light:text-richblack-600">
                     {review?.review.split(" ").length > truncateWords
                       ? `${review?.review
                           .split(" ")
