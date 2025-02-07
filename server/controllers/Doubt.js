@@ -16,7 +16,8 @@ exports.createDoubt = async (req, res) => {
             title,
             description
         });
-
+ 
+        
         // Populate student details
         const populatedDoubt = await doubt.populate('student', 'firstName lastName email');
 
