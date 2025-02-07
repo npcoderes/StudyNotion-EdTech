@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000/api/v1/doubts'; // Update with your backend URL
+const API_URL = process.env.REACT_APP_BASE_URL+"/doubts" // Update with your backend URL
 
 export const getDoubtsByCourse = (courseId) => {
   return axios.get(`${API_URL}/course/${courseId}`);
