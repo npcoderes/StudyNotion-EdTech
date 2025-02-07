@@ -19,34 +19,33 @@ import Course_Slider from "../components/cors/catalog/Course_Slider";
 import SkeletonCourse from "../components/cors/homepage/SkeletonCourse";
 import { IosShareOutlined } from "@mui/icons-material";
 const Home = () => {
-  const [courses,setCourses] = useState([]);
-  const BASE_URL=process.env.REACT_APP_BASE_URL;
-  const[loading,setLoading]=useState(false);
-  useEffect(()=>{
+  const [courses, setCourses] = useState([]);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
-      
-      try{
+
+      try {
         const res = await apiConnector("GET",BASE_URL+"/course/getAllCourses")
         console.log("courses",res.data.data)
         setCourses(res.data.data)
         setLoading(false);
 
-      }catch(error)
-      {
+      } catch (error) {
         setLoading(false);
-        console.log("error",error);
+        console.log("error", error);
       }
-      finally{
+      finally {
         setLoading(false);
       }
     }
     fetchCourses();
 
-  },[])
+  }, [])
 
 
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -55,7 +54,7 @@ const Home = () => {
       exit={{ opacity: 0 }}
       className="bg-white  text-black"
     >
-      
+
       {/* Section-1 */}
       <div className="relative w-11/12 mx-auto flex flex-col max-w-maxContent items-center justify-between mt-5">
         <Link to="/signup">
@@ -104,7 +103,7 @@ const Home = () => {
           whileInView={"show"}
           viewport={{ once: false, amount: 0.1 }}
 
-        className="mx-3 my-12 shadow-[#FFCC00] drop-video">
+          className="mx-3 my-12 shadow-[#FFCC00] drop-video">
           <video muted loop autoPlay>
             <source src={Banner} type="video/mp4" />
           </video>
@@ -119,19 +118,25 @@ const Home = () => {
             content="Study Notion offers online coding courses for beginners and experts. Learn to code with our hands-on projects, quizzes, and personalized feedback from instructors."
           />
           <div className="py-4">
-           {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(3)].map((_, index) => (
-            <SkeletonCourse key={index} />
-          ))}
-        </div>
-      ) : (
-        <Course_Slider Courses={courses} />
-      )}
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(3)].map((_, index) => (
+
+                  <div class="flex w-80 flex-col gap-4" key={index}>
+                    <div class="skeleton h-48 w-full"></div>
+                    <div class="skeleton h-8 w-28"></div>
+                    <div class="skeleton h-6 w-full"></div>
+                    <div class="skeleton h-6 w-full"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Course_Slider Courses={courses} />
+            )}
           </div>
 
         </div>
-        
+
 
         {/* Code Section 1 */}
         <motion.div
@@ -139,7 +144,7 @@ const Home = () => {
           initial="hidden"
           whileInView={"show"}
           viewport={{ once: false, amount: 0.1 }}
-          // className="w-11/12 mx-auto max-w-maxContent flex flex-col items-center justify-between gap-7 mt-10"
+        // className="w-11/12 mx-auto max-w-maxContent flex flex-col items-center justify-between gap-7 mt-10"
         >
           <CodeBlocks
             position={"lg:flex-row max-sm:flex-col"}
@@ -174,10 +179,10 @@ const Home = () => {
 
         {/* Code Section 2 */}
         <motion.div
-                 variants={fadeIn("left", 0.1)}
-                 initial="hidden"
-                 whileInView={"show"}
-                 viewport={{ once: false, amount: 0.1 }}>
+          variants={fadeIn("left", 0.1)}
+          initial="hidden"
+          whileInView={"show"}
+          viewport={{ once: false, amount: 0.1 }}>
           <CodeBlocks
             position={"lg:flex-row-reverse max-sm:flex-col"}
             heading={

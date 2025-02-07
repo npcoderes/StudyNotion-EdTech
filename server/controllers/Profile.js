@@ -24,6 +24,10 @@ exports.updateProfile = async (req, res) => {
 		profile.contactNumber = contactNumber;
 		profile.gender = gender;
 
+    const updatedUserDetails= await User.findById(id)
+    .populate("additionalDetails")
+    .exec();
+
 		// Save the updated profile
 		await profile.save();
 
@@ -31,7 +35,7 @@ exports.updateProfile = async (req, res) => {
 			success: true,
 			message: "Profile updated successfully",
 			profile,
-			userDetails
+      updatedUserDetails:updatedUserDetails
 		});
 	} catch (error) {
 		// console.log(error);

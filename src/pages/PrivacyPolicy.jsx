@@ -1,80 +1,92 @@
-import React from 'react'
+import React from "react";
+import { FaEnvelope } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="bg-richblack-900 text-richblack-5 min-h-screen mt-8">
-      <div className="w-11/12 max-w-maxContent mx-auto py-12 md:py-16">
-        <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">Privacy Policy</h1>
-        
-        <div className="space-y-8">
+    <div className="bg-richblack-900 text-richblack-5 min-h-screen py-12 mt-16">
+      <div className="w-11/12 max-w-4xl mx-auto">
+        {/* Page Title */}
+        <motion.h1
+          className="text-4xl md:text-5xl font-bold text-center mb-10 text-yellow-50"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Privacy Policy
+        </motion.h1>
+
+        {/* Sections */}
+        <div className="space-y-10">
           {/* Introduction */}
-          <section className="bg-richblack-800 p-6 rounded-lg">
+          <section className="bg-richblack-800 p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-2xl">
             <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Introduction</h2>
             <p className="text-richblack-100">
-              Welcome to StudyNotion. This Privacy Policy outlines how we collect, use, and protect your information when you use our platform.
-              Last updated: {new Date().toLocaleDateString()}
+              Welcome to <span className="font-semibold text-yellow-50">StudyNotion</span>. This Privacy Policy explains how we collect, use, and protect your data when using our platform.  
+              <br />
+              <span className="italic text-yellow-100">Last updated: {new Date().toLocaleDateString()}</span>
             </p>
           </section>
 
           {/* Course Creation & Revenue */}
-          <section className="bg-richblack-800 p-6 rounded-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Course Creation & Revenue Policy</h2>
+          <section className="bg-richblack-800 p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-2xl">
+            <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Course Creation & Revenue</h2>
             <ul className="list-disc list-inside space-y-3 text-richblack-100">
-              <li>Instructors receive 80% of the course price for each student enrollment</li>
-              <li>StudyNotion retains 20% as platform fee for maintenance and services</li>
-              <li>Payments are processed securely through our payment gateway</li>
-              <li>Instructor earnings are disbursed on a monthly basis</li>
+              <li>Instructors earn <span className="font-semibold text-yellow-50">80%</span> of course revenue.</li>
+              <li>StudyNotion retains <span className="font-semibold text-yellow-50">20%</span> as a platform fee.</li>
+              <li>Payments are processed securely.</li>
+              <li>Earnings are disbursed <span className="font-semibold text-yellow-50">monthly</span>.</li>
             </ul>
           </section>
 
           {/* Course Validity */}
-          <section className="bg-richblack-800 p-6 rounded-lg">
+          <section className="bg-richblack-800 p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-2xl">
             <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Course Validity</h2>
             <ul className="list-disc list-inside space-y-3 text-richblack-100">
-              <li>Course access is valid for 1 year from the date of enrollment</li>
-              <li>Students will be notified before course expiration</li>
-              <li>Course certificates are issued upon completion</li>
+              <li>Access valid for <span className="font-semibold text-yellow-50">1 year</span> from enrollment.</li>
+              <li>Students receive expiration reminders.</li>
+              <li>Certificates are awarded upon completion.</li>
             </ul>
           </section>
 
           {/* Data Collection */}
-          <section className="bg-richblack-800 p-6 rounded-lg">
+          <section className="bg-richblack-800 p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-2xl">
             <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Data Collection</h2>
-            <p className="text-richblack-100 mb-4">We collect and process the following information:</p>
+            <p className="text-richblack-100 mb-4">We collect and process the following:</p>
             <ul className="list-disc list-inside space-y-3 text-richblack-100">
-              <li>Personal information (name, email, contact details)</li>
-              <li>Course progress and completion data</li>
-              <li>Payment information</li>
-              <li>Usage statistics and interaction with course content</li>
+              <li>Personal information (name, email, etc.).</li>
+              <li>Course progress & completion data.</li>
+              <li>Payment details.</li>
+              <li>Platform interaction data.</li>
             </ul>
           </section>
 
           {/* User Rights */}
-          <section className="bg-richblack-800 p-6 rounded-lg">
+          {/* <section className="bg-richblack-800 p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-2xl">
             <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Your Rights</h2>
             <ul className="list-disc list-inside space-y-3 text-richblack-100">
-              <li>Access your personal data</li>
-              <li>Request data correction or deletion</li>
-              <li>Withdraw consent for data processing</li>
-              <li>Request data portability</li>
+              <li>Access & review personal data.</li>
+              <li>Request corrections or deletion.</li>
+              <li>Withdraw data processing consent.</li>
+              <li>Request data portability.</li>
             </ul>
-          </section>
+          </section> */}
 
           {/* Contact Information */}
-          <section className="bg-richblack-800 p-6 rounded-lg">
+          <section className="bg-richblack-800 p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-2xl flex flex-col items-center text-center">
             <h2 className="text-2xl font-semibold mb-4 text-yellow-50">Contact Us</h2>
             <p className="text-richblack-100">
-              For any privacy-related concerns or queries, please contact us at:
-              <br />
-              Email: studynotionedtech7@gmail.com
-              <br />
-              
+              Have privacy concerns? Reach out to us at:
             </p>
+            <div className="flex items-center gap-3 mt-3">
+              <FaEnvelope className="text-yellow-50 text-xl" />
+              <span className="text-yellow-100 font-semibold">studynotionedtech7@gmail.com</span>
+            </div>
           </section>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PrivacyPolicy
+export default PrivacyPolicy;

@@ -126,7 +126,9 @@ exports.createCourse = async (req, res) => {
 
 exports.getAllCourses = async (req, res) => {
 	try {
-		const allCourses = await Course.find()
+		const allCourses = await Course.find(
+            { status: "Published" },
+        )
 			.populate("instructor")
             .populate("ratingAndReviews")
 			.exec();

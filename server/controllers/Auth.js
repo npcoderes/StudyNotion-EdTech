@@ -6,7 +6,7 @@ const otpGenerator = require("otp-generator");
 const mailSender = require("../utils/mailSender");
 const { passwordUpdated } = require("../mail/templates/passwordUpdate");
 const Profile = require("../models/Profile");
-const {uploadPdfToCloudinary,uploadImageToCloudinary}=require("../utils/imageUploader")
+const { uploadPdfToCloudinary, uploadImageToCloudinary } = require("../utils/imageUploader")
 require("dotenv").config();
 
 // Signup Controller for Registering Users
@@ -24,21 +24,33 @@ exports.signup = async (req, res) => {
 			contactNumber,
 			otp
 		} = req.body;
-		 console.log("req.body",req.body)
+		console.log("req.body", req.body)
 		//  console.log("req.file",req.file)
-        //  let documents = req.file;
+		//  let documents = req.file;
 		//  if (!documents) {
 		// 	return res.status(400).json({ success: false, message: "Documents are required" });
 		//   }
+		if (accountType === "Instructor") {
+			if (!req.files || !req.files.file) {
+				return res.status(400).send({ message: "No file uploaded." });
+			}
 
-		if (!req.files || !req.files.file) {
-			return res.status(400).send({ message: "No file uploaded." });
-		  }
+			console.log("req.files", req.files)
+		}
 
-		console.log("req.files",req.files)
-
-		let documents=req.files.file
 		
+		let documentUrl
+
+		if (accountType === "Instructor") {
+			let documents = req.files.file
+			if (documents) {
+				documentUrl = await uploadImageToCloudinary(documents, process.env.FOLDER_NAME);
+				console.log("Document Url", documentUrl.secure_url);
+			}
+
+		}
+
+
 		// Check if All Details are there or not
 		if (
 			!firstName ||
@@ -46,8 +58,8 @@ exports.signup = async (req, res) => {
 			!email ||
 			!password ||
 			!confirmPassword ||
-			!otp 
-		
+			!otp
+
 		) {
 			return res.status(403).send({
 				success: false,
@@ -95,13 +107,9 @@ exports.signup = async (req, res) => {
 		// Create the user
 		let approved = accountType;
 		approved === "Instructor" ? (approved = false) : (approved = true);
-		let active=accountType
+		let active = accountType
 		active === "Instructor" ? (active = false) : (active = true);
-        let documentUrl
-		if(documents){
-			 documentUrl = await uploadImageToCloudinary(documents,process.env.FOLDER_NAME);
-			console.log("Document Url", documentUrl.secure_url);
-		}
+
 
 		// Create the Additional Profile For User
 		const profileDetails = await Profile.create({
@@ -121,10 +129,10 @@ exports.signup = async (req, res) => {
 			approved: approved,
 			additionalDetails: profileDetails._id,
 			image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
-			documents: documentUrl.secure_url,
+			documents: documentUrl?.secure_url,
 		});
 
-		if(accountType === "Instructor"){
+		if (accountType === "Instructor") {
 			await mailSender(
 				user.email,
 				"Instructor Account Created",
@@ -150,13 +158,13 @@ exports.signup = async (req, res) => {
 				  </body>
 				</html>
 				`
-			  );
+			);
 
-          return res.status(201).json({
-			success: true,
-			user,
-			message: "Your Account is Created Successfully, Please Wait for Approval",
-		});
+			return res.status(201).json({
+				success: true,
+				user,
+				message: "Your Account is Created Successfully, Please Wait for Approval",
+			});
 
 		}
 
@@ -212,7 +220,7 @@ exports.login = async (req, res) => {
 				message: `Your Account is not Approved Yet`,
 			});
 		}
-		if(user.active === false){
+		if (user.active === false) {
 			return res.status(401).json({
 				success: false,
 				message: `Your Account is Deactivated`,

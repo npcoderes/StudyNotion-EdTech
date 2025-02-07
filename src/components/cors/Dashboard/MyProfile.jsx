@@ -6,6 +6,7 @@ import IconBtn from "../../common/IconBtn";
 export default function MyProfile() {
   const { user } = useSelector((state) => state.profile);
   const navigate = useNavigate();
+  console.log(user);
   // Scroll to the top of the page when the component mounts
   useEffect(() => {
     window.scrollTo(0, 0);

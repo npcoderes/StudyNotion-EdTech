@@ -10,6 +10,8 @@ import Loading from "../components/common/Loading";
 import Card from "../components/cors/catalog/Card";
 import Course_Slider from "../components/cors/catalog/Course_Slider";
 import Footer from "../components/common/Footer";
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import debounce from 'lodash/debounce';
 
 const Catelog = () => {
   const { catalogName } = useParams();
@@ -18,6 +20,8 @@ const Catelog = () => {
   const [categoryId, setCategoryId] = useState("");
   const [loading, setLoading] = useState(false);
   const [most, setMost] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredCourses, setFilteredCourses] = useState([]);
 
   useEffect(() => {
     const getCategories = async () => {
@@ -37,7 +41,7 @@ const Catelog = () => {
         const toastid = toast.loading("Loading...");
         try {
           const res = await getCatalogPageData(categoryId);
-          // console.log("CATALOG PAGE DATA API RESPONSE............", res);
+          console.log("CATALOG PAGE DATA API RESPONSE............", res);
           setCataLogPageData(res);
           toast.dismiss(toastid);
         } catch (error) {
@@ -49,6 +53,32 @@ const Catelog = () => {
       })();
     }
   }, [categoryId]);
+
+  useEffect(() => {
+    if (catalogPageData?.selectedCategory?.courses) {
+      setFilteredCourses(catalogPageData.selectedCategory.courses);
+    }
+  }, [catalogPageData]);
+
+  const debouncedSearch = debounce((query) => {
+    if (!query) {
+      setFilteredCourses(catalogPageData?.selectedCategory?.courses || []);
+      return;
+    }
+    
+    
+
+const allCourses = [
+  ...(catalogPageData?.selectedCategory?.courses || []),
+  ...(catalogPageData?.mostSellingCourses || []),
+  ...(catalogPageData?.differentCategory?.courses || []),
+];
+
+const filtered = allCourses.filter(course =>
+  course.courseName.toLowerCase().includes(query.toLowerCase())
+);
+    setFilteredCourses(filtered);
+  }, 300);
 
   if (loading) {
     return (
@@ -76,6 +106,24 @@ const Catelog = () => {
       </motion.div>
     );
   }
+
+  const searchSection = (
+    <div className="relative w-full max-w-md mx-auto mb-8">
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Search courses..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            debouncedSearch(e.target.value);
+          }}
+          className="w-full px-4 py-2 pl-10 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/10 text-gray-200"
+        />
+        <MagnifyingGlassIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -109,6 +157,7 @@ const Catelog = () => {
           </div>
         </div>
       </motion.div>
+      {searchSection}
       {/* course part  */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -118,7 +167,7 @@ const Catelog = () => {
         className="w-11/12 lg:max-w-maxContent flex flex-col mx-auto gap-5 text-gray-800 mt-3 py-12"
       >
         <p className="text-gray-600 text-3xl ">
-          Courses to get you started
+          {searchQuery ? 'Search Results' : 'Courses to get you started'}
         </p>
         <div className="flex gap-x-5 text-gray-500 border-b-[1px] border-gray-300 pb-4 text-sm">
           <p
@@ -141,7 +190,7 @@ const Catelog = () => {
 
         {/* courses  */}
         <div className=""> 
-          <Course_Slider Courses={catalogPageData?.selectedCategory?.courses}  objectFit={"object-cover"}/>
+          <Course_Slider Courses={filteredCourses}  objectFit={"object-cover"}/>
         </div>
 
         {/* Section 2 */}
