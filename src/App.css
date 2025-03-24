@@ -64,55 +64,7 @@ body {
   }
 }
 
-/* @keyframes aurora {
-  0% {
-    transform: rotate(0deg) scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: rotate(180deg) scale(1.2);
-    opacity: 0.5;
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-    opacity: 0.3;
-  }
-}
-
-.sec-2-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-}
-
-.stars, .aurora {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-.stars {
-  background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png') repeat;
-  background-size: cover;
-  transform: translateZ(0);
-  animation: move-background 70s linear infinite;
-}
-
-.aurora {
-  background: linear-gradient(45deg, 
-    rgba(0, 255, 255, 0.1) 0%, 
-    rgba(0, 255, 255, 0) 70%,
-    rgba(0, 255, 255, 0.1) 100%
-  );
-  filter: blur(80px);
-  opacity: 0.3;
-  animation: aurora 20s infinite;
-} */
+          
 
 /* For Chrome, Edge, and other WebKit-based browsers */
 ::-webkit-scrollbar {

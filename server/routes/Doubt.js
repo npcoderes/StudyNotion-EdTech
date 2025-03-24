@@ -13,8 +13,8 @@ const {
 router.post('/',auth, createDoubt);
 router.get('/course/:courseId', getDoubtsByCourse);
 router.post('/:doubtId/reply', auth, addReply);
-router.patch('/:doubtId/upvote', auth, upvoteDoubt);
-router.patch('/:doubtId/resolve', auth, isInstructor, resolveDoubt);
+router.post('/:doubtId/upvote', auth, upvoteDoubt);
+router.post('/:doubtId/resolve', auth, isInstructor, resolveDoubt);
 
 
 module.exports = router;

@@ -24,12 +24,13 @@ exports.updateProfile = async (req, res) => {
 		profile.contactNumber = contactNumber;
 		profile.gender = gender;
 
-    const updatedUserDetails= await User.findById(id)
-    .populate("additionalDetails")
-    .exec();
+
 
 		// Save the updated profile
 		await profile.save();
+    const updatedUserDetails= await User.findById(id)
+    .populate("additionalDetails")
+    .exec();
 
 		return res.json({
 			success: true,

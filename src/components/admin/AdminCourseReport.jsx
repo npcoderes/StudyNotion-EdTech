@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -22,15 +22,14 @@ import {
   Chip,
   Avatar,
   Box,
-  Stack
+  Stack,
+  CircularProgress
 } from '@mui/material';
 import {
   PictureAsPdf,
   FileDownload,
   CalendarToday,
-  Person,
   Category,
-  AttachMoney,
   People
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -38,7 +37,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { Bar, Pie } from 'react-chartjs-2';
-import { CircularProgress } from '@mui/material';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -76,6 +74,11 @@ const AdminCourseReport = () => {
   const BASE_URL = REACT_APP_BASE_URL;
   const [popularityFilter, setPopularityFilter] = useState('');
   const [filteredCourses, setFilteredCourses] = useState([]);
+
+  // Create refs for the charts
+  const pieChartRef = useRef(null);
+  const barChartRef = useRef(null);
+  const adminChartRef = useRef(null);
 
   useEffect(() => {
     fetchCourses();
@@ -125,7 +128,6 @@ const AdminCourseReport = () => {
     fetchCourses();
     let filtered = [...courses];
 
-    // Apply existing filters
     if (startDate && endDate) {
       filtered = filtered.filter(course => {
         const createdAt = new Date(course.createdAt);
@@ -141,13 +143,13 @@ const AdminCourseReport = () => {
       filtered = filtered.filter(course => course.category._id === category);
     }
 
-    // Apply popularity filter
     if (popularityFilter) {
       filtered = sortByPopularity(filtered, popularityFilter);
     }
 
     setFilteredCourses(filtered);
   };
+
   const sortByPopularity = (courses, filterType) => {
     switch (filterType) {
       case 'mostEnrolled':
@@ -160,7 +162,6 @@ const AdminCourseReport = () => {
         return courses;
     }
   };
-
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -179,175 +180,208 @@ const AdminCourseReport = () => {
       unit: 'mm',
       format: 'a3',
     });
-
-    // Brand Colors
+  
+    // Define brand colors
     const colors = {
-      primary: [255, 214, 10],     // yellow-50
-      secondary: [78, 78, 78],     // richblack-900
-      accent: [255, 255, 255],     // white
+      primary: [255, 214, 10],
+      secondary: [78, 78, 78],
+      accent: [255, 255, 255],
       table: {
-        header: [78, 78, 78],      // richblack-900
-        odd: [242, 242, 242],      // gray-100
-        even: [255, 255, 255]      // white
-      }
+        header: [78, 78, 78],
+        odd: [242, 242, 242],
+        even: [255, 255, 255],
+      },
     };
   
+    // Add Header
     const addHeader = () => {
-      // Main header background
       doc.setFillColor(...colors.secondary);
-      doc.rect(0, 0, doc.internal.pageSize.width, 35, 'F');
-
-      // StudyNotion title
-      doc.setFontSize(30);
+      doc.rect(0, 0, doc.internal.pageSize.width, 30, 'F'); // Header background
+      doc.setFontSize(28);
       doc.setTextColor(...colors.primary);
-      doc.text('StudyNotion', 15, 15);
-
-      // Report type subtitle
-      doc.setFontSize(20);
+      doc.text('StudyNotion', 15, 20);
+      doc.setFontSize(12);
       doc.setTextColor(...colors.accent);
       doc.text('Course Analysis Report', 15, 28);
-
-      // Add date on right
-      const dateText = `Generated on: ${new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+  
+      // Add generated date
+      const dateText = `Generated on: ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       })}`;
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       const dateWidth = doc.getTextWidth(dateText);
-      doc.text(dateText, doc.internal.pageSize.width - dateWidth - 15, 15);
+      doc.text(dateText, doc.internal.pageSize.width - dateWidth - 15, 20);
     };
   
+    // Add Filter Summary
     const addFilterSummary = (y) => {
-      // Section title background
       doc.setFillColor(...colors.primary);
-      doc.rect(10, y, doc.internal.pageSize.width - 20, 8, 'F');
-      
-      // Section title
-      doc.setFontSize(14);
-      doc.setTextColor(...colors.secondary);
-      doc.text('Report Parameters', 15, y + 6);
-
-      y += 15;
+      doc.rect(10, y, doc.internal.pageSize.width - 20, 10, 'F'); // Filter summary background
       doc.setFontSize(12);
+      doc.setTextColor(...colors.secondary);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Report Parameters', 15, y + 8);
+  
+      y += 15; // Move cursor down
+      doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-
-      // Filter details with bullet points
+      doc.setFont('helvetica', 'normal');
+  
       const filters = [];
       if (startDate) filters.push(`• Date Range: ${dayjs(startDate).format('DD/MM/YYYY')} - ${dayjs(endDate).format('DD/MM/YYYY')}`);
       if (status) filters.push(`• Status: ${status}`);
-      if (category) filters.push(`• Category: ${categories.find(c => c._id === category)?.name}`);
+      if (category) filters.push(`• Category: ${categories.find((c) => c._id === category)?.name}`);
       if (popularityFilter) filters.push(`• Sorted by: ${popularityFilter}`);
-
+  
       doc.text(filters, 20, y);
-      return y + (filters.length * 8) + 10;
+      return y + filters.length * 6 + 15; // Adjust spacing dynamically
     };
   
+    // Add Statistics
     const addStatistics = (y) => {
-      const totalRevenue = filteredCourses.reduce((sum, course) => 
-        sum + (course.price * course.studentsEnrolledCount), 0);
-      const totalStudents = filteredCourses.reduce((sum, course) => 
-        sum + course.studentsEnrolledCount, 0);
-      const activeCount = filteredCourses.filter(c => c.status === 'Published').length;
-
-      // Stats box
+      const totalRevenue = filteredCourses.reduce((sum, course) => sum + course.price * course.studentsEnrolledCount, 0);
+      const totalStudents = filteredCourses.reduce((sum, course) => sum + course.studentsEnrolledCount, 0);
+      const activeCount = filteredCourses.filter((c) => c.status === 'Published').length;
+  
       doc.setFillColor(245, 245, 245);
-      doc.roundedRect(15, y, doc.internal.pageSize.width - 30, 40, 3, 3, 'F');
-
-      // Stats grid
+      doc.roundedRect(15, y, doc.internal.pageSize.width - 30, 30, 3, 3, 'F'); // Statistics background
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
-
+  
       const stats = [
         ['Total Courses', 'Active Courses', 'Total Students', 'Total Revenue'],
         [
           filteredCourses.length.toString(),
           activeCount.toString(),
           totalStudents.toString(),
-        ` Rs. ${totalRevenue.toLocaleString()}`
-        ]
+          `Rs. ${totalRevenue.toLocaleString()}`,
+        ],
       ];
-
+  
       const colWidth = (doc.internal.pageSize.width - 60) / 4;
       stats[0].forEach((label, i) => {
-        doc.setFont(undefined, 'bold');
-        doc.text(label, 25 + (i * colWidth), y + 15);
-        doc.setFont(undefined, 'normal');
-        doc.text(stats[1][i], 25 + (i * colWidth), y + 25);
+        doc.setFont('helvetica', 'bold');
+        doc.text(label, 25 + i * colWidth, y + 12); // Column headers
+        doc.setFont('helvetica', 'normal');
+        doc.text(stats[1][i], 25 + i * colWidth, y + 22); // Column values
       });
-
-      return y + 50;
+  
+      return y + 40; // Adjust spacing
     };
   
+    // Add Course Table
     const addCourseTable = (y) => {
       doc.autoTable({
         startY: y,
         head: [['Course Name', 'Instructor', 'Category', 'Price', 'Status', 'Students', 'Revenue']],
-        body: filteredCourses.map(course => [
+        body: filteredCourses.map((course) => [
           course.courseName,
           `${course.instructor.firstName} ${course.instructor.lastName}`,
           course.category.name,
           `Rs. ${course.price}`,
           course.status,
           course.studentsEnrolledCount,
-          `Rs. ${(course.price * course.studentsEnrolledCount).toLocaleString()}`
+          `Rs. ${(course.price * course.studentsEnrolledCount).toLocaleString()}`,
         ]),
-        styles: { 
-          fontSize: 10, 
-          cellPadding: 5,
+        styles: {
+          fontSize: 10,
+          cellPadding: 4,
           lineColor: [200, 200, 200],
-          lineWidth: 0.1
+          lineWidth: 0.1,
         },
-        headStyles: { 
+        headStyles: {
           fillColor: colors.table.header,
           textColor: colors.accent,
           fontStyle: 'bold',
-          halign: 'center'
+          halign: 'center',
         },
-        alternateRowStyles: { 
-          fillColor: colors.table.odd
+        alternateRowStyles: {
+          fillColor: colors.table.odd,
         },
         bodyStyles: {
-          halign: 'center'
+          halign: 'center',
         },
         columnStyles: {
           0: { halign: 'left' },
           1: { halign: 'left' },
-          2: { halign: 'left' }
+          2: { halign: 'left' },
         },
-        margin: { top: 10 }
+        margin: { top: 10 },
+        didDrawPage: function (data) {
+          if (data.pageNumber > 1) {
+            addHeader(); // Add header on every page
+          }
+        },
       });
     };
   
-    // Generate PDF
+    // Add Charts
+    const addCharts = () => {
+      doc.addPage(); // Add a new page for charts
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      const title = 'Graphical Representations';
+      const titleWidth = doc.getTextWidth(title);
+      doc.text(title, (doc.internal.pageSize.width - titleWidth) / 2, 30);
+  
+      if (pieChartRef.current) {
+        const pieImg = pieChartRef.current.toBase64Image('image/png', 2.0); // Higher quality
+        doc.setFontSize(20); // Increased font size
+        const pieTitle = 'Courses by Category';
+        doc.text(pieTitle, 25, 50); // Moved to left with margin
+        doc.addImage(pieImg, 'PNG', 15, 60, 180, 100); // Larger chart size
+      }
+    
+      // Add "Revenue by Instructor" Bar Chart
+      if (barChartRef.current) {
+        const barImg = barChartRef.current.toBase64Image('image/png', 2.0);
+        doc.setFontSize(20);
+        const barTitle = 'Revenue by Instructor';
+        doc.text(barTitle, doc.internal.pageSize.width / 2 + 20, 50); // Adjusted position
+        doc.addImage(barImg, 'PNG', doc.internal.pageSize.width / 2 + 10, 60, 180, 100);
+      }
+    
+      // Add "Revenue Of Admin" Bar Chart
+      if (adminChartRef.current) {
+        const adminImg = adminChartRef.current.toBase64Image('image/png', 2.0);
+        doc.setFontSize(20);
+        const adminTitle = 'Revenue Of Admin';
+        doc.text(adminTitle, 25, 180); // Aligned with first chart title
+        doc.addImage(adminImg, 'PNG', 15, 190, 180, 100);
+      }
+    };
+  
+    // Generate PDF Content
     addHeader();
-    let yPos = 45;
+    let yPos = 40; // Initial Y position
     yPos = addFilterSummary(yPos);
     yPos = addStatistics(yPos);
     addCourseTable(yPos);
+    addCharts();
   
-    // Footer with page numbers
+    // Add Footer with Page Numbers
     const pageCount = doc.internal.getNumberOfPages();
-    for(let i = 1; i <= pageCount; i++) {
+    for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
       doc.text(
-        `Page ${i} of ${pageCount}`, 
-        doc.internal.pageSize.width/2, 
-        doc.internal.pageSize.height - 10, 
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
         { align: 'center' }
       );
     }
-    
+  
+    // Save PDF
     doc.save('course_report.pdf');
-};
-  
-  
+  };
+
   const downloadExcel = () => {
     const workbook = XLSX.utils.book_new();
-  
-    // Summary Sheet
+
     const summaryData = [
       ['StudyNotion Course Report'],
       ['Generated on:', new Date().toLocaleString()],
@@ -364,8 +398,7 @@ const AdminCourseReport = () => {
       ['Total Students:', filteredCourses.reduce((sum, c) => sum + c.studentsEnrolledCount, 0)],
       ['Total Revenue:', `₹${filteredCourses.reduce((sum, c) => sum + (c.price * c.studentsEnrolledCount), 0).toLocaleString()}`],
     ];
-  
-    // Course Details Sheet
+
     const courseData = [
       ['Course Name', 'Instructor', 'Category', 'Price', 'Status', 'Students', 'Revenue', 'Created Date']
     ];
@@ -381,68 +414,54 @@ const AdminCourseReport = () => {
         new Date(course.createdAt).toLocaleDateString()
       ]);
     });
-  
+
     const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
     const courseWS = XLSX.utils.aoa_to_sheet(courseData);
-  
+
     XLSX.utils.book_append_sheet(workbook, summaryWS, 'Summary');
     XLSX.utils.book_append_sheet(workbook, courseWS, 'Course Details');
-  
+
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(data, 'course_report.xlsx');
   };
-  
-  // 1. Update chart data preparation
-  const getCategoryChartData = () => {
-    return {
-      labels: categories.map(cat => cat.name),
-      datasets: [{
-        data: categories.map(cat =>
-          courses.filter(course =>
-            course.category._id === cat._id
-          ).length
-        ),
-        backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF'
-        ]
-      }]
-    };
-  };
 
-  const getRevenueChartData = () => {
-    return {
-      labels: instructors.map(inst => `${inst.firstName} ${inst.lastName}`),
-      datasets: [{
-        label: 'Revenue',
-        data: instructors.map(inst =>
-          courses
-            .filter(course => course.instructor._id === inst._id)
-            .reduce((sum, course) => sum + ((course.price * 80 / 100) * course.studentsEnrolledCount), 0)
-        ),
-        backgroundColor: '#36A2EB'
-      }]
-    };
-  };
+  // Chart data functions
+  const getCategoryChartData = () => ({
+    labels: categories.map(cat => cat.name),
+    datasets: [{
+      data: categories.map(cat =>
+        courses.filter(course => course.category._id === cat._id).length
+      ),
+      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+    }]
+  });
 
-  const getRevenueAdminChartData = () => {
-    return {
-      labels: ['Admin Revenue'],
-      datasets: [{
-        label: 'Revenue',
-        data: instructors.map(inst =>
-          courses
-            .filter(course => course.instructor._id === inst._id)
-            .reduce((sum, course) => sum + ((course.price * 20 / 100) * course.studentsEnrolledCount), 0)
-        ),
-        backgroundColor: '#36A2EB'
-      }]
-    };
-  }
+  const getRevenueChartData = () => ({
+    labels: instructors.map(inst => `${inst.firstName} ${inst.lastName}`),
+    datasets: [{
+      label: 'Revenue',
+      data: instructors.map(inst =>
+        courses
+          .filter(course => course.instructor._id === inst._id)
+          .reduce((sum, course) => sum + ((course.price * 80 / 100) * course.studentsEnrolledCount), 0)
+      ),
+      backgroundColor: '#36A2EB'
+    }]
+  });
+
+  const getRevenueAdminChartData = () => ({
+    labels: ['Admin Revenue'],
+    datasets: [{
+      label: 'Revenue',
+      data: instructors.map(inst =>
+        courses
+          .filter(course => course.instructor._id === inst._id)
+          .reduce((sum, course) => sum + ((course.price * 20 / 100) * course.studentsEnrolledCount), 0)
+      ),
+      backgroundColor: '#36A2EB'
+    }]
+  });
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -544,8 +563,7 @@ const AdminCourseReport = () => {
                         <CircularProgress />
                       </Box>
                     ) : (
-                      <Pie
-                        data={getCategoryChartData()}
+                      <Pie ref={pieChartRef} data={getCategoryChartData()}
                         options={{
                           responsive: true,
                           plugins: {
@@ -553,13 +571,13 @@ const AdminCourseReport = () => {
                               position: 'bottom'
                             }
                           }
-                        }}
+                        }} 
                       />
                     )}
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 2 }}>
+                  <Paper sx={{ p: 2, mb: 2 }}>
                     <Typography variant="h6" gutterBottom>
                       Revenue by Instructor
                     </Typography>
@@ -568,20 +586,16 @@ const AdminCourseReport = () => {
                         <CircularProgress />
                       </Box>
                     ) : (
-                      <Bar
-                        data={getRevenueChartData()}
+                      <Bar ref={barChartRef} data={getRevenueChartData()}
                         options={{
                           responsive: true,
                           scales: {
                             y: {
                               beginAtZero: true,
-                              title: {
-                                display: true,
-                                text: 'Revenue (₹)'
-                              }
+                              title: { display: true, text: 'Revenue (₹)' }
                             }
                           }
-                        }}
+                        }} 
                       />
                     )}
                   </Paper>
@@ -594,25 +608,20 @@ const AdminCourseReport = () => {
                         <CircularProgress />
                       </Box>
                     ) : (
-                      <Bar
-                        data={getRevenueAdminChartData()}
+                      <Bar ref={adminChartRef} data={getRevenueAdminChartData()}
                         options={{
                           responsive: true,
                           scales: {
                             y: {
                               beginAtZero: true,
-                              title: {
-                                display: true,
-                                text: 'Revenue (₹)'
-                              }
+                              title: { display: true, text: 'Revenue (₹)' }
                             }
                           }
-                        }}
+                        }} 
                       />
                     )}
                   </Paper>
                 </Grid>
-
               </Grid>
               <Grid item xs={12} md={4}>
                 <Button
@@ -661,7 +670,15 @@ const AdminCourseReport = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredCourses.map((course) => (
+                {    
+                filteredCourses.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">
+                      No courses found
+                    </TableCell>
+                  </TableRow>
+                ) :
+                filteredCourses.map((course) => (
                   <TableRow key={course._id} hover>
                     <TableCell>{course.courseName}</TableCell>
                     <TableCell>
@@ -682,7 +699,6 @@ const AdminCourseReport = () => {
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-
                         ₹{course.price}
                       </Box>
                     </TableCell>

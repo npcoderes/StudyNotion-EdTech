@@ -5,14 +5,10 @@ import { useSelector } from "react-redux"
 import CourseBuilderForm from "./CourseBuilder/CourseBuilderForm"
 import CourseInformationForm from "./CourseInformation/CourseInformationForm"
 import PublishCourse from "./PublishCourse/PublishCourse"
-import EditCourse from './../EditCourse/EditCourse';
-
+import { motion } from "framer-motion"
 
 export default function RenderSteps() {
-
-  const { step } = useSelector((state) => state.course)
-  const { editCourse } = useSelector(state => state.course)
-
+  const { step, editCourse } = useSelector((state) => state.course)
 
   const steps = [
     {
@@ -29,53 +25,84 @@ export default function RenderSteps() {
     },
   ]
 
+  // Animation variants for step transitions
+  const stepVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.4 }
+    },
+    exit: { 
+      opacity: 0,
+      y: -20,
+      transition: { duration: 0.3 }
+    }
+  }
+
   return (
     <>
-      <div className=" mb-2 flex w-full select-none justify-center ">
-        {steps.map((item) => (
+      {/* Progress Steps */}
+      <div className="mb-8 flex w-full select-none justify-center">
+        {steps.map((item, index) => (
           <React.Fragment key={item.id}>
-            <div
-              className="flex flex-col items-center "
-              // key={item.id}
-            >
+            <div className="flex flex-col items-center">
               <div
-                className={`grid  aspect-square w-[34px] place-items-center rounded-full border-[1px] 
-                    ${step === item.id ? "border-[#422faf] bg-white text-[#422faf]"
-                    : "border-richblack-700 bg-richblack-800 text-richblack-300"}
-                    ${step > item.id && "bg-[#422faf] text-white"}} `}
+                className={`grid aspect-square w-[40px] place-items-center rounded-full border
+                  ${
+                    step === item.id
+                      ? "border-[#422FAF] bg-[#EEF2FF] text-[#422FAF] font-medium"
+                      : step > item.id
+                        ? "bg-[#422FAF] text-white border-[#422FAF]"
+                        : "border-[#D1D5DB] bg-white text-[#6B7280]"
+                  }`}
               >
-                {step > item.id ?
-                  (<FaCheck className="font-bold text-richblack-5" />)
-                  : (item.id)
-                }
+                {step > item.id ? (
+                  <FaCheck className="text-white" />
+                ) : (
+                  item.id
+                )}
               </div>
+              
+              {/* Step Title */}
+              <p className={`mt-2 text-sm ${
+                step >= item.id 
+                  ? "text-[#111827] font-medium" 
+                  : "text-[#6B7280]"
+              }`}>
+                {item.title}
+              </p>
             </div>
 
-            {/* dashes  */}
+            {/* Connector Line */}
             {item.id !== steps.length && (
-              <div
-                className={`h-[calc(34px/2)] w-[33%] border-dashed border-b-2 ${step > item.id ? "border-[#422faf]" : "border-richblack-500"} `}
-              >
+              <div className="flex items-center w-[20%] mx-2">
+                <div
+                  className={`h-[2px] w-full ${
+                    step > item.id 
+                      ? "bg-[#422FAF]" 
+                      : "bg-[#E5E7EB]"
+                  }`}
+                ></div>
               </div>
             )}
           </React.Fragment>
         ))}
       </div>
 
-      <div className="relative mb-16 flex w-full select-none justify-between">
-        {steps.map((item) => (
-          <div className={`sm:min-w-[130px] flex flex-col items-center gap-y-2 ${editCourse && 'sm:min-w-[270px]'}`} key={item.id}>
-            <p className={`text-sm ${step >= item.id ? "text-richblack-800" : "text-richblack-500"}`}>
-              {item.title}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Render specific component based on current step */}
-      {step === 1 && <CourseInformationForm />}
-      {step === 2 && <CourseBuilderForm />}
-      {step === 3 && <PublishCourse />}
+      {/* Step Content Container */}
+      <motion.div
+        key={step}
+        variants={stepVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-6"
+      >
+        {step === 1 && <CourseInformationForm />}
+        {step === 2 && <CourseBuilderForm />}
+        {step === 3 && <PublishCourse />}
+      </motion.div>
     </>
   )
 }

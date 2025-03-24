@@ -40,7 +40,7 @@ function LoginForm() {
         </p>
         <input
           required
-          type="text"
+          type="email"
           name="email"
           value={email}
           onChange={handleOnChange}

@@ -8,14 +8,12 @@ import RatingStars from "../components/common/RatingStars";
 import Img from "../components/common/Img";
 import { RxInfoCircled } from "react-icons/rx";
 import { MdLanguage } from "react-icons/md";
-import Button from "../components/cors/homepage/Button";
 import { useDispatch } from "react-redux";
 import { addItem, removeItem } from "../slices/cartSlice";
 import { FaClockRotateLeft } from "react-icons/fa6";
 import { GrCertificate } from "react-icons/gr";
-import { FaCheckCircle, FaMobile } from "react-icons/fa";
+import {  FaMobile } from "react-icons/fa";
 import { FaRegCaretSquareRight } from "react-icons/fa";
-import { RxDropdownMenu } from "react-icons/rx";
 import { buyCourse } from "../services/operations/studentFeaturesAPI";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
@@ -171,7 +169,7 @@ const CourseDetails = () => {
                   {courseDetails?.courseDetails?.category?.name}
                 </span>
               </p>
-              <h1 className="text-[#E0E0E0] text-3xl sm:text-4xl font-semibold tracking-wide">
+              <h1 className="text-[#E0E0E0] text-3xl sm:text-4xl w-[60%] font-semibold tracking-wide">
                 {courseDetails?.courseDetails?.courseName}
               </h1>
               <p className="text-[#E0E0E0] text-xs sm:text-sm w-full sm:w-[630px] mt-3 line-clamp-2 tracking-wide font-inter">

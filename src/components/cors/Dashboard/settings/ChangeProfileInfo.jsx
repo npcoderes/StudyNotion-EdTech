@@ -1,167 +1,224 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { updateProfile } from "../../../../services/operations/SettingsAPI";
 import IconBtn from "../../../common/IconBtn";
+import { toast } from "react-hot-toast";
 
 const ChangeProfileInfo = () => {
   const { user } = useSelector((state) => state.profile);
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      dateOfBirth: user?.additionalDetails?.dateOfBirth || "",
+      gender: user?.additionalDetails?.gender || "",
+      contactNumber: user?.additionalDetails?.contactNumber || "",
+      about: user?.additionalDetails?.about || "",
+    },
+  });
+
   const formsubmit = async (data) => {
+    setLoading(true);
     try {
-      dispatch(updateProfile(token,data))
-    } catch (e) {
-      console.error("change profile error  "+e);
+      await dispatch(updateProfile(token, data));
+      toast.success("Profile updated successfully!");
+      navigate("/dashboard/my-profile");
+    } catch (error) {
+      toast.error("Failed to update profile");
+      console.error("Profile update error:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const FormInput = ({ label, id, type = "text", validation = {}, ...props }) => (
+    <div className="flex flex-col gap-2 lg:w-[48%]">
+      <label
+        htmlFor={id}
+        className="text-[#1A1A1A] font-medium"
+      >
+        {label}
+      </label>
+      <input
+        type={type}
+        id={id}
+        className="w-full bg-[#F9F9F9] border border-[#E5E5E5] text-[#1A1A1A] p-3 
+                 rounded-lg transition-all duration-200 
+                 focus:outline-none focus:ring-2 focus:ring-[#422faf]"
+        {...register(id, validation)}
+        {...props}
+      />
+      {errors[id] && (
+        <span className="text-[12px] text-[#DC2626]">
+          {errors[id].message}
+        </span>
+      )}
+    </div>
+  );
+
   return (
-    <>
-      <form action="" onSubmit={handleSubmit(formsubmit)}>
-        <div className="my-10 flex  flex-col rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12 gap-5">
-          <h2 className="text-lg font-semibold text-richblack-5">Profile Information</h2>
-          {/* firstname-lastname  */}
-          <div className="flex flex-col gap-5 lg:flex-row">
-            {/* First Name  */}
-            <div className="flex flex-col gap-2 lg:w-[48%]">
-              <label htmlFor="firstName" className="label-style">First Name </label>
-              <input
-                type="text"
-                name="firstName"
-                id="firstName"
-                placeholder="Enter first name"
-                className="form-style"
-                {...register("firstName", { required: true })}
-                defaultValue={user?.firstName}
-              />
-              {errors.firstName && (
-                <span className="-mt-1 text-[12px] text-yellow-100">
-                  Please enter your first name.
-                </span>
-              )}
-            </div>
-            {/* Last Name  */}
-            <div className="flex flex-col gap-2 lg:w-[48%]">
-              <label htmlFor="lastName" className="label-style">Last Name </label>
-              <input
-                type="text"
-                name="lastName"
-                id="lastName"
-                placeholder="Enter Last name"
-                className="form-style"
-                {...register("lastName", { required: true })}
-                defaultValue={user?.lastName}
-              />
-              {errors.firstName && (
-                <span className="-mt-1 text-[12px] text-yellow-100">
-                  Please enter your Last name.
-                </span>
-              )}
-            </div>
-          </div>
-          {/* DOB and Gender  */}
-          <div className="flex flex-col gap-5 lg:flex-row">
-            {/* DOB  */}
-            <div className="flex flex-col gap-2 lg:w-[48%]">
-              <label htmlFor="dateOfBirth" className="label-style">Date of Birth </label>
-              <input
-                type="date"
-                name="dateOfBirth"
-                id="dateOfBirth"
-                className="form-style"
-                {...register("dateOfBirth", { required: true })}
-                defaultValue={user?.dateOfBirth}
-              />
-              {errors.dob && (
-                <span className="-mt-1 text-[12px] text-yellow-100">
-                  Please enter your Date of Birth.
-                </span>
-              )}
-            </div>
-            {/* Gender  */}
-            <div className="flex flex-col gap-2 lg:w-[48%]">
-              <label htmlFor="gender" className="label-style">Gender </label>
-              <select
-                name="gender"
-                id="gender"
-                className="form-style"
-                {...register("gender", { required: true })}
-                defaultValue={user?.gender}
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-                <option value="Prefer not to say">Prefer not to say</option>
-              </select>
-              {errors.gender && (
-                <span className="-mt-1 text-[12px] text-yellow-100">
-                  Please select your Gender.
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Contact No and about  */}
-          <div className="flex flex-col gap-5 lg:flex-row">
-            {/* Contact Number  */}
-            <div className="flex flex-col gap-2 lg:w-[48%]">
-              <label htmlFor="contactNumber" className="label-style">Contact Number </label>
-              <input
-                type="text"
-                name="contactNumber"
-                id="contactNumber"
-                placeholder="Enter Contact Number"
-                className="form-style"
-                {...register("contactNumber", { required: true })}
-                defaultValue={user?.contactNumber}
-              />
-              {errors.contactNumber && (
-                <span className="-mt-1 text-[12px] text-yellow-100">
-                  Please enter your Contact Number.
-                </span>
-              )}
-            </div>
-            {/* About  */}
-            <div className="flex flex-col gap-2 lg:w-[48%]">
-              <label htmlFor="about" className="label-style">About </label>
-              <input
-                type="text"
-                name="about"
-                id="about"
-                placeholder="Enter Bio Details"
-                className="form-style"
-                {...register("about", { required: true })}
-                defaultValue={user?.additionalDetails?.about}
-              />
-              {errors.about && (
-                <span className="-mt-1 text-[12px] text-yellow-100">
-                  Please enter about yourself.
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => {
-              navigate("/dashboard/my-profile");
+    <form onSubmit={handleSubmit(formsubmit)} className="w-full max-w-[1000px] mx-auto">
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#111827] mb-2">
+          Edit Profile
+        </h1>
+        <p className="text-[#6B7280] text-sm">
+          Update your personal information and profile details
+        </p>
+      </div>
+
+      {/* Profile Information Card */}
+      <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-6 sm:p-8 mb-6">
+        <h2 className="text-lg font-semibold text-[#111827] mb-6 flex items-center">
+          <span className="inline-block w-1 h-6 bg-[#422faf] rounded mr-3"></span>
+          Profile Information
+        </h2>
+
+        {/* Name Fields */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-6">
+          <FormInput
+            label="First Name"
+            id="firstName"
+            placeholder="Enter first name"
+            validation={{
+              required: "First name is required",
+              minLength: {
+                value: 2,
+                message: "First name must be at least 2 characters",
+              },
             }}
-            className="cursor-pointer rounded-md bg-richblack-700 py-2 px-5 font-semibold text-richblack-50"
-          >
-            Cancel
-          </button>
-          <IconBtn type="submit" text="Save" />
+          />
+          <FormInput
+            label="Last Name"
+            id="lastName"
+            placeholder="Enter last name"
+            validation={{
+              required: "Last name is required",
+            }}
+          />
         </div>
-      </form>
-    </>
+
+        {/* DOB and Gender */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-6">
+          <FormInput
+            label="Date of Birth"
+            id="dateOfBirth"
+            type="date"
+            validation={{
+              required: "Date of birth is required",
+              validate: value => new Date(value) <= new Date() || "Date cannot be in future",
+            }}
+          />
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label className="text-[#1A1A1A] font-medium">
+              Gender
+            </label>
+            <select
+              {...register("gender", { required: "Please select gender" })}
+              className="w-full bg-[#F9F9F9] border border-[#E5E5E5] text-[#1A1A1A] p-3 
+                       rounded-lg transition-all duration-200 
+                       focus:outline-none focus:ring-2 focus:ring-[#422faf] appearance-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                backgroundPosition: `right 0.5rem center`,
+                backgroundRepeat: `no-repeat`,
+                backgroundSize: `1.5em 1.5em`,
+                paddingRight: `2.5rem`
+              }}
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+            {errors.gender && (
+              <span className="text-[12px] text-[#DC2626]">
+                {errors.gender.message}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Contact Number */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-6">
+          <FormInput
+            label="Contact Number"
+            id="contactNumber"
+            type="tel"
+            placeholder="Enter contact number"
+            validation={{
+              required: "Contact number is required",
+              pattern: {
+                value: /^[0-9]{10}$/,
+                message: "Please enter a valid 10-digit number",
+              },
+            }}
+          />
+          <div className="lg:w-[48%]"></div>
+        </div>
+
+        {/* About Section */}
+        <div className="mb-2">
+          <label className="text-[#1A1A1A] font-medium block mb-2">
+            About
+          </label>
+          <textarea
+            {...register("about", {
+              required: "Please write something about yourself",
+              maxLength: {
+                value: 250,
+                message: "About should not exceed 250 characters",
+              },
+            })}
+            placeholder="Tell us about yourself"
+            className="w-full bg-[#F9F9F9] border border-[#E5E5E5] text-[#1A1A1A] p-3 
+                     rounded-lg transition-all duration-200 min-h-[120px]
+                     focus:outline-none focus:ring-2 focus:ring-[#422faf]"
+          ></textarea>
+          {errors.about && (
+            <span className="text-[12px] text-[#DC2626] block mt-1">
+              {errors.about.message}
+            </span>
+          )}
+          <div className="text-right text-[#6B7280] text-xs mt-1">
+            Max 250 characters
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-4 mt-6">
+        <button
+          type="button"
+          onClick={() => navigate("/dashboard/my-profile")}
+          className="px-6 py-2 rounded-lg border border-[#D1D5DB]
+                   text-[#4B5563] hover:bg-[#F3F4F6] hover:border-[#9CA3AF]
+                   transition-all duration-200"
+          disabled={loading}
+        >
+          Cancel
+        </button>
+        <IconBtn
+          type="submit"
+          text={loading ? "Saving..." : "Save Changes"}
+          disabled={loading}
+        />
+      </div>
+    </form>
   );
 };
 

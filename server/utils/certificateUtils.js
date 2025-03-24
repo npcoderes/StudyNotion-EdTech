@@ -1,6 +1,5 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
-const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
@@ -41,15 +40,36 @@ exports.generateCertificate = async ({ user, course, filePath }) => {
                 primary: '#1F2937',
                 secondary: '#4B5563',
                 accent: '#FFD60A',
-                border: '#E5E7EB'
+                border: '#E5E7EB',
+                background: '#F3F4F6',
+                pattern: '#D3D3D3' // Changed to accent color for better visibility
             };
 
             const certificateId = uuidv4().slice(0, 8).toUpperCase();
 
-            // Background and border
+            // Background color
             doc
                 .rect(0, 0, doc.page.width, doc.page.height)
-                .fill('#FFFFFF');
+                .fill(colors.background);
+
+            // Generate a pattern programmatically
+            const patternSize = 20; // Size of each pattern tile
+            const patternSpacing = 5; // Spacing between pattern elements
+            const patternOpacity = 0.1; // Reduced opacity for better look with new color
+
+            doc.save();
+            doc.opacity(patternOpacity); // Set opacity for the pattern
+
+            for (let x = 0; x < doc.page.width; x += patternSize + patternSpacing) {
+                for (let y = 0; y < doc.page.height; y += patternSize + patternSpacing) {
+                    // Draw a circle (dot) as the pattern
+                    doc
+                        .circle(x + patternSize / 2, y + patternSize / 2, patternSize / 4)
+                        .fill(colors.pattern);
+                }
+            }
+
+            doc.restore(); // Restore original opacity
 
             // Enhanced border with double lines
             const outerBorder = 15;
@@ -65,21 +85,26 @@ exports.generateCertificate = async ({ user, course, filePath }) => {
                 .lineWidth(0.5)
                 .stroke(colors.border);
 
-            // Logo with error handling
+            // Logo with error handling - increased size
             try {
-                doc.image(logoPath, doc.page.width / 2 - 40, 50, { width: 80 });
+                doc.image(logoPath, 
+                    doc.page.width / 2 - 60, // Adjusted x position for centering
+                    40, // Moved slightly higher
+                    { 
+                        width: 120 // Increased from 80 to 120
+                    }
+                );
             } catch (error) {
                 console.warn('Logo loading failed:', error);
             }
 
-            // Content
+            // Adjusted the text position to accommodate larger logo
             doc
                 .font('Helvetica-Bold')
                 .fontSize(36)
                 .fillColor(colors.primary)
-                .text('CERTIFICATE OF COMPLETION', 0, 150, { align: 'center' });
+                .text('CERTIFICATE OF COMPLETION', 0, 170, { align: 'center' });
 
-            // ... rest of your text content ...
             // Recipient
             doc
                 .font('Helvetica')
@@ -116,8 +141,6 @@ exports.generateCertificate = async ({ user, course, filePath }) => {
                 .fontSize(12)
                 .text(`Date: ${new Date().toLocaleDateString()}`, 100, 450)
                 .text(`Certificate ID: ${certificateId}`, doc.page.width - 250, 450);
-
-        
 
             // Add signature with error handling
             try {

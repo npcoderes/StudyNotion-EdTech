@@ -16,9 +16,11 @@ export const addReply = (doubtId, replyData,token) => {
 };
 
 export const markDoubtResolved = (doubtId) => {
-  return axios.patch(`${API_URL}/${doubtId}/resolve`);
+  return axios.put(`${API_URL}/${doubtId}/resolve`);
 };
 
-export const upvoteDoubt = (doubtId, userId) => {
-  return axios.patch(`${API_URL}/${doubtId}/upvote`, { userId });
+export const upvoteDoubt = (doubtId,token) => {
+  console.log("Token....",token)
+
+  return axios.post(`${API_URL}/${doubtId}/upvote`, { token: token });
 };

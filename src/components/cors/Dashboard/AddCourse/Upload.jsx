@@ -1,56 +1,71 @@
-import React, { useState } from 'react'
-import { useRef,useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Player } from 'video-react'
-import { FiUploadCloud } from "react-icons/fi"
+import { FiUploadCloud, FiX, FiFile } from "react-icons/fi"
 import "video-react/dist/video-react.css"
-const Upload = ({ name, label, register, setValue, errors, video = false, viewData = null, editData = null, }) => {
-    const[selectedFile,setSelectedFile]=useState(null)
-    const [previewSource, setPreviewSource] = useState(viewData ? viewData : editData ? editData : "")
-    const inputRef = useRef(null)
-    const onDrop = (acceptedFiles) => {
-        const file = acceptedFiles[0]
-        if (file) {
-          previewFile(file)
-          setSelectedFile(file)
-        }
-      }
-      const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        accept: !video
-          ? { "image/*": [".jpeg", ".jpg", ".png"] }
-          : { "video/*": [".mp4"] },
-        onDrop,
-      })
 
-      const previewFile = (file) => {
-        // console.log(file)
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onloadend = () => {
-          setPreviewSource(reader.result)
-        }
-      }
-    
-      useEffect(() => {
-        register(name, { required: true })
-      }, [register])
-    
-    
-      useEffect(() => {
-        setValue(name, selectedFile)
-      }, [selectedFile, setValue])
-    
+const Upload = ({ 
+  name, 
+  label, 
+  register, 
+  setValue, 
+  errors, 
+  video = false, 
+  viewData = null, 
+  editData = null 
+}) => {
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [previewSource, setPreviewSource] = useState(viewData ? viewData : editData ? editData : "")
+  const inputRef = useRef(null)
+  
+  const onDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0]
+    if (file) {
+      previewFile(file)
+      setSelectedFile(file)
+    }
+  }
+  
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+    accept: !video
+      ? { "image/*": [".jpeg", ".jpg", ".png"] }
+      : { "video/*": [".mp4"] },
+    onDrop,
+    noClick: false,
+    noKeyboard: false
+  })
+
+  const previewFile = (file) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = () => {
+      setPreviewSource(reader.result)
+    }
+  }
+
+  const handleManualBrowse = (e) => {
+    e.stopPropagation()
+    open()
+  }
+
+  useEffect(() => {
+    register(name, { required: true })
+  }, [register])
+
+  useEffect(() => {
+    setValue(name, selectedFile)
+  }, [selectedFile, setValue])
 
   return (
-    <>
- <div className="flex flex-col space-y-2">
-      <label className="text-sm text-richblack-5" htmlFor={name}>
-        {label} {!viewData && <sup className="text-pink-200">*</sup>}
+    <div className="flex flex-col space-y-2">
+      <label className="text-sm font-medium text-[#4B5563]" htmlFor={name}>
+        {label} {!viewData && <span className="text-[#EF4444]">*</span>}
       </label>
 
       <div
-        className={`${isDragActive ? "bg-richblack-600" : "bg-richblack-700"}
-         flex min-h-[250px] cursor-pointer items-center justify-center rounded-md border-2 border-dotted border-richblack-500`}
+        className={`${
+          isDragActive ? "bg-[#F3F4F6] border-[#422FAF]" : "bg-white border-[#D1D5DB]"
+        } flex min-h-[250px] cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition-colors`}
       >
         {previewSource ? (
           <div className="flex w-full flex-col p-6">
@@ -58,10 +73,10 @@ const Upload = ({ name, label, register, setValue, errors, video = false, viewDa
               <img
                 src={previewSource}
                 alt="Preview"
-                className="h-full w-full rounded-md object-cover"
+                className="h-full w-full rounded-md object-cover shadow-sm"
               />
             ) : (
-              <Player aspectRatio='16:9'  playsInline src={previewSource}   />
+              <Player aspectRatio="16:9" playsInline src={previewSource} />
             )}
 
             {!viewData && (
@@ -72,9 +87,10 @@ const Upload = ({ name, label, register, setValue, errors, video = false, viewDa
                   setSelectedFile(null)
                   setValue(name, null)
                 }}
-                className="mt-3 text-richblack-400 underline"
+                className="mt-3 flex items-center justify-center gap-1 text-[#6B7280] hover:text-[#EF4444] transition-colors text-sm font-medium"
               >
-                Cancel
+                <FiX className="text-base" />
+                Remove {!video ? "image" : "video"}
               </button>
             )}
           </div>
@@ -84,29 +100,43 @@ const Upload = ({ name, label, register, setValue, errors, video = false, viewDa
             {...getRootProps()}
           >
             <input {...getInputProps()} ref={inputRef} />
-            <div className="grid aspect-square w-14 place-items-center rounded-full bg-pure-greys-800">
-              <FiUploadCloud className="text-2xl text-yellow-50" />
+            <div className="grid aspect-square w-14 place-items-center rounded-full bg-[#EEF2FF]">
+              <FiUploadCloud className="text-2xl text-[#422FAF]" />
             </div>
-            <p className="mt-2 max-w-[200px] text-center text-sm text-richblack-200">
-              Drag and drop an {!video ? "image" : "video"}, or click to{" "}
-              <span className="font-semibold text-yellow-50">Browse</span> a
-              file
+            <p className="mt-2 max-w-[240px] text-center text-sm text-[#6B7280]">
+              Drag and drop an {!video ? "image" : "video"}, or click here
             </p>
-            <ul className="mt-10 flex list-disc justify-between space-x-12 text-center  text-xs text-richblack-200">
-              <li>Aspect ratio 16:9</li>
-              <li>Recommended size 1024x576</li>
+            
+            {/* Explicit Browse Button */}
+            <button
+              type="button"
+              onClick={handleManualBrowse}
+              className="mt-3 flex items-center justify-center gap-1 px-3 py-2 bg-[#EEF2FF] text-[#422FAF] rounded-lg hover:bg-[#E0E7FF] transition-colors text-sm font-medium"
+            >
+              <FiFile className="text-base" />
+              Browse Files
+            </button>
+            
+            <ul className="mt-5 flex flex-wrap justify-center gap-x-8 gap-y-2 text-center text-xs text-[#6B7280]">
+              <li className="flex items-center">
+                <div className="mr-1.5 h-1 w-1 rounded-full bg-[#6B7280]"></div>
+                Aspect ratio 16:9
+              </li>
+              <li className="flex items-center">
+                <div className="mr-1.5 h-1 w-1 rounded-full bg-[#6B7280]"></div>
+                Recommended size 1024x576
+              </li>
             </ul>
           </div>
         )}
       </div>
 
       {errors[name] && (
-        <span className="ml-2 text-xs tracking-wide text-pink-200">
+        <span className="text-xs text-[#EF4444]">
           {label} is required
         </span>
       )}
-    </div>  
-    </>
+    </div>
   )
 }
 

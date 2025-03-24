@@ -203,27 +203,29 @@ const InstructorAnalytics = () => {
     ]
 
     return (
-        <div className="p-6 bg-richblack-900">
-            <h1 className="text-3xl font-bold text-richblack-5 mb-8">
-                Instructor Performance Analytics
-            </h1>
-
-            {loading ? (
-                <div className="flex justify-center">Loading...</div>
-            ) : (
-                <DataTable
-                    data={instructors}
-                    columns={columns}
-                    sortField={sortField}
-                    sortOrder={sortOrder}
-                    onSort={(field, order) => {
-                        setSortField(field)
-                        setSortOrder(order)
-                    }}
-                />
-            )}
-        </div>
-    )
+        
+            <div className="p-6 bg-[#F9F9F9] dark:bg-[#1A1A1A]">
+                <h1 className="text-3xl font-bold text-[#1A1A1A] dark:text-[#FFFFFF] mb-8">
+                    Instructor Performance Analytics
+                </h1>
+        
+                {loading ? (
+                    <div className="flex justify-center text-[#1A1A1A] dark:text-[#FFFFFF]">Loading...</div>
+                ) : (
+                    <DataTable
+                        data={instructors}
+                        columns={columns}
+                        sortField={sortField}
+                        sortOrder={sortOrder}
+                        onSort={(field, order) => {
+                            setSortField(field)
+                            setSortOrder(order)
+                        }}
+                    />
+                )}
+            </div>
+        )
+    
 }
 
 export default InstructorAnalytics

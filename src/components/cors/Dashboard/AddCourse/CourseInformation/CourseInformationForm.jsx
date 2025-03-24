@@ -14,7 +14,6 @@ import TagInput from "./TagInput"
 import RequiremenrInstruction from "./RequirementInstruction"
 
 export default function CourseInformationForm() {
-
   const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm()
 
   const dispatch = useDispatch()
@@ -28,15 +27,13 @@ export default function CourseInformationForm() {
       setLoading(true)
       const categories = await fetchCourseCategories();
       if (categories.length > 0) {
-        // console.log("categories", categories)
         setCourseCategories(categories.filter((category) => category.Active === true))
       }
       setLoading(false)
     }
-    // if form is in edit mode 
-    // It will add value in input field
+    
+    // if form is in edit mode, add values in input fields
     if (editCourse) {
-      // console.log("editCourse ", editCourse)
       setValue("courseTitle", course.courseName)
       setValue("courseShortDesc", course.courseDescription)
       setValue("coursePrice", course.price)
@@ -50,11 +47,8 @@ export default function CourseInformationForm() {
     getCategories()
   }, [])
 
-
-
   const isFormUpdated = () => {
     const currentValues = getValues()
-    // console.log("changes after editing form values:", currentValues)
     if (
       currentValues.courseTitle !== course.courseName ||
       currentValues.courseShortDesc !== course.courseDescription ||
@@ -69,20 +63,14 @@ export default function CourseInformationForm() {
     return false
   }
 
-  //   handle next button click
+  // Handle form submission
   const onSubmit = async (data) => {
-    // console.log(data)
-
     if (editCourse) {
-      // const currentValues = getValues()
-      // console.log("changes after editing form values:", currentValues)
-      // console.log("now course:", course)
-      // console.log("Has Form Changed:", isFormUpdated())
       if (isFormUpdated()) {
         const currentValues = getValues()
         const formData = new FormData()
-        // console.log('data -> ',data)
         formData.append("courseId", course._id)
+        
         if (currentValues.courseTitle !== course.courseName) {
           formData.append("courseName", data.courseTitle)
         }
@@ -94,7 +82,6 @@ export default function CourseInformationForm() {
         }
         if (currentValues.courseTags.toString() !== course.tag.toString()) {
           formData.append("tag", JSON.stringify(data.courseTags))
-          // formData.append("tag", data.courseTags)
         }
         if (currentValues.courseBenefits !== course.whatYouWillLearn) {
           formData.append("whatYouWillLearn", data.courseBenefits)
@@ -109,7 +96,7 @@ export default function CourseInformationForm() {
           formData.append("thumbnailImage", data.courseImage)
         }
 
-        // send data to backend
+        // Send data to backend
         setLoading(true)
         const result = await editCourseDetails(formData, token)
         setLoading(false)
@@ -123,7 +110,7 @@ export default function CourseInformationForm() {
       return
     }
 
-    // user has visted first time to step 1 
+    // User has visited first time to step 1 
     const formData = new FormData()
     formData.append("courseName", data.courseTitle)
     formData.append("courseDescription", data.courseShortDesc)
@@ -134,6 +121,7 @@ export default function CourseInformationForm() {
     formData.append("status", COURSE_STATUS.DRAFT)
     formData.append("instructions", JSON.stringify(data.courseRequirements))
     formData.append("thumbnailImage", data.courseImage)
+    
     setLoading(true)
     const result = await addCourseDetails(formData, token)
     if (result) {
@@ -146,21 +134,21 @@ export default function CourseInformationForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-8 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6 "
+      className="space-y-8"
     >
       {/* Course Title */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="courseTitle">
-          Course Title <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-[#4B5563]" htmlFor="courseTitle">
+          Course Title <span className="text-[#EF4444]">*</span>
         </label>
         <input
           id="courseTitle"
           placeholder="Enter Course Title"
           {...register("courseTitle", { required: true })}
-          className="form-style w-full"
+          className="w-full px-4 py-2.5 text-[#111827] bg-white border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#422FAF] focus:border-[#422FAF] focus:outline-none transition-colors"
         />
         {errors.courseTitle && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
+          <span className="text-xs text-[#EF4444]">
             Course title is required
           </span>
         )}
@@ -168,17 +156,17 @@ export default function CourseInformationForm() {
 
       {/* Course Short Description */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="courseShortDesc">
-          Course Short Description <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-[#4B5563]" htmlFor="courseShortDesc">
+          Course Short Description <span className="text-[#EF4444]">*</span>
         </label>
         <textarea
           id="courseShortDesc"
           placeholder="Enter Description"
           {...register("courseShortDesc", { required: true })}
-          className="form-style resize-x-none min-h-[130px] w-full ] "
+          className="w-full min-h-[130px] px-4 py-2.5 text-[#111827] bg-white border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#422FAF] focus:border-[#422FAF] focus:outline-none transition-colors resize-none"
         />
         {errors.courseShortDesc && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
+          <span className="text-xs text-[#EF4444]">
             Course Description is required
           </span>
         )}
@@ -186,8 +174,8 @@ export default function CourseInformationForm() {
 
       {/* Course Price */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="coursePrice">
-          Course Price <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-[#4B5563]" htmlFor="coursePrice">
+          Course Price <span className="text-[#EF4444]">*</span>
         </label>
         <div className="relative">
           <input
@@ -200,28 +188,27 @@ export default function CourseInformationForm() {
                 value: /^(0|[1-9]\d*)(\.\d+)?$/,
               },
             })}
-            className="form-style w-full !pl-12"
-
+            className="w-full px-4 py-2.5 pl-12 text-[#111827] bg-white border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#422FAF] focus:border-[#422FAF] focus:outline-none transition-colors"
           />
-          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 inline-block -translate-y-1/2 text-2xl text-richblack-200" />
+          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl text-[#6B7280]" />
         </div>
         {errors.coursePrice && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Price is required
+          <span className="text-xs text-[#EF4444]">
+            Course Price is required and must be a valid number
           </span>
         )}
       </div>
 
       {/* Course Category */}
-      <div className="flex flex-col space-y-2 ">
-        <label className="text-sm text-richblack-5" htmlFor="courseCategory">
-          Course Category <sup className="text-pink-200">*</sup>
+      <div className="flex flex-col space-y-2">
+        <label className="text-sm font-medium text-[#4B5563]" htmlFor="courseCategory">
+          Course Category <span className="text-[#EF4444]">*</span>
         </label>
         <select
           {...register("courseCategory", { required: true })}
           defaultValue=""
           id="courseCategory"
-          className="form-style w-full cursor-pointer"
+          className="w-full px-4 py-2.5 text-[#111827] bg-white border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#422FAF] focus:border-[#422FAF] focus:outline-none transition-colors cursor-pointer"
         >
           <option value="" disabled>
             Choose a Category
@@ -234,7 +221,7 @@ export default function CourseInformationForm() {
             ))}
         </select>
         {errors.courseCategory && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
+          <span className="text-xs text-[#EF4444]">
             Course Category is required
           </span>
         )}
@@ -262,17 +249,17 @@ export default function CourseInformationForm() {
 
       {/* Benefits of the course */}
       <div className="flex flex-col space-y-2">
-        <label className="text-sm text-richblack-5" htmlFor="courseBenefits">
-          Benefits of the course <sup className="text-pink-200">*</sup>
+        <label className="text-sm font-medium text-[#4B5563]" htmlFor="courseBenefits">
+          Benefits of the course <span className="text-[#EF4444]">*</span>
         </label>
         <textarea
           id="courseBenefits"
           placeholder="Enter benefits of the course"
           {...register("courseBenefits", { required: true })}
-          className="form-style resize-x-none min-h-[130px] w-full"
+          className="w-full min-h-[130px] px-4 py-2.5 text-[#111827] bg-white border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#422FAF] focus:border-[#422FAF] focus:outline-none transition-colors resize-none"
         />
         {errors.courseBenefits && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
+          <span className="text-xs text-[#EF4444]">
             Benefits of the course is required
           </span>
         )}
@@ -293,18 +280,28 @@ export default function CourseInformationForm() {
           <button
             onClick={() => dispatch(setStep(2))}
             disabled={loading}
-            className={`flex cursor-pointer items-center gap-x-2 rounded-md py-[8px] px-[20px] font-semibold
-              text-richblack-900 bg-richblack-300 hover:bg-richblack-900 hover:text-richblack-300 duration-300`}
+            className="px-5 py-2.5 border border-[#E5E7EB] text-[#4B5563] rounded-lg hover:bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-[#E5E7EB] transition-colors font-medium disabled:opacity-70"
           >
-            Continue Wihout Saving
+            Continue Without Saving
           </button>
         )}
-        <IconBtn
+        <button
+          type="submit"
           disabled={loading}
-          text={!editCourse ? "Next" : "Save Changes"}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#422FAF] text-white rounded-lg hover:bg-[#3B27A1] focus:outline-none focus:ring-2 focus:ring-[#422FAF] focus:ring-offset-2 transition-colors font-medium disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <MdNavigateNext />
-        </IconBtn>
+          {loading ? (
+            <>
+              <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+              {!editCourse ? "Processing..." : "Saving..."}
+            </>
+          ) : (
+            <>
+              {!editCourse ? "Next" : "Save Changes"}
+              <MdNavigateNext size={20} />
+            </>
+          )}
+        </button>
       </div>
     </form>
   )
