@@ -49,7 +49,7 @@ const examResultSchema = new mongoose.Schema({
   },
   totalPoints: {
     type: Number,
-    required: true,
+    required: true,  
   },
   passed: {
     type: Boolean,

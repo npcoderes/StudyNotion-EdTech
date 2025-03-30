@@ -33,4 +33,4 @@ requireModel('Certificate', './Certificate');
 console.log("Final registered models:", Object.keys(mongoose.models));
 
 // Export mongoose with all models registered
-module.exports = mongoose;
+module.exports = mongoose; 
