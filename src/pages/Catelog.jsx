@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -25,6 +25,11 @@ const fadeIn = {
   },
   exit: { opacity: 0 }
 };
+
+// Debounced search function
+const debouncedSearchFunction = debounce((value, callback) => {
+  callback(value);
+}, 300);
 
 const Catelog = () => {
   // State variables
@@ -105,7 +110,7 @@ const Catelog = () => {
   }, [catalogPageData]);
 
   // Filter courses based on all criteria
-  const applyFilters = () => {
+  const applyFilters = useCallback((searchValue = searchQuery) => {
     setIsFiltering(true);
     
     // Get all courses from different sections
@@ -127,9 +132,9 @@ const Catelog = () => {
     let courses = Array.from(uniqueCoursesMap.values());
     
     // Apply search query filter
-    if (searchQuery) {
+    if (searchValue) {
       courses = courses.filter(course =>
-        course.courseName.toLowerCase().includes(searchQuery.toLowerCase())
+        course.courseName.toLowerCase().includes(searchValue.toLowerCase())
       );
     }
     
@@ -190,55 +195,90 @@ const Catelog = () => {
     
     setFilteredCourses(courses);
     setIsFiltering(false);
-  };
-  
-  // Apply filters when filter parameters change
-  useEffect(() => {
-    // Skip the initial render
-    if (catalogPageData?.selectedCategory?.courses) {
-      applyFilters();
-    }
-  }, [searchQuery, priceRange, selectedDurations, selectedLevels, ratings, activeTab]);
+  }, [catalogPageData, priceRange, selectedDurations, selectedLevels, ratings, activeTab]);
 
-  // Debounced search function
-  const debouncedSearch = debounce((query) => {
-    setSearchQuery(query);
-  }, 300);
-  
+  // Add useEffect to handle filter changes
+  useEffect(() => {
+    if (catalogPageData) {
+      applyFilters(searchQuery);
+    }
+  }, [priceRange, selectedDurations, selectedLevels, ratings, activeTab]);
+
+  // Use useCallback to memoize the search handler
+  const handleSearchChange = useCallback((e) => {
+    const value = e.target.value;
+    // Update local state immediately for input value
+    setSearchQuery(value);
+    // Debounce the actual filtering
+    debouncedSearchFunction(value, (debouncedValue) => {
+      applyFilters(debouncedValue);
+    });
+  }, [applyFilters]);
+
+  // Update price range handler
+  const handlePriceRangeChange = useCallback((type, value) => {
+    const newValue = parseInt(value);
+    setPriceRange(prev => {
+      const newRange = type === 'min' 
+        ? [newValue, prev[1]]
+        : [prev[0], newValue];
+      
+      // Ensure min doesn't exceed max
+      if (newRange[0] > newRange[1]) {
+        return type === 'min'
+          ? [newRange[1], newRange[1]]
+          : [newRange[0], newRange[0]];
+      }
+      return newRange;
+    });
+  }, []);
+
+  // Update duration handler
+  const handleDurationChange = useCallback((value) => {
+    setSelectedDurations(prev => {
+      const newDurations = prev.includes(value)
+        ? prev.filter(item => item !== value)
+        : [...prev, value];
+      return newDurations;
+    });
+  }, []);
+
+  // Update level handler
+  const handleLevelChange = useCallback((value) => {
+    setSelectedLevels(prev => {
+      const newLevels = prev.includes(value)
+        ? prev.filter(item => item !== value)
+        : [...prev, value];
+      return newLevels;
+    });
+  }, []);
+
+  // Update ratings handler
+  const handleRatingChange = useCallback((value) => {
+    setRatings(prev => prev === value ? 0 : value);
+  }, []);
+
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearchFunction.cancel();
+    };
+  }, []);
+
   // Reset all filters
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setPriceRange([0, 10000]);
     setSelectedDurations([]);
     setSelectedLevels([]);
     setRatings(0);
-    setSearchQuery("");
-  };
+    setSearchQuery('');
+    // Explicitly call applyFilters after reset
+    applyFilters('');
+  }, [applyFilters]);
 
   // Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-  };
-  
-  // Handle duration selection
-  const handleDurationChange = (value) => {
-    setSelectedDurations(prev => {
-      if (prev.includes(value)) {
-        return prev.filter(item => item !== value);
-      } else {
-        return [...prev, value];
-      }
-    });
-  };
-  
-  // Handle level selection
-  const handleLevelChange = (value) => {
-    setSelectedLevels(prev => {
-      if (prev.includes(value)) {
-        return prev.filter(item => item !== value);
-      } else {
-        return [...prev, value];
-      }
-    });
   };
 
   // Loading state
@@ -316,9 +356,7 @@ const Catelog = () => {
                 type="text"
                 placeholder="Search courses..."
                 value={searchQuery}
-                onChange={(e) => {
-                  debouncedSearch(e.target.value);
-                }}
+                onChange={handleSearchChange}
                 className="w-full px-4 py-3 pl-10 text-[#111827] border border-[#D1D5DB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#422faf] focus:border-transparent shadow-sm"
               />
               <MagnifyingGlassIcon className="absolute left-3 top-3.5 h-5 w-5 text-[#9CA3AF]" />
@@ -382,7 +420,7 @@ const Catelog = () => {
                         max="10000"
                         step="500"
                         value={priceRange[0]}
-                        onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                        onChange={(e) => handlePriceRangeChange('min', e.target.value)}
                         className="w-full h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer accent-[#422faf]"
                       />
                       <input
@@ -391,7 +429,7 @@ const Catelog = () => {
                         max="10000"
                         step="500"
                         value={priceRange[1]}
-                        onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                        onChange={(e) => handlePriceRangeChange('max', e.target.value)}
                         className="w-full h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer accent-[#422faf]"
                       />
                     </div>
@@ -443,7 +481,7 @@ const Catelog = () => {
                             type="radio"
                             name="rating"
                             checked={ratings === star}
-                            onChange={() => setRatings(star)}
+                            onChange={() => handleRatingChange(star)}
                             className="w-4 h-4 text-[#422faf] border-[#D1D5DB] focus:ring-[#422faf]"
                           />
                           <div className="flex items-center">
