@@ -1,5 +1,5 @@
 // Import mongoose with all models registered
-const mongoose = require('../models/index');
+const mongoose = require('../models/indexModal');
 
 // Use mongoose.model to get models
 const ExamResult = mongoose.model('ExamResult');

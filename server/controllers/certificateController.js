@@ -1,4 +1,4 @@
-const mongoose = require('../models/index');
+const mongoose = require('../models/indexModal');
 // Make sure you're using the exact case as used in your model registration
 const User = mongoose.model('User');  // Not 'user'
 const Course = mongoose.model('Course');

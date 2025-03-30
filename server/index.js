@@ -7,7 +7,7 @@ const database = require("./config/database");
 database.connect();
 
 // Load all models to ensure they're registered
-const mongoose = require('./models/index');
+const mongoose = require('./models/indexModal');
 
 // Log all registered models for debugging
 console.log('Registered Mongoose models:', Object.keys(mongoose.models));
