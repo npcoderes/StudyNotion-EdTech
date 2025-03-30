@@ -60,7 +60,7 @@ function UpdatePassword() {
   }
 
   return (
-    <div className="grid min-h-[calc(100vh-3.5rem)] place-items-center">
+    <div className="grid min-h-[calc(100vh-3.5rem)] place-items-center pt-20">
       {loading ? (
         <div className="spinner"></div>
       ) : (

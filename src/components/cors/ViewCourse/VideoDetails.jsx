@@ -12,7 +12,8 @@ import IconBtn from "../../common/IconBtn"
 import DoubtList from "../Doubt/DoubtList"
 import CreateDoubt from "../Doubt/CreateDoubt "
 import { getDoubtsByCourse } from "../../../services/operations/doubtService"
-
+import { FaQuestionCircle, FaPencilAlt, FaLock } from 'react-icons/fa'
+import { motion } from 'framer-motion'
 
 const VideoDetails = () => {
   const { courseId, sectionId, subSectionId } = useParams()
@@ -21,16 +22,24 @@ const VideoDetails = () => {
   const playerRef = useRef(null)
   const dispatch = useDispatch()
   const { token } = useSelector((state) => state.auth)
-  const { courseSectionData, courseEntireData, completedLectures } =
+  const { courseSectionData, courseEntireData, completedLectures, totalNoOfLectures } =
     useSelector((state) => state.viewCourse)
 
   const [videoData, setVideoData] = useState([])
   const [previewSource, setPreviewSource] = useState("")
   const [videoEnded, setVideoEnded] = useState(false)
   const [loading, setLoading] = useState(false)
-  const {user} =useSelector(state=>state.profile)
-  const [showDoubtForm, setShowDoubtForm] = useState(false);
-  const [doubts, setDoubts] = useState([]);
+  const {user} = useSelector(state => state.profile)
+  const [showDoubtForm, setShowDoubtForm] = useState(false)
+  const [doubts, setDoubts] = useState([])
+  const [isAllContentCompleted, setIsAllContentCompleted] = useState(false)
+
+  // Check if all content is completed
+  useEffect(() => {
+    if (totalNoOfLectures && completedLectures) {
+      setIsAllContentCompleted(completedLectures.length === totalNoOfLectures)
+    }
+  }, [completedLectures, totalNoOfLectures])
 
   const fetchDoubts = async () => {
     try {
@@ -45,7 +54,6 @@ const VideoDetails = () => {
   useEffect(() => {
     fetchDoubts();
   }, [courseId]);
-  // console.log(user)
 
   useEffect(() => {
     ;(async () => {
@@ -53,15 +61,12 @@ const VideoDetails = () => {
       if (!courseId && !sectionId && !subSectionId) {
         navigate(`/dashboard/enrolled-courses`)
       } else {
-        // console.log("courseSectionData", courseSectionData)
         const filteredData = courseSectionData.filter(
           (course) => course._id === sectionId
         )
-        // console.log("filteredData", filteredData)
         const filteredVideoData = filteredData?.[0]?.subSection.filter(
           (data) => data._id === subSectionId
         )
-        // console.log("filteredVideoData", filteredVideoData)
         setVideoData(filteredVideoData[0])
         setPreviewSource(courseEntireData.thumbnail)
         setVideoEnded(false)
@@ -88,8 +93,6 @@ const VideoDetails = () => {
 
   // go to the next video
   const goToNextVideo = () => {
-    // console.log(courseSectionData)
-
     const currentSectionIndx = courseSectionData.findIndex(
       (data) => data._id === sectionId
     )
@@ -100,8 +103,6 @@ const VideoDetails = () => {
     const currentSubSectionIndx = courseSectionData[
       currentSectionIndx
     ].subSection.findIndex((data) => data._id === subSectionId)
-
-    // console.log("no of subsections", noOfSubsections)
 
     if (currentSubSectionIndx !== noOfSubsections - 1) {
       const nextSubSectionId =
@@ -146,8 +147,6 @@ const VideoDetails = () => {
 
   // go to the previous video
   const goToPrevVideo = () => {
-    // console.log(courseSectionData)
-
     const currentSectionIndx = courseSectionData.findIndex(
       (data) => data._id === sectionId
     )
@@ -192,7 +191,7 @@ const VideoDetails = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 text-black">
+    <div className="flex flex-col gap-5 text-[#1E293B]">
       {!videoData ? (
         <img
           src={previewSource}
@@ -200,101 +199,124 @@ const VideoDetails = () => {
           className="h-full w-full rounded-md object-cover"
         />
       ) : (
-        <Player
-          ref={playerRef}
-          aspectRatio="16:9"
-          playsInline
-          onEnded={() => setVideoEnded(true)}
-          src={videoData?.videoUrl}
-        >
-          <BigPlayButton position="center" />
-          {/* Render When Video Ends */}
-          {videoEnded && (
-            <div
-              style={{
-                backgroundImage:
-                  "linear-gradient(to top, rgb(0, 0, 0), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.1)",
-              }}
-              className="full absolute inset-0 z-[100] grid h-full place-content-center font-inter"
-            >
-              {!completedLectures.includes(subSectionId) && (
+        <div className="relative rounded-lg overflow-hidden border border-[#E2E8F0]">
+          <Player
+            ref={playerRef}
+            aspectRatio="16:9"
+            playsInline
+            onEnded={() => setVideoEnded(true)}
+            src={videoData?.videoUrl}
+          >
+            <BigPlayButton position="center" />
+            {/* Render When Video Ends */}
+            {videoEnded && (
+              <div
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to top, rgb(0, 0, 0), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.1)",
+                }}
+                className="absolute inset-0 z-[100] grid h-full place-content-center font-inter"
+              >
+                {!completedLectures.includes(subSectionId) && (
+                  <IconBtn
+                    disabled={loading}
+                    onclick={() => handleLectureCompletion()}
+                    text={!loading ? "Mark As Completed" : "Loading..."}
+                    customClasses="text-xl max-w-max px-4 mx-auto bg-[#3B82F6] hover:bg-[#2563EB] text-white"
+                  />
+                )}
                 <IconBtn
                   disabled={loading}
-                  onclick={() => handleLectureCompletion()}
-                  text={!loading ? "Mark As Completed" : "Loading..."}
-                  customClasses="text-xl max-w-max px-4 mx-auto"
+                  onclick={() => {
+                    if (playerRef?.current) {
+                      // set the current time of the video to 0
+                      playerRef?.current?.seek(0)
+                      setVideoEnded(false)
+                    }
+                  }}
+                  text="Rewatch"
+                  customClasses="text-xl max-w-max px-4 mx-auto mt-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#1E293B]"
                 />
-              )}
-              <IconBtn
-                disabled={loading}
-                onclick={() => {
-                  if (playerRef?.current) {
-                    // set the current time of the video to 0
-                    playerRef?.current?.seek(0)
-                    setVideoEnded(false)
-                  }
-                }}
-                text="Rewatch"
-                customClasses="text-xl max-w-max px-4 mx-auto mt-2"
-              />
-              <div className="mt-10 flex min-w-[250px] justify-center gap-x-4 text-xl">
-                {!isFirstVideo() && (
-                  <button
-                    disabled={loading}
-                    onClick={goToPrevVideo}
-                    className="blackButton"
-                  >
-                    Prev
-                  </button>
-                )}
-                {!isLastVideo() && (
-                  <button
-                    disabled={loading}
-                    onClick={goToNextVideo}
-                    className="blackButton"
-                  >
-                    Next
-                  </button>
-                )}
+                <div className="mt-10 flex min-w-[250px] justify-center gap-x-4 text-xl">
+                  {!isFirstVideo() && (
+                    <button
+                      disabled={loading}
+                      onClick={goToPrevVideo}
+                      className="px-4 py-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#1E293B] rounded-lg transition-all"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  {!isLastVideo() && (
+                    <button
+                      disabled={loading}
+                      onClick={goToNextVideo}
+                      className="px-4 py-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white rounded-lg transition-all"
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+          </Player>
+        </div>
+      )}
+
+      <h1 className="mt-4 text-2xl font-semibold text-[#1E293B]">{videoData?.title}</h1>
+      <p className="text-[#64748B]">{videoData?.description}</p>
+
+      <div className="my-7 border-t border-[#E2E8F0] pt-6">
+        <div className="flex flex-wrap gap-4 mb-6">
+          <button
+            onClick={() => setShowDoubtForm(true)}
+            className="flex items-center gap-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#1E293B] px-4 py-2 rounded-lg transition-all"
+          >
+            <FaQuestionCircle className="text-[#3B82F6]" />
+            Ask a Doubt
+          </button>
+
+          {courseEntireData?.hasExam && (
+            <button
+              onClick={() => navigate(`/view-course/${courseEntireData._id}/take-exam`)}
+              disabled={!isAllContentCompleted}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all
+                ${isAllContentCompleted 
+                  ? "bg-[#3B82F6] hover:bg-[#2563EB] text-white" 
+                  : "bg-[#F1F5F9] text-[#94A3B8] cursor-not-allowed"}`}
+            >
+              {isAllContentCompleted 
+                ? <FaPencilAlt className="text-white" /> 
+                : <FaLock className="text-[#94A3B8]" />}
+              {isAllContentCompleted 
+                ? "Take Exam" 
+                : "Complete all lectures to unlock exam"}
+            </button>
           )}
-        </Player>
-      )}
+        </div>
 
-      <h1 className="mt-4 text-3xl font-semibold">{videoData?.title}</h1>
-      <p className="pt-2 pb-6">{videoData?.description}</p>
+        {showDoubtForm && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CreateDoubt 
+              courseId={courseId} 
+              onDoubtCreated={fetchDoubts} 
+              onClose={() => setShowDoubtForm(false)}
+            />
+          </motion.div>
+        )}
 
-      <>
-      <div className="my-7">
-      <button
-        onClick={() => setShowDoubtForm(true)}
-        className="bg-yellow-50 text-richblack-900 px-4 py-2 rounded-md hover:bg-yellow-100 transition-all duration-200"
-      >
-        Ask a Doubt
-      </button>
-
-      {showDoubtForm && (
-        <CreateDoubt 
-          courseId={courseId} 
-          onDoubtCreated={fetchDoubts} 
-          onClose={() => setShowDoubtForm(false)}
+        <DoubtList 
+          doubts={doubts} 
+          isInstructor={false} 
+          onUpdate={fetchDoubts} 
         />
-      )}
-
-     {
-      
-     }    <DoubtList 
-        doubts={doubts} 
-        isInstructor={false} 
-        onUpdate={fetchDoubts} 
-      />
-    </div>
-
-      </>
+      </div>
     </div>
   )
 }
 
 export default VideoDetails
-// video

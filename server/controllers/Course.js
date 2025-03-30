@@ -22,12 +22,14 @@ exports.createCourse = async (req, res) => {
 			category,
 			status,
 			instructions,
+			hasExam,
+			exam
 		} = req.body;
 
 		// Get thumbnail image from request files
-		const thumbnail = req.files.thumbnailImage;
+		const thumbnail = req.files?.thumbnailImage;
 
-		// Check if any of the required fields are missing
+		// Check if any of the required fields are missing                                                                                                          
 		if (
 			!courseName ||
 			!courseDescription ||
@@ -70,7 +72,20 @@ exports.createCourse = async (req, res) => {
 			thumbnail,
 			process.env.FOLDER_NAME
 		);
-		// console.log(thumbnailImage); // Commented out for security
+
+		// Parse exam data if provided
+		let examData = null;
+		if (hasExam === "true" && exam) {
+			try {
+				examData = JSON.parse(exam);
+			} catch (error) {
+				return res.status(400).json({
+					success: false,
+					message: "Invalid exam data format",
+				});
+			}
+		}
+
 		// Create a new course with the given details
 		const newCourse = await Course.create({
 			courseName,
@@ -78,11 +93,13 @@ exports.createCourse = async (req, res) => {
 			instructor: instructorDetails._id,
 			whatYouWillLearn: whatYouWillLearn,
 			price,
-			tag: tag,
+			tag: JSON.parse(tag),
 			category: categoryDetails._id,
 			thumbnail: thumbnailImage.secure_url,
 			status: status,
-			instructions: instructions,
+			instructions: JSON.parse(instructions || "[]"),
+			hasExam: hasExam === "true",
+			exam: examData,
 		});
 
 		// Add the new course to the User Schema of the Instructor
@@ -115,7 +132,6 @@ exports.createCourse = async (req, res) => {
 		});
 	} catch (error) {
 		// Handle any errors that occur during the creation of the course
-		// console.error(error); // Commented out for security
 		res.status(500).json({
 			success: false,
 			message: "Failed to create course",
@@ -198,78 +214,174 @@ exports.getCourseDetails = async (req, res) => {
 
 // ================ Edit Course Details ================
 exports.editCourse = async (req, res) => {
-    try {
-        const { courseId } = req.body
-        const updates = req.body
-        const course = await Course.findById(courseId)
-
-        if (!course) {
-            return res.status(404).json({ error: "Course not found" })
-        }
-
-        // If Thumbnail Image is found, update it
-        if (req.files) {
-            // console.log("thumbnail update")
-            const thumbnail = req.files.thumbnailImage
-            const thumbnailImage = await uploadImageToCloudinary(
-                thumbnail,
-                process.env.FOLDER_NAME
-            )
-            course.thumbnail = thumbnailImage.secure_url
-        }
-
-        // Update only the fields that are present in the request body
-        for (const key in updates) {
-            if (updates.hasOwnProperty(key)) {
-                if (key === "tag" || key === "instructions") {
-                    course[key] = JSON.parse(updates[key])
-                } else {
-                    course[key] = updates[key]
-                }
-            }
-        }
-
-        // updatedAt
-        course.updatedAt = Date.now();
-
-        //   save data
-        await course.save()
-
-        const updatedCourse = await Course.findOne({
-            _id: courseId,
-        })
-            .populate({
-                path: "instructor",
-                populate: {
-                    path: "additionalDetails",
-                },
-            })
-            .populate("category")
-            .populate("ratingAndReviews")
-            .populate({
-                path: "courseContent",
-                populate: {
-                    path: "subSection",
-                },
-            })
-            .exec()
-
-        // success response
-        res.status(200).json({
-            success: true,
-            message: "Course updated successfully",
-            data: updatedCourse,
-        })
-    } catch (error) {
-        // console.error(error) // Commented out for security
-        res.status(500).json({
-            success: false,
-            message: "Error while updating course",
-            error: error.message,
-        })
+  try {
+    const { courseId } = req.body;
+    const updates = req.body;
+    console.log("Updates received:", updates);
+    
+    // Find the course first
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ 
+        success: false,
+        message: "Course not found" 
+      });
     }
-}
 
+    // Check if user is authorized to edit
+    if (course.instructor.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to edit this course"
+      });
+    }
+
+    // Handle exam data
+    if (updates.hasExam !== undefined) {
+      course.hasExam = updates.hasExam === "true" || updates.hasExam === true;
+      
+      if (course.hasExam && updates.exam) {
+        try {
+          let examData;
+          
+          // Parse exam data if it's a string
+          if (typeof updates.exam === 'string') {
+            examData = JSON.parse(updates.exam);
+          } else {
+            examData = updates.exam;
+          }
+          
+          console.log("Exam data:", examData);
+          
+          // Make sure required fields are present
+          if (!examData.title) {
+            return res.status(400).json({
+              success: false,
+              message: "Exam title is required"
+            });
+          }
+          
+          // Process questions to ensure they meet validation requirements
+          if (examData.questions && Array.isArray(examData.questions)) {
+            examData.questions = examData.questions.map(question => {
+              // For multiple choice, ensure options have text
+              if (question.type === 'mcq') {
+                // Filter out empty options
+                question.options = question.options
+                  .filter(option => option && option.text && option.text.trim() !== '')
+                  .map(option => ({
+                    text: option.text.trim(),
+                    isCorrect: !!option.isCorrect
+                  }));
+              }
+              
+              // For true/false, ensure options are correct
+              else if (question.type === 'truefalse') {
+                question.options = [
+                  { text: 'True', isCorrect: question.options[0]?.isCorrect || false },
+                  { text: 'False', isCorrect: question.options[1]?.isCorrect || false }
+                ];
+              }
+              
+              // For short answer, filter out empty answers
+              else if (question.type === 'shortAnswer') {
+                question.options = []; // No options for short answer
+                question.answers = question.answers
+                  .filter(answer => answer && answer.trim() !== '')
+                  .map(answer => answer.trim());
+              }
+              
+              return question;
+            });
+          }
+          
+          // Set the exam data on the course
+          course.exam = examData;
+        } catch (error) {
+          console.error("Error processing exam data:", error);
+          return res.status(400).json({ 
+            success: false,
+            message: "Invalid exam data format",
+            error: error.message
+          });
+        }
+      } else if (!course.hasExam) {
+        // If hasExam is false, remove the exam data
+        course.exam = undefined;
+      }
+    }
+    
+    // Handle other course updates
+    if (updates.courseName) course.courseName = updates.courseName;
+    if (updates.courseDescription) course.courseDescription = updates.courseDescription;
+    if (updates.whatYouWillLearn) course.whatYouWillLearn = updates.whatYouWillLearn;
+    if (updates.price) course.price = updates.price;
+    if (updates.tag) course.tag = JSON.parse(updates.tag);
+    if (updates.category) {
+      // Make sure we're storing the category ID as a string
+      if (typeof updates.category === 'object') {
+        // If it's an object, get the ID
+        if (updates.category._id) {
+          course.category = updates.category._id;
+        } else {
+          console.log("Invalid category object received:", updates.category);
+        }
+      } else {
+        // If it's already a string (ID), use it directly
+        course.category = updates.category;
+      }
+      console.log("Category set to:", course.category);
+    }
+    if (updates.instructions) course.instructions = JSON.parse(updates.instructions || "[]");
+    if (updates.status) course.status = updates.status;
+    if (updates.thumbnail) {
+      // Delete old thumbnail from Cloudinary
+      await deleteResourceFromCloudinary(course.thumbnail);
+      // Upload new thumbnail to Cloudinary
+      const thumbnailImage = await uploadImageToCloudinary(
+        updates.thumbnail,
+        process.env.FOLDER_NAME
+      );
+      course.thumbnail = thumbnailImage.secure_url;
+    }
+    
+    // ...other fields
+    
+    // Save the course with validation
+    await course.save({ validateBeforeSave: true });
+
+    // Fetch the updated course with populated fields
+    const updatedCourse = await Course.findById(courseId)
+      .populate({
+        path: "instructor",
+        populate: {
+          path: "additionalDetails",
+        },
+      })
+      .populate("category")
+      .populate("ratingAndReviews")
+      .populate({
+        path: "courseContent",
+        populate: {
+          path: "subSection",
+        },
+      })
+      .exec();
+
+    return res.status(200).json({
+      success: true,
+      message: "Course updated successfully",
+      data: updatedCourse,
+    });
+  } catch (error) {
+    console.error("Error editing course:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to edit course",
+      error: error.message,
+    });
+  }
+};
 
 
 // ================ Get a list of Course for a given Instructor ================

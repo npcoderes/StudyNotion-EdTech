@@ -5,11 +5,11 @@ const CourseProgress = require("../models/CourseProgress")
 const Course = require("../models/Course")
 const {convertSecondsToDuration} = require("../utils/secToDuration")
 const { generateCertificate } = require("../utils/certificateUtils"); // Utility for certificate generation
-const  mailSender= require("../utils/mailSender")
-const {uploadImageToCloudinary,uploadPdfToCloudinary}=require("../utils/imageUploader")
+const mailSender = require("../utils/mailSender")
+const {uploadImageToCloudinary, uploadPdfToCloudinary} = require("../utils/imageUploader")
 const User = require("../models/User")
 const path = require("path")
-
+const ExamAttempt = require("../models/ExamAttempt") // Added for exam attempt model
 
 exports.updateCourseProgress = async (req, res) => {
   const { courseId, subsectionId } = req.body;
@@ -52,33 +52,62 @@ exports.updateCourseProgress = async (req, res) => {
     );
 
     if (courseProgress.completedVideos.length === totalLectures) {
-      // Course completed - Generate a certificate
+      // Content is complete, check exam requirements
+      courseProgress.contentCompleted = true;
+      await courseProgress.save();
+      
+      // Check if the course has an exam and if it's been passed
+      if (course.hasExam) {
+        const passedExam = await ExamAttempt.findOne({
+          student: userId,
+          courseID: courseId,
+          passed: true,
+          status: "graded"
+        });
+        
+        if (!passedExam) {
+          // Content completed but exam not passed
+          return res.status(200).json({ 
+            message: "Course content completed, but exam must be passed to get certificate",
+            contentCompleted: true,
+            examPassed: false 
+          });
+        }
+        
+        // Exam passed, update course progress
+        courseProgress.examPassed = true;
+        await courseProgress.save();
+      }
+      
+      // Generate certificate - content complete and exam passed (if required)
       const certificatePath = path.join(
         __dirname,
         `../certificates/${userId}_${courseId}.pdf`
       );
 
-    let user=await User.findById(userId)
+      let user = await User.findById(userId);
 
       await generateCertificate({
-        user:user, 
+        user: user, 
         course,
         filePath: certificatePath,
       });
 
       // upload certificatePath to cloudinary and get the url
-      const certificateImage = await uploadPdfToCloudinary(certificatePath, process.env.FOLDER_NAME, 600, 100);
-     console.log("certificate   ..",certificateImage)
-
+      const certificateImage = await uploadPdfToCloudinary(
+        certificatePath, 
+        process.env.FOLDER_NAME, 
+        600, 
+        100
+      );
+      
       // Save certificate URL in the database
       courseProgress.certificateURL = certificateImage.secure_url;
-
-
       await courseProgress.save();
 
       return res.status(200).json({
         message: "Course progress updated and certificate generated",
-        certificateURL: certificatePath,
+        certificateURL: certificateImage.secure_url,
       });
     }
 
@@ -88,6 +117,7 @@ exports.updateCourseProgress = async (req, res) => {
     return res.status(500).json({ error: "Internal server error........."+error });
   }
 };
+
 exports.getProgressPercentage = async (req, res) => {
   const { courseId } = req.body
   const userId = req.user.id
@@ -139,48 +169,74 @@ exports.getProgressPercentage = async (req, res) => {
   }
 }
 
-
-// check if course id completed 
-
 exports.checkCourseCompleted = async (req, res) => {
   try {
-    const {courseId}  = req.body
-    console.log("courseId", courseId)
-    const userId = req.user.id
+    const { courseId } = req.body;
+    const userId = req.user.id;
 
     if (!courseId) {
-      return res.status(400).json({ error: "Course ID not provided." })
+      return res.status(400).json({ error: "Course ID not provided." });
     }
-    // console.log(courseId, userId)
+
     const courseProgress = await CourseProgress.findOne({
       courseID: courseId,
       userId: userId,
-    })
+    });
+
     if (!courseProgress) {
-      return res
-        .status(400)
-        .json({ error: "Can not find Course Progress with these IDs." }
-        )
+      return res.status(400).json({ 
+        error: "Can not find Course Progress with these IDs." 
+      });
     }
-    // console.log(courseProgress)
+
     const course = await Course.findById(courseId).populate("courseContent");
+    
+    // Calculate content completion
     const totalLectures = course.courseContent.reduce(
       (acc, section) => acc + section.subSection.length,
       0
     );
-
-    if (courseProgress.completedVideos.length === totalLectures) {
-      return res.status(200).json({ message: "Course Completed",
-        certificateURL: courseProgress.certificateURL
-       });
+    const contentCompleted = courseProgress.completedVideos.length === totalLectures;
+    
+    // Check exam requirement
+    let examRequirementMet = true; // Default to true if no exam
+    let examAttempted = false;
+    
+    if (course.hasExam) {
+      // Check if the student has attempted the exam
+      const examAttempt = await ExamAttempt.findOne({
+        student: userId,
+        courseID: courseId,
+        status: "graded"
+      });
+      
+      examAttempted = !!examAttempt;
+      examRequirementMet = examAttempt?.passed || false;
     }
-    return res.status(200).json({ message: "Course Not Completed" });
+    
+    // Update course progress status
+    courseProgress.contentCompleted = contentCompleted;
+    courseProgress.examPassed = examRequirementMet;
+    await courseProgress.save();
+    
+    // Determine if course is fully completed and certificate is available
+    const isFullyCompleted = contentCompleted && examRequirementMet;
+    
+    return res.status(200).json({ 
+      success: true,
+      contentCompleted,
+      examPassed: examRequirementMet,
+      examAttempted,
+      requiresExam: course.hasExam,
+      isFullyCompleted,
+      certificateURL: isFullyCompleted ? courseProgress.certificateURL : null,
+      message: isFullyCompleted ? "Course Completed" : "Course Not Completed" 
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
   }
-  catch (error) {
-    console.error(error)
-    return res.status(500).json({ error: "Internal server error" })
-  }
-}
+};
 
 
 

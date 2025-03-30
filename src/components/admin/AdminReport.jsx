@@ -102,9 +102,16 @@ const AdminReport = () => {
     let filtered = [...users];
 
     if (startDate && endDate) {
+      // Create date objects with time set to start and end of day
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);  // Set to beginning of the day
+      
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);  // Set to end of the day
+      
       filtered = filtered.filter(user => {
         const createdAt = new Date(user.createdAt);
-        return createdAt >= new Date(startDate) && createdAt <= new Date(endDate);
+        return createdAt >= start && createdAt <= end;
       });
     }
 
@@ -114,7 +121,6 @@ const AdminReport = () => {
 
     setFilteredUsers(filtered);
   };
-
   const processUserDistributionData = (users) => {
     return [
       { name: 'Students', value: users.filter(u => u.accountType === 'Student').length },

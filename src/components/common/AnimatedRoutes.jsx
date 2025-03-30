@@ -34,6 +34,10 @@ import AdminInstructoreManagement from "../admin/AdminInstructoreManagement";
 import InstructorAnalytics from "../admin/InstructorAnalytics";
 import PrivacyPolicy from "../../pages/PrivacyPolicy";
 import InstructorCourses from "../cors/Doubt/InstructorCourses";
+import TakeExam from "../cors/ViewCourse/TakeExam";
+import ExamResults from "../cors/ViewCourse/ExamResults";
+import CertificateView from "../cors/Certificate/CertificateView";
+import MyCertificates from "../cors/Dashboard/Certificate/MyCertificates";
 
 const AnimatedRoutes = () => {
   const { user } = useSelector((state) => state.profile);
@@ -97,6 +101,23 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         >
+          <Route path="dashboard/my-certificates" element={
+            <PrivateRoute>
+              <MyCertificates />
+            </PrivateRoute>
+          } />
+
+// Public certificate verification route
+          <Route path="certificate/verify/:certificateId" element={<CertificateView />} />
+
+// Protected certificate view route
+          <Route path="certificate/view/:certificateId" element={
+            <PrivateRoute>
+              <CertificateView />
+            </PrivateRoute>
+          } />
+
+
           <Route path="/dashboard/my-profile" element={<MyProfile />} />
           <Route path="/dashboard/settings" element={<ProfileSet />} />
           <Route
@@ -118,7 +139,7 @@ const AnimatedRoutes = () => {
               <Route path="/admin/report" element={<AdminReport />} />
               <Route path="/admin/report/courses" element={<AdminCourseReport />} />
               <Route path="/admin/users" element={<AdminInstructoreManagement />} />
-              <Route path="/admin/analytics" element={<InstructorAnalytics />} /> 
+              <Route path="/admin/analytics" element={<InstructorAnalytics />} />
 
             </>
 
@@ -139,6 +160,12 @@ const AnimatedRoutes = () => {
                 path="view-course/:courseId/section/:sectionId/sub-section/:subSectionId"
                 element={<VideoDetails />}
               />
+              <Route path="/view-course/:courseId/take-exam" element={<TakeExam />} />;
+              <Route path="view-course/:courseId/exam-results" element={
+                <PrivateRoute>
+                  <ExamResults />
+                </PrivateRoute>
+              } />
             </>
           )}
         </Route>

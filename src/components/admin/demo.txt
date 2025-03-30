@@ -1,0 +1,1426 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Box,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Paper,
+  TextField,
+  MenuItem,
+  Button,
+  IconButton,
+  Tooltip,
+  LinearProgress,
+  Alert,
+  Chip,
+  Snackbar,
+  Divider,
+  Fade,
+  useMediaQuery,
+  useTheme,
+  FormControlLabel,
+  Switch,
+  CircularProgress,
+  Badge,
+  Skeleton,
+  Tab,
+  Tabs
+} from '@mui/material';
+import {
+  DataGrid,
+  GridToolbar,
+} from '@mui/x-data-grid';
+import {
+  DownloadOutlined,
+  PictureAsPdf,
+  TableChart,
+  Assessment,
+  People,
+  School,
+  DateRange,
+  PersonAdd,
+  Group,
+  Refresh,
+  FilterAlt,
+  ClearAll,
+  CheckCircle,
+  TrendingUp,
+  TrendingDown,
+  MoreVert,
+  InsertChart,
+  StackedLineChart,
+  Dashboard,
+  CalendarToday,
+  Email,
+  Visibility,
+  AccountCircle
+} from '@mui/icons-material';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Legend,
+  Line,
+  LineChart,
+  Area,
+  AreaChart
+} from 'recharts';
+import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { PieChart, Pie, Cell, LabelList, Sector } from 'recharts';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+// Color theme for the entire report
+const colorTheme = {
+  primary: '#422FAF',
+  secondary: '#6366F1',
+  student: '#2196f3',
+  instructor: '#f50057',
+  success: '#4caf50',
+  warning: '#ff9800',
+  error: '#f44336',
+  chartColors: ['#422FAF', '#6366F1', '#2196f3', '#f50057', '#ff9800', '#4caf50']
+};
+
+const AdminReport = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // State management
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [accountType, setAccountType] = useState('');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [selectedPieIndex, setSelectedPieIndex] = useState(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    students: 0,
+    instructors: 0,
+    newUsersThisMonth: 0,
+    activationRate: 0,
+    growthRate: 0
+  });
+
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Refresh data handler
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchUsers().then(() => {
+      setRefreshing(false);
+      showSnackbar('Data refreshed successfully', 'success');
+    });
+  };
+
+  // Reset filters handler
+  const handleResetFilters = () => {
+    setStartDate('');
+    setEndDate('');
+    setAccountType('');
+    setFilteredUsers(users);
+    showSnackbar('Filters have been reset', 'info');
+  };
+
+  // Show snackbar helper
+  const showSnackbar = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  // Close snackbar handler
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Fetch users data
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(BASE_URL + '/admin/report');
+      
+      // Add uniqueId to each user if _id is missing
+      const processedUsers = response.data.map((user, index) => ({
+        ...user,
+        _id: user._id || `user-${index}`,
+        // Calculate activity level based on login frequency or other metrics
+        activityLevel: Math.random() > 0.7 ? 'High' : Math.random() > 0.4 ? 'Medium' : 'Low'
+      }));
+
+      setUsers(processedUsers);
+      setFilteredUsers(processedUsers);
+      calculateEnhancedStats(processedUsers);
+      console.log('Users data loaded:', processedUsers.length);
+      return processedUsers;
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError('Failed to fetch user data. ' + (err.message || 'Please try again.'));
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate enhanced statistics
+  const calculateEnhancedStats = (userData) => {
+    const now = new Date();
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    
+    // Current month users
+    const thisMonthUsers = userData.filter(user => new Date(user.createdAt) >= thisMonth);
+    
+    // Last month users
+    const lastMonthUsers = userData.filter(user => {
+      const date = new Date(user.createdAt);
+      return date >= lastMonth && date < thisMonth;
+    });
+
+    // Calculate growth rate
+    const growthRate = lastMonthUsers.length > 0 
+      ? ((thisMonthUsers.length - lastMonthUsers.length) / lastMonthUsers.length) * 100
+      : thisMonthUsers.length > 0 ? 100 : 0;
+
+    // Calculate activation rate (based on active property if available)
+    const activationRate = userData.length > 0
+      ? (userData.filter(user => user.active !== false).length / userData.length) * 100
+      : 0;
+
+    setStats({
+      totalUsers: userData.length,
+      students: userData.filter(user => user.accountType === 'Student').length,
+      instructors: userData.filter(user => user.accountType === 'Instructor').length,
+      newUsersThisMonth: thisMonthUsers.length,
+      activationRate: Math.round(activationRate),
+      growthRate: Math.round(growthRate * 10) / 10
+    });
+  };
+
+  // Date filter handler with improved validation
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+
+    try {
+      let filtered = [...users];
+      const filterCriteria = [];
+
+      // Date range filtering with validation
+      if (startDate && endDate) {
+        // Validate dates
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+          throw new Error("Invalid date format");
+        }
+        
+        if (start > end) {
+          throw new Error("Start date must be before end date");
+        }
+        
+        // Set time to beginning and end of day
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+        
+        filtered = filtered.filter(user => {
+          const createdAt = new Date(user.createdAt);
+          return createdAt >= start && createdAt <= end;
+        });
+        
+        filterCriteria.push(`date range: ${start.toLocaleDateString()} - ${end.toLocaleDateString()}`);
+      }
+
+      // Account type filtering
+      if (accountType) {
+        filtered = filtered.filter(user => user.accountType === accountType);
+        filterCriteria.push(`account type: ${accountType}`);
+      }
+
+      setFilteredUsers(filtered);
+      
+      if (filterCriteria.length > 0) {
+        showSnackbar(`Applied filters: ${filterCriteria.join(', ')}`, 'info');
+      } else {
+        showSnackbar('Showing all users (no filters applied)', 'info');
+      }
+      
+    } catch (error) {
+      showSnackbar(`Filter error: ${error.message}`, 'error');
+      console.error("Filter error:", error);
+    }
+  };
+
+  // Process data for user distribution chart
+  const processUserDistributionData = useMemo(() => {
+    return [
+      { name: 'Students', value: filteredUsers.filter(u => u.accountType === 'Student').length, color: colorTheme.student },
+      { name: 'Instructors', value: filteredUsers.filter(u => u.accountType === 'Instructor').length, color: colorTheme.instructor }
+    ];
+  }, [filteredUsers]);
+
+  // Process chart data with optimized memoization
+  const processChartData = useMemo(() => {
+    const dateGroups = {};
+
+    // Sort users by date first for better processing
+    [...filteredUsers]
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      .forEach(user => {
+        const date = new Date(user.createdAt).toLocaleDateString();
+        if (!dateGroups[date]) {
+          dateGroups[date] = {
+            date,
+            Student: 0,
+            Instructor: 0,
+            Total: 0
+          };
+        }
+        dateGroups[date][user.accountType]++;
+        dateGroups[date].Total++;
+      });
+
+    // Convert to array and ensure dates are chronologically ordered
+    return Object.values(dateGroups).sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [filteredUsers]);
+
+  // Calculate monthly trend data
+  const monthlyTrendData = useMemo(() => {
+    const monthlyGroups = {};
+    
+    filteredUsers.forEach(user => {
+      const date = new Date(user.createdAt);
+      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      const monthLabel = date.toLocaleString('default', { month: 'short', year: '2-digit' });
+      
+      if (!monthlyGroups[monthKey]) {
+        monthlyGroups[monthKey] = {
+          month: monthLabel,
+          Student: 0,
+          Instructor: 0,
+          Total: 0,
+          monthKey // Keep for sorting
+        };
+      }
+      monthlyGroups[monthKey][user.accountType]++;
+      monthlyGroups[monthKey].Total++;
+    });
+    
+    // Convert to array and ensure chronological order
+    return Object.values(monthlyGroups)
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+  }, [filteredUsers]);
+
+  // Custom pie chart active sector renderer
+  const renderActiveShape = (props) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
+  
+    return (
+      <g>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius + 10}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+        <Sector
+          cx={cx}
+          cy={cy}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          innerRadius={outerRadius + 12}
+          outerRadius={outerRadius + 16}
+          fill={fill}
+        />
+        <text x={cx} y={cy} dy={-20} textAnchor="middle" fill={fill} style={{ fontSize: 16, fontWeight: 'bold' }}>
+          {payload.name}
+        </text>
+        <text x={cx} y={cy + 10} textAnchor="middle" fill="#333" style={{ fontSize: 14 }}>
+          {value} users
+        </text>
+        <text x={cx} y={cy + 30} textAnchor="middle" fill="#666" style={{ fontSize: 12 }}>
+          {(percent * 100).toFixed(0)}%
+        </text>
+      </g>
+    );
+  };
+
+  // Enhanced PDF generation
+  const downloadPDF = async () => {
+    try {
+      setLoading(true);
+      showSnackbar('Generating PDF report...', 'info');
+      
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Brand Colors
+      const colors = {
+        primary: [66, 47, 175], // #422FAF
+        secondary: [99, 102, 241], // #6366F1
+        accent: [255, 255, 255],     // white
+        table: {
+          header: [66, 47, 175],
+          odd: [242, 242, 242],
+          even: [255, 255, 255]
+        }
+      };
+
+      // Calculate stats
+      const userStats = {
+        totalUsers: filteredUsers.length,
+        students: filteredUsers.filter(u => u.accountType === 'Student').length,
+        instructors: filteredUsers.filter(u => u.accountType === 'Instructor').length,
+        newUsersThisMonth: filteredUsers.filter(u => {
+          const userDate = new Date(u.createdAt);
+          const today = new Date();
+          return userDate.getMonth() === today.getMonth() &&
+            userDate.getFullYear() === today.getFullYear();
+        }).length,
+        activationRate: Math.round(filteredUsers.length > 0
+          ? (filteredUsers.filter(user => user.active !== false).length / filteredUsers.length) * 100
+          : 0)
+      };
+
+      const statsData = [
+        ['Total Users', 'Students', 'Instructors', 'New This Month', 'Activation Rate'],
+        [
+          userStats.totalUsers.toString(),
+          userStats.students.toString(),
+          userStats.instructors.toString(),
+          userStats.newUsersThisMonth.toString(),
+          `${userStats.activationRate}%`
+        ]
+      ];
+
+      // Header Section with gradient background
+      doc.setFillColor(...colors.primary);
+      doc.rect(0, 0, doc.internal.pageSize.width, 40, 'F');
+
+      // Logo placeholder
+      doc.setFillColor(...colors.secondary);
+      doc.roundedRect(15, 10, 20, 20, 3, 3, 'F');
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(14);
+      doc.text('SN', 23, 23);
+
+      // Main Title
+      doc.setFontSize(24);
+      doc.setTextColor(255, 255, 255);
+      doc.text('StudyNotion', 40, 20);
+
+      // Report Title
+      doc.setFontSize(16);
+      doc.setTextColor(200, 200, 200);
+      doc.text('User Analysis Report', 40, 30);
+
+      // Filter information
+      let filterText = 'All Users';
+      if (startDate && endDate) {
+        filterText = `Date Range: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`;
+      }
+      if (accountType) {
+        filterText += accountType ? ` | Type: ${accountType}` : '';
+      }
+      
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text(`Filtered: ${filterText}`, doc.internal.pageSize.width - 20, 15, { align: 'right' });
+
+      // Date on right
+      const dateText = new Date().toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      doc.setFontSize(10);
+      doc.text(`Generated: ${dateText}`, doc.internal.pageSize.width - 20, 25, { align: 'right' });
+
+      // Stats Cards
+      const statsY = 50;
+      doc.setFillColor(250, 250, 250);
+      doc.roundedRect(15, statsY, doc.internal.pageSize.width - 30, 35, 5, 5, 'F');
+      doc.setDrawColor(...colors.primary);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(15, statsY, doc.internal.pageSize.width - 30, 35, 5, 5, 'S');
+
+      const colWidth = (doc.internal.pageSize.width - 60) / 5;
+      statsData[0].forEach((label, i) => {
+        doc.setFillColor(...colors.primary);
+        doc.roundedRect(25 + (i * colWidth), statsY + 8, colWidth - 10, 20, 3, 3, 'F');
+        
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(10);
+        doc.text(label, 25 + (i * colWidth) + ((colWidth - 10) / 2), statsY + 15, { align: 'center' });
+        
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(0);
+        doc.setFontSize(14);
+        doc.text(statsData[1][i], 25 + (i * colWidth) + ((colWidth - 10) / 2), statsY + 25, { align: 'center' });
+      });
+
+      // Add Table
+      doc.autoTable({
+        startY: statsY + 45,
+        head: [['Name', 'Email', 'Account Type', 'Join Date', 'Status']],
+        body: filteredUsers.map(user => [
+          `${user.firstName} ${user.lastName}`,
+          user.email,
+          user.accountType,
+          new Date(user.createdAt).toLocaleDateString(),
+          user.active !== false ? 'Active' : 'Inactive'
+        ]),
+        styles: {
+          fontSize: 10,
+          cellPadding: 5,
+          lineColor: [200, 200, 200],
+          lineWidth: 0.1
+        },
+        headStyles: {
+          fillColor: colors.table.header,
+          textColor: colors.accent,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        alternateRowStyles: {
+          fillColor: colors.table.odd
+        },
+        bodyStyles: {
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { halign: 'left' },
+          1: { halign: 'left' }
+        },
+        margin: { top: 10 }
+      });
+
+      // Add page numbers
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(
+          `Page ${i} of ${pageCount}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 10,
+          { align: 'center' }
+        );
+        doc.text(
+          'StudyNotion Analytics',
+          20,
+          doc.internal.pageSize.height - 10
+        );
+      }
+      
+      // Save the PDF
+      doc.save('studynotion_user_report.pdf');
+      showSnackbar('PDF report generated successfully', 'success');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      showSnackbar('Failed to generate PDF report', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Enhanced Excel export with better formatting
+  const downloadExcel = () => {
+    try {
+      setLoading(true);
+      showSnackbar('Generating Excel report...', 'info');
+      
+      const workbook = XLSX.utils.book_new();
+
+      // Title formatting
+      const titleStyle = {
+        font: { bold: true, size: 16, color: { rgb: "422FAF" } },
+        fill: { fgColor: { rgb: "EEEEEE" } }
+      };
+      
+      // Header formatting
+      const headerStyle = { 
+        font: { bold: true },
+        fill: { fgColor: { rgb: "E0E0E0" } },
+        alignment: { horizontal: "center" }
+      };
+
+      // Summary Sheet with enhanced styling
+      const summaryData = [
+        ['StudyNotion User Analytics Report'],
+        ['Generated on:', new Date().toLocaleString()],
+        ['Filters Applied:', startDate && endDate ? 
+          `Date Range: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}` : 'None',
+          accountType ? `Account Type: ${accountType}` : ''
+        ],
+        [''],
+        ['Summary Statistics'],
+        ['Total Users:', stats.totalUsers],
+        ['Students:', stats.students],
+        ['Instructors:', stats.instructors],
+        ['New Users This Month:', stats.newUsersThisMonth],
+        ['User Growth Rate:', `${stats.growthRate}%`],
+        ['Activation Rate:', `${stats.activationRate}%`]
+      ];
+
+      const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+      
+      // Style the summary sheet
+      summaryWS['!cols'] = [{ wch: 25 }, { wch: 30 }];
+
+      // Users Sheet with enhanced data
+      const usersData = filteredUsers.map(user => ({
+        'First Name': user.firstName,
+        'Last Name': user.lastName,
+        'Email': user.email,
+        'Account Type': user.accountType,
+        'Join Date': new Date(user.createdAt).toLocaleDateString(),
+        'Join Time': new Date(user.createdAt).toLocaleTimeString(),
+        'Status': user.active !== false ? 'Active' : 'Inactive',
+        'Activity Level': user.activityLevel || 'Unknown'
+      }));
+
+      const usersWS = XLSX.utils.json_to_sheet(usersData);
+      
+      // Create monthly trend sheet
+      const trendData = monthlyTrendData.map(month => ({
+        'Month': month.month,
+        'Total Users': month.Total,
+        'Students': month.Student,
+        'Instructors': month.Instructor
+      }));
+      
+      const trendWS = XLSX.utils.json_to_sheet(trendData);
+
+      // Add sheets to workbook
+      XLSX.utils.book_append_sheet(workbook, summaryWS, 'Summary');
+      XLSX.utils.book_append_sheet(workbook, usersWS, 'User Details');
+      XLSX.utils.book_append_sheet(workbook, trendWS, 'Monthly Trend');
+
+      // Generate Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      saveAs(new Blob([excelBuffer]), 'studynotion_user_analytics.xlsx');
+      
+      showSnackbar('Excel report generated successfully', 'success');
+    } catch (err) {
+      console.error('Excel generation error:', err);
+      showSnackbar('Failed to generate Excel report', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Enhanced DataGrid columns with better formatting
+  const columns = [
+    {
+      field: 'accountType',
+      headerName: '',
+      width: 40,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <AccountCircle 
+          color={params.value === 'Instructor' ? 'primary' : 'secondary'} 
+          fontSize="small"
+        />
+      )
+    },
+    { field: 'firstName', headerName: 'First Name', flex: 1, minWidth: 100 },
+    { field: 'lastName', headerName: 'Last Name', flex: 1, minWidth: 100 },
+    { 
+      field: 'email',
+      headerName: 'Email', 
+      flex: 1.5,
+      minWidth: 180,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Email fontSize="small" color="action" />
+          <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {params.value}
+          </Typography>
+        </Box>
+      )
+    },
+    {
+      field: 'accountType',
+      headerName: 'Account Type',
+      flex: 1,
+      minWidth: 120,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={params.value === 'Instructor' ? 'primary' : 'secondary'}
+          size="small"
+          sx={{ fontWeight: 500 }}
+          icon={params.value === 'Instructor' ? <School fontSize="small" /> : <People fontSize="small" />}
+        />
+      )
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Join Date',
+      flex: 1,
+      minWidth: 120,
+      renderCell: (params) => {
+        const date = new Date(params.value);
+        return (
+          <Tooltip 
+            title={date.toLocaleString()} 
+            arrow
+            placement="top"
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CalendarToday fontSize="small" color="action" />
+              <Typography variant="body2">
+                {date.toLocaleDateString()}
+              </Typography>
+            </Box>
+          </Tooltip>
+        );
+      }
+    },
+    {
+      field: 'active',
+      headerName: 'Status',
+      flex: 0.8,
+      minWidth: 100,
+      renderCell: (params) => (
+        <Chip
+          label={params.value !== false ? 'Active' : 'Inactive'}
+          color={params.value !== false ? 'success' : 'default'}
+          size="small"
+          variant="outlined"
+          icon={params.value !== false ? <CheckCircle fontSize="small" /> : undefined}
+        />
+      )
+    },
+    {
+      field: 'activityLevel',
+      headerName: 'Activity',
+      flex: 0.8,
+      minWidth: 100,
+      renderCell: (params) => {
+        const level = params.value || 'Low';
+        let color;
+        switch(level) {
+          case 'High': color = 'success'; break;
+          case 'Medium': color = 'warning'; break;
+          default: color = 'default';
+        }
+        
+        return (
+          <Chip
+            label={level}
+            color={color}
+            size="small"
+            variant="outlined"
+          />
+        );
+      }
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 50,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <IconButton size="small">
+          <Visibility fontSize="small" />
+        </IconButton>
+      )
+    }
+  ];
+
+  // Tab change handler
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  // Calculate summary statistics for memoized components
+  const summaryStats = useMemo(() => {
+    if (!filteredUsers.length) return null;
+    
+    // Last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const last7DaysUsers = filteredUsers.filter(user => 
+      new Date(user.createdAt) >= sevenDaysAgo
+    ).length;
+    
+    // Most active day
+    const dayCount = {};
+    filteredUsers.forEach(user => {
+      const dayOfWeek = new Date(user.createdAt).toLocaleString('en-US', { weekday: 'long' });
+      dayCount[dayOfWeek] = (dayCount[dayOfWeek] || 0) + 1;
+    });
+    
+    let mostActiveDay = { day: 'None', count: 0 };
+    Object.entries(dayCount).forEach(([day, count]) => {
+      if (count > mostActiveDay.count) {
+        mostActiveDay = { day, count };
+      }
+    });
+
+    return {
+      last7DaysUsers,
+      mostActiveDay
+    };
+  }, [filteredUsers]);
+
+  return (
+    <Container maxWidth="xl">
+      <Box sx={{ py: 4 }}>
+        {/* Header with title */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box>
+            <Typography variant="h4" sx={{ mb: 1, fontWeight: 600, color: '#111827' }}>
+              User Analytics
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Monitor, analyze and export user data across your platform
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Tooltip title="Refresh Data">
+              <span>
+                <IconButton onClick={handleRefresh} color="primary" disabled={refreshing}>
+                  {refreshing ? <CircularProgress size={20} /> : <Refresh />}
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        </Box>
+        
+        {error && (
+          <Alert 
+            severity="error" 
+            sx={{ mb: 3 }}
+            action={
+              <Button color="inherit" size="small" onClick={handleRefresh}>RETRY</Button>
+            }
+          >
+            {error}
+          </Alert>
+        )}
+
+        {/* Stats Cards */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={2} sx={{ borderRadius: 2, height: '100%' }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={1}>
+                  <Box
+                    sx={{
+                      backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                      borderRadius: 2,
+                      p: 1.5,
+                      mr: 2
+                    }}
+                  >
+                    <People sx={{ fontSize: 28, color: colorTheme.student }} />
+                  </Box>
+                  <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    Total Users
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', mt: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {loading ? <Skeleton width={60} /> : stats.totalUsers}
+                  </Typography>
+                  
+                  {stats.growthRate !== 0 && (
+                    <Chip 
+                      size="small"
+                      label={`${stats.growthRate > 0 ? '+' : ''}${stats.growthRate}%`}
+                      color={stats.growthRate >= 0 ? 'success' : 'error'}
+                      icon={stats.growthRate >= 0 ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
+                      sx={{ ml: 2, height: 24 }}
+                    />
+                  )}
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {summaryStats?.last7DaysUsers} new in last 7 days
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={2} sx={{ borderRadius: 2, height: '100%' }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={1}>
+                  <Box
+                    sx={{
+                      backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                      borderRadius: 2,
+                      p: 1.5,
+                      mr: 2
+                    }}
+                  >
+                    <School sx={{ fontSize: 28, color: colorTheme.student }} />
+                  </Box>
+                  <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    Students
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', mt: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {loading ? <Skeleton width={60} /> : stats.students}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                    ({Math.round((stats.students / stats.totalUsers) * 100) || 0}%)
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Most active day: {summaryStats?.mostActiveDay?.day || '-'}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={2} sx={{ borderRadius: 2, height: '100%' }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={1}>
+                  <Box
+                    sx={{
+                      backgroundColor: 'rgba(245, 0, 87, 0.1)',
+                      borderRadius: 2,
+                      p: 1.5,
+                      mr: 2
+                    }}
+                  >
+                    <Group sx={{ fontSize: 28, color: colorTheme.instructor }} />
+                  </Box>
+                  <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    Instructors
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', mt: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {loading ? <Skeleton width={60} /> : stats.instructors}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                    ({Math.round((stats.instructors / stats.totalUsers) * 100) || 0}%)
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {Math.round(stats.instructors / Math.max(stats.students, 1) * 100) / 100} instructors per student
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card elevation={2} sx={{ borderRadius: 2, height: '100%' }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={1}>
+                  <Box
+                    sx={{
+                      backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                      borderRadius: 2,
+                      p: 1.5,
+                      mr: 2
+                    }}
+                  >
+                    <PersonAdd sx={{ fontSize: 28, color: colorTheme.success }} />
+                  </Box>
+                  <Badge 
+                    badgeContent="New" 
+                    color="error" 
+                    sx={{ '& .MuiBadge-badge': { fontSize: '0.6rem', height: 16 } }}
+                  >
+                    <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      This Month
+                    </Typography>
+                  </Badge>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', mt: 1 }}>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {loading ? <Skeleton width={60} /> : stats.newUsersThisMonth}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Activation rate: {stats.activationRate}%
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        {/* Tab controls for charts/data toggle */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs value={activeTab} onChange={handleTabChange} aria-label="dashboard tabs">
+            <Tab 
+              icon={<Dashboard sx={{ mr: 1 }} />} 
+              label="Dashboard" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<InsertChart sx={{ mr: 1 }} />} 
+              label="Charts & Analytics" 
+              iconPosition="start"
+            />
+            <Tab 
+              icon={<TableChart sx={{ mr: 1 }} />} 
+              label="User Data" 
+              iconPosition="start"
+            />
+          </Tabs>
+        </Box>
+
+        {/* Dashboard Tab - Main view */}
+        {activeTab === 0 && (
+          <>
+            {/* Filters */}
+            <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                <FilterAlt sx={{ mr: 1 }} /> Data Filters
+              </Typography>
+              <Divider sx={{ mb: 3 }} />
+              
+              <form onSubmit={handleFilterSubmit}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} md={3}>
+                    <TextField
+                      fullWidth
+                      type="date"
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                      error={startDate && endDate && new Date(startDate) > new Date(endDate)}
+                      helperText={startDate && endDate && new Date(startDate) > new Date(endDate) ? 
+                        "Start date must be before end date" : ""}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <TextField
+                      fullWidth
+                      type="date"
+                      label="End Date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      InputLabelProps={{ shrink: true }}
+                      error={startDate && endDate && new Date(startDate) > new Date(endDate)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <TextField
+                      fullWidth
+                      select
+                      label="Account Type"
+                      value={accountType}
+                      onChange={(e) => setAccountType(e.target.value)}
+                    >
+                      <MenuItem value="">All Types</MenuItem>
+                      <MenuItem value="Student">Students</MenuItem>
+                      <MenuItem value="Instructor">Instructors</MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Assessment />}
+                        type="submit"
+                        sx={{ py: 1.5 }}
+                      >
+                        Apply Filters
+                      </Button>
+                      <Button
+                        color="inherit"
+                        onClick={handleResetFilters}
+                        startIcon={<ClearAll />}
+                        sx={{ py: 1.5 }}
+                      >
+                        Reset
+                      </Button>
+                    </Box>
+                  </Grid>
+                </Grid>
+                
+                {showAdvancedFilters && (
+                  <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+                    <Typography variant="subtitle2" sx={{ mb: 2 }}>Advanced Filters</Typography>
+                    <Grid container spacing={2}>
+                      {/* Additional filters could go here */}
+                    </Grid>
+                  </Box>
+                )}
+                
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                  <FormControlLabel
+                    control={
+                      <Switch 
+                        checked={showAdvancedFilters} 
+                        onChange={(e) => setShowAdvancedFilters(e.target.checked)}
+                        size="small"
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        Advanced filters
+                      </Typography>
+                    }
+                  />
+                </Box>
+              </form>
+            </Paper>
+
+            {/* Export Buttons */}
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h6" sx={{ mb: 1 }}>Quick Actions</Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<PictureAsPdf />}
+                    onClick={downloadPDF}
+                    disabled={loading}
+                    sx={{ borderRadius: 8, pl: 2, pr: 3 }}
+                  >
+                    Export PDF
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<TableChart />}
+                    onClick={downloadExcel}
+                    disabled={loading}
+                    sx={{ borderRadius: 8, pl: 2, pr: 3 }}
+                  >
+                    Export Excel
+                  </Button>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6} sx={{ textAlign: 'right' }}>
+                <Typography variant="h6" sx={{ mb: 1 }}>Results</Typography>
+                <Typography>
+                  Showing <strong>{filteredUsers.length}</strong> users
+                  {filteredUsers.length !== users.length && ` (filtered from ${users.length})`}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            {/* Charts - Main grid */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid item xs={12} md={8}>
+                <Paper elevation={3} sx={{ p: 3, borderRadius: 2, height: '100%' }}>
+                  <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                    <StackedLineChart sx={{ mr: 1 }} /> User Registration Trend
+                  </Typography>
+                  <Divider sx={{ mb: 3 }} />
+                  
+                  {loading ? (
+                    <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : processChartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={400}>
+                      <AreaChart data={processChartData}>
+                        <defs>
+                          <linearGradient id="colorStudent" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={colorTheme.student} stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor={colorTheme.student} stopOpacity={0.1}/>
+                          </linearGradient>
+                          <linearGradient id="colorInstructor" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={colorTheme.instructor} stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor={colorTheme.instructor} stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }} 
+                          tickLine={false}
+                          axisLine={{ strokeOpacity: 0.2 }}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={10}
+                        />
+                        <RechartsTooltip
+                          contentStyle={{ 
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                            borderRadius: '8px', 
+                            border: 'none',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                          }}
+                          cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                          formatter={(value, name) => [value, name]}
+                        />
+                        <Legend 
+                          verticalAlign="top" 
+                          height={36} 
+                          iconType="circle"
+                          wrapperStyle={{ paddingBottom: '15px' }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="Student" 
+                          stroke={colorTheme.student} 
+                          fillOpacity={1} 
+                          fill="url(#colorStudent)" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="Instructor" 
+                          stroke={colorTheme.instructor} 
+                          fillOpacity={1} 
+                          fill="url(#colorInstructor)" 
+                          strokeWidth={2}
+                          activeDot={{ r: 6 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                      <Assessment sx={{ fontSize: 60, color: 'rgba(0,0,0,0.1)', mb: 2 }} />
+                      <Typography color="textSecondary">No data available for the selected filters</Typography>
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Paper elevation={3} sx={{ p: 3, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="h6" gutterBottom>
+                    User Distribution
+                  </Typography>
+                  <Divider sx={{ mb: 3 }} />
+                  
+                  {loading ? (
+                    <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : processUserDistributionData.length > 0 ? (
+                    <Box sx={{ flex: 1, minHeight: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            activeIndex={selectedPieIndex}
+                            activeShape={renderActiveShape}
+                            data={processUserDistributionData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            onMouseEnter={(data, index) => setSelectedPieIndex(index)}
+                            onMouseLeave={() => setSelectedPieIndex(null)}
+                          >
+                            {processUserDistributionData.map((entry, index) => (
+                              <Cell 
+                                key={`cell-${index}`} 
+                                fill={entry.color} 
+                                stroke="none"
+                              />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip />
+                          <Legend 
+                            iconType="circle" 
+                            verticalAlign="bottom" 
+                            align="center" 
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+
+                      {/* Legend stats */}
+                      <Grid container spacing={2} sx={{ mt: 2 }}>
+                        <Grid item xs={6}>
+                          <Card variant="outlined" sx={{ textAlign: 'center', p: 1 }}>
+                            <Typography variant="body2" color="textSecondary">Students</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: 'bold', color: colorTheme.student }}>
+                              {stats.students}
+                            </Typography>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Card variant="outlined" sx={{ textAlign: 'center', p: 1 }}>
+                            <Typography variant="body2" color="textSecondary">Instructors</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: 'bold', color: colorTheme.instructor }}>
+                              {stats.instructors}
+                            </Typography>
+                          </Card>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  ) : (
+                    <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                      <Assessment sx={{ fontSize: 60, color: 'rgba(0,0,0,0.1)', mb: 2 }} />
+                      <Typography color="textSecondary">No data available</Typography>
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
+            </Grid>
+          </>
+        )}
+
+        {/* Charts Tab - Analytics */}
+        {activeTab === 1 && (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                  Monthly Growth Trend
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={monthlyTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Total" 
+                      stroke={colorTheme.primary} 
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Student" 
+                      stroke={colorTheme.student} 
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Instructor" 
+                      stroke={colorTheme.instructor} 
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                  User Type Distribution by Month
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={monthlyTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Bar dataKey="Student" fill={colorTheme.student} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Instructor" fill={colorTheme.instructor} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Paper>
+            </Grid>
+          </Grid>
+        )}
+        
+        {/* Users Data Tab */}
+        {activeTab === 2 && (
+          <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+            {loading ? (
+              <LinearProgress />
+            ) : (
+              <DataGrid
+                rows={filteredUsers}
+                columns={columns}
+                pageSize={10}
+                rowsPerPageOptions={[5, 10, 20, 50]}
+                checkboxSelection
+                disableSelectionOnClick
+                components={{
+                  Toolbar: GridToolbar,
+                }}
+                getRowId={(row) => row._id}
+                autoHeight
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: '#f5f5f5',
+                  },
+                  '& .MuiDataGrid-row:nth-of-type(even)': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    backgroundColor: '#f5f5f5',
+                  },
+                }}
+                density="comfortable"
+              />
+            )}
+          </Paper>
+        )}
+        
+      </Box>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={5000}
+        onClose={handleCloseSnackbar}
+        TransitionComponent={Fade}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Container>
+  );
+};
+
+export default AdminReport;

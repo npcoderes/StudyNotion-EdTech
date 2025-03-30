@@ -8,7 +8,7 @@ const doubtSchema = new mongoose.Schema({
   },
   student: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
     required: true
   },
   title: {
@@ -31,7 +31,7 @@ const doubtSchema = new mongoose.Schema({
   }],
   upvotes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user'
+    ref: 'User'
   }],
   createdAt: {
     type: Date,

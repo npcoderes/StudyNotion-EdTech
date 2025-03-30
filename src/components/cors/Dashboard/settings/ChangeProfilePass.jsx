@@ -79,7 +79,7 @@ const ChangeProfilePass = () => {
     setLoading(true)
     try {
       await changePassword(token, data)
-      toast.success("Password updated successfully")
+      // toast.success("Password updated successfully")
       reset()
       navigate("/dashboard/my-profile")
     } catch (error) {

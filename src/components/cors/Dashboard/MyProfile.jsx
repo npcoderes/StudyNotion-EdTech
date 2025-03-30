@@ -154,10 +154,10 @@ export default function MyProfile() {
 const DetailItem = ({ label, value, icon, isEmpty = false }) => (
   <div className="bg-[#F9FAFB] border border-[#E5E7EB] p-4 rounded-lg transition-all duration-200 hover:border-[#D1D5DB] hover:shadow-sm">
     <div className="flex items-center gap-2 mb-2">
-      <span className="text-sm">{icon}</span>
-      <p className="text-sm text-[#6B7280]">{label}</p>
+      <span className="text-base">{icon}</span>
+      <p className="text-base text-[#6B7280]">{label}</p>
     </div>
-    <p className={`text-sm font-medium ${isEmpty ? "text-[#9CA3AF] italic" : "text-[#111827]"} capitalize`}>
+    <p className={`text-base font-medium ${isEmpty ? "text-[#9CA3AF] italic" : "text-[#111827]"} capitalize`}>
       {value}
     </p>
   </div>

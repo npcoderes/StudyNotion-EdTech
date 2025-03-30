@@ -181,6 +181,9 @@ function SignupForm() {
               name="password"
               value={password}
               onChange={handleOnChange}
+              minLength={8}
+              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+              title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
               placeholder="Enter Password"
               style={{
                 boxShadow: "inset 0px -1px 0px rgba(255, 255, 255, 0.18)",

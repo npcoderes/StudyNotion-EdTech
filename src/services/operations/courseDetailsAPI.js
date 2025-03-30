@@ -22,6 +22,7 @@ const {
   GET_FULL_COURSE_DETAILS_AUTHENTICATED,
   CREATE_RATING_API,
   LECTURE_COMPLETION_API,
+  
 } = courseEndpoints
 
 export const getAllCourses = async () => {
@@ -100,24 +101,27 @@ export const addCourseDetails = async (data, token) => {
 
 // edit the course details
 export const editCourseDetails = async (data, token) => {
-  let result = null
-  const toastId = toast.loading("Loading...")
+  const toastId = toast.loading("Updating course...");
   try {
     const response = await apiConnector("POST", EDIT_COURSE_API, data, {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
-    })
+    });
+
+    console.log("EDIT COURSE API RESPONSE............", response);
+
     if (!response?.data?.success) {
-      throw new Error("Could Not Update Course Details")
+      throw new Error("Could not update course details");
     }
-    toast.success("Course Details Updated Successfully")
-    result = response?.data?.data
+    toast.success("Course details updated successfully");
+    return response?.data?.data;
   } catch (error) {
-    console.log("EDIT COURSE API ERROR............", error)
-    toast.error(error.message)
+    console.log("EDIT COURSE API ERROR............", error);
+    toast.error(error.message);
+    return null;
+  } finally {
+    toast.dismiss(toastId);
   }
-  toast.dismiss(toastId)
-  return result
 }
 
 // create a section
@@ -359,3 +363,29 @@ export const createRating = async (data, token) => {
   toast.dismiss(toastId)
   return success
 }
+
+// create a course
+export const createCourse = async (formData, token) => {
+  const toastId = toast.loading("Creating course...");
+  try {
+    const response = await apiConnector("POST", CREATE_COURSE_API, formData, {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`,
+    });
+
+    console.log("CREATE COURSE API RESPONSE............", response);
+
+    if (!response.data.success) {
+      throw new Error(response.data.message);
+    }
+
+    toast.success("Course created successfully");
+    return response.data.data;
+  } catch (error) {
+    console.log("CREATE COURSE API ERROR............", error);
+    toast.error(error.message);
+    return null;
+  } finally {
+    toast.dismiss(toastId);
+  }
+};

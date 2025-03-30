@@ -1,13 +1,11 @@
 import React from 'react'
-import SideBarLinks from './SideBarLinks'
 import { sidebarLinks } from '../../../data/dashboard-links'
 import ConfirmationModal from '../../common/ConfirmationModal'
 import { useDispatch, useSelector } from 'react-redux'
-import { VscSignOut } from 'react-icons/vsc'
+import { VscSignOut, VscSettingsGear } from 'react-icons/vsc'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { logout } from "../../../services/operations/authAPI"
-import { Link } from 'react-router-dom'
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
 
 const SlideBar = () => {
@@ -20,10 +18,10 @@ const SlideBar = () => {
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+    
     return (
-        <div  className=' lg:flex lg:flex-col text-[#E0E0E0]'>
+        <div className='lg:flex lg:flex-col text-[#E0E0E0]'>
             {/* Toggle Button for Small Screens */}
-            {/* Toggle button for sidebar */}
             <button
                 className="fixed top-[70px] left-4 z-[60] lg:hidden text-2xl text-[#E0E0E0] bg-[#1A1A1A] p-2 rounded-md "
                 onClick={toggleSidebar}
@@ -32,22 +30,51 @@ const SlideBar = () => {
             </button>
             <div className={`fixed top-0 mt-16 left-0 h-full w-64 bg-[#1A1A1A] py-10 transition-transform duration-300 
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:mt-14 lg:w-auto lg:h-full lg:block z-50 max-sm:pt-16`}>
+                
+                {/* Navigation Links */}
                 <div className='flex flex-col'>
-                    {
-
-                        sidebarLinks.map((link) => {
-                            if (link.type && user?.accountType !== link.type) return null;
-                            return (
-                                <SideBarLinks key={link.id} link={link} iconName={link.icon} />
-                            )
-                        })}
+                    {sidebarLinks.map((link) => {
+                        // Skip links that don't match the user's account type
+                        if (link.type && user?.accountType !== link.type) return null;
+                        
+                        // Get the icon component
+                        const Icon = link.icon;
+                        
+                        return (
+                            <NavLink
+                                key={link.id}
+                                to={link.path}
+                                className={({ isActive }) => 
+                                    `flex items-center gap-2 px-8 py-2 text-sm font-medium
+                                    ${isActive ? "bg-yellow-800 text-yellow-50" : "text-richblack-300"}
+                                    hover:text-yellow-50 transition-all duration-200`
+                                }
+                            >
+                                {Icon && <Icon className="text-lg" />}
+                                <span>{link.name}</span>
+                            </NavLink>
+                        )
+                    })}
                 </div>
+                
                 <div className='mx-auto mt-6 mb-6 h-[1px] w-10/12 bg-richblack-600'></div>
+                
+                {/* Settings and Logout */}
                 <div className='flex flex-col'>
-                    <SideBarLinks
-                        link={{ name: "Settings", path: "dashboard/settings" }}
-                        iconName="VscSettingsGear"
-                    />
+                    {/* Settings Link */}
+                    <NavLink
+                        to="/dashboard/settings"
+                        className={({ isActive }) => 
+                            `flex items-center gap-2 px-8 py-2 text-sm font-medium
+                            ${isActive ? "bg-yellow-800 text-yellow-50" : "text-richblack-300"}
+                            hover:text-yellow-50 transition-all duration-200`
+                        }
+                    >
+                        <VscSettingsGear className="text-lg" />
+                        <span>Settings</span>
+                    </NavLink>
+                    
+                    {/* Logout Button */}
                     <button
                         onClick={() => setConfirmationModal({
                             text1: "Are You Sure ?",
@@ -57,19 +84,14 @@ const SlideBar = () => {
                             btn1Handler: () => dispatch(logout(navigate)),
                             btn2Handler: () => setConfirmationModal(null),
                         })}
-                        className='text-sm font-medium text-richblack-300'>
-                        <div className='flex items-center gap-x-2 px-8 py-2'>
-                            <VscSignOut className='text-lg' />
-                            <span>Logout</span>
-                        </div>
+                        className='flex items-center gap-2 px-8 py-2 text-sm font-medium text-richblack-300 hover:text-yellow-50 transition-all duration-200'
+                    >
+                        <VscSignOut className='text-lg' />
+                        <span>Logout</span>
                     </button>
-
-
-    
-                  
                 </div>
-
             </div>
+            
             {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
         </div>
     )

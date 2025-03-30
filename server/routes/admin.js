@@ -9,6 +9,14 @@ const { auth, isInstructor, isStudent, isAdmin } = require("../middleware/auth")
 const { getInstructorAnalytics, deactivateInstructor } = require("../controllers/RatingAndReview");
 
 const { getNotApprovedUser } = require("../controllers/Auth");
+
+const {
+  getAllReviews,
+  getCourseReviews,
+  getReviewAnalytics,
+  deleteReview
+} = require('../controllers/ReviewController');
+
 const mailSender = require('../utils/mailSender');
 // Route to fetch report data
 router.get('/report', async (req, res) => {
@@ -106,6 +114,32 @@ router.post('/approveUser', async (req, res) => {
     const { userId } = req.body;
     console.log('Approving user:', userId);
     const user = await User.findByIdAndUpdate(userId, { approved: true }, { new: true });
+    await mailSender(
+      user.email,
+      'Account Approval Request Response',
+      `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+            <header style="text-align: center; padding-bottom: 20px;">
+              <h1 style="color: #E53E3E;">StudyNotion</h1>
+            </header>
+            <main>
+              <h2>Hello ${user.firstName} ${user.lastName},</h2>
+              <p>We are pleased to inform you that your account approval request has been approved. You can now login to your account and start exploring our platform.</p>
+              <p>If you have any questions or need further assistance, please contact our support team.</p>
+              <div style="text-align: center; margin: 20px 0;">
+                <a href="https://studynotion.com/support" style="background-color: #E53E3E; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Contact Support</a>
+              </div>
+            </main>
+            <footer style="text-align: center; padding-top: 20px; border-top: 1px solid #ddd;">
+              <p style="font-size: 0.9em; color: #777;">&copy; 2023 StudyNotion. All rights reserved.</p>
+            </footer>
+          </div>
+        </body>
+      </html>
+      `
+    )
     res.json(user);
   } catch (err) {
     console.error('Error approving user:', err);
@@ -180,5 +214,13 @@ router.post('/activeUser', async (req, res) => {
 
 router.get("/instructor-analytics",  getInstructorAnalytics)
 router.post("/deactivate-instructor", auth, isAdmin, deactivateInstructor)
+
+
+// Admin routes
+router.get('/reviews', auth, isAdmin, getAllReviews);
+router.get('/reviews/analytics', auth, isAdmin, getReviewAnalytics);
+router.get('/reviews/course/:courseId', auth, isAdmin, getCourseReviews);
+router.delete('/reviews/:reviewId', auth, isAdmin, deleteReview);
+
 
 module.exports = router;          

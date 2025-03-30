@@ -79,7 +79,7 @@ export default function Instructor() {
                 <div>
                   <p className="text-lg text-richblack-200">Total Income</p>
                   <p className="text-3xl font-semibold text-richblack-50">
-                    Rs. {(user?.Revenue).toFixed(2)}
+                  Rs. {(user?.Revenue || 0).toFixed(2)}
                   </p>
                 </div>
               </div>

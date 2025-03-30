@@ -3,8 +3,9 @@ import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { MdArrowBack } from "react-icons/md"
+import { toast } from "react-hot-toast"
 
-import { editCourseDetails } from "../../../../../services/operations/courseDetailsAPI"
+import { editCourseDetails, createCourse } from "../../../../../services/operations/courseDetailsAPI"
 import { resetCourseState, setStep, setEditCourse } from "../../../../../slices/courseSlice"
 import { COURSE_STATUS } from "../../../../../utils/constants"
 
@@ -16,6 +17,8 @@ const PublishCourse = () => {
   const { token } = useSelector((state) => state.auth)
   const { course } = useSelector((state) => state.course)
   const [loading, setLoading] = useState(false)
+  const [thumbnail, setThumbnail] = useState(null)
+  const [status, setStatus] = useState(COURSE_STATUS.DRAFT)
 
   useEffect(() => {
     if (course?.status === COURSE_STATUS.PUBLISHED) {
@@ -24,13 +27,57 @@ const PublishCourse = () => {
   }, [])
 
   const goBack = () => {
-    dispatch(setStep(2))
+    dispatch(setStep(3))
     dispatch(setEditCourse(true))
   }
 
   const goToCourses = () => {
     dispatch(resetCourseState())
     navigate("/dashboard/my-courses")
+  }
+
+  const handleCourseSubmission = async () => {
+    // Validate if thumbnail is there or not
+    // If course is being edited and thumbnail exists, no need to check
+    if (!thumbnail && !course.thumbnail) {
+      toast.error("Please upload a thumbnail")
+      return
+    }
+
+    // Create form data
+    const formData = new FormData()
+
+    formData.append("courseId", course._id)
+    formData.append("courseName", course.courseName)
+    formData.append("courseDescription", course.courseDescription)
+    formData.append("coursePrice", course.price)
+    formData.append("courseBenefits", course.benefits)
+    formData.append("courseCategory", course.category)
+    formData.append("courseRequirements", JSON.stringify(course.requirements))
+    formData.append("courseInstructions", JSON.stringify(course.instructions))
+    formData.append("status", status)
+    formData.append("tag", JSON.stringify(course.tag))
+
+    // Add exam data if it exists
+    if (course.hasExam) {
+      formData.append("hasExam", course.hasExam)
+      formData.append("exam", JSON.stringify(course.exam))
+    }
+
+    // If thumbnail exists, add it to formData
+    if (thumbnail) {
+      formData.append("thumbnailImage", thumbnail)
+    }
+
+    // Make the API call
+    setLoading(true)
+    const result = await createCourse(formData, token)
+    setLoading(false)
+
+    if (result) {
+      dispatch(resetCourseState())
+      navigate("/dashboard/my-courses")
+    }
   }
 
   const handleCoursePublish = async () => {

@@ -17,13 +17,22 @@ const courseProgressSchema = new mongoose.Schema({
       ref: "SubSection",
     },
   ],
+  // New fields to track certificate requirements
+  contentCompleted: {
+    type: Boolean,
+    default: false,
+  },
+  examPassed: {
+    type: Boolean,
+    default: false,
+  },
+  certificateURL: {
+    type: String,
+  },
   expireTime: {
     type: Date,
     required: true, // Mark this as required if every course should have an expiration time
   },
-  certificateURL: {
-    type: String,
-  }
 });
 
 // Export the model

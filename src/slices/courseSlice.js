@@ -28,9 +28,9 @@ const courseSlice = createSlice({
       state.course = null
       state.editCourse = false
     },
-    setStepOne:(state)=>{
-      state.step=1
-    }
+    setStepOne: (state) => {
+      state.step = 1
+    },
   },
 })
 

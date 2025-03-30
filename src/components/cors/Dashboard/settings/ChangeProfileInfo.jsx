@@ -119,7 +119,25 @@ const ChangeProfileInfo = () => {
             type="date"
             validation={{
               required: "Date of birth is required",
-              validate: value => new Date(value) <= new Date() || "Date cannot be in future",
+              validate: value => {
+                // Check if date is not in the future
+                if (new Date(value) > new Date()) {
+                  return "Date cannot be in the future";
+                }
+                
+                // Calculate if user is at least 10 years old
+                const today = new Date();
+                const birthDate = new Date(value);
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                // Adjust age if birthday hasn't occurred yet this year
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                  age--;
+                }
+                
+                return age >= 10 || "You must be at least 10 years old";
+              }
             }}
           />
           <div className="flex flex-col gap-2 lg:w-[48%]">
