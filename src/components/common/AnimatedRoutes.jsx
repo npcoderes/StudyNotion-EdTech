@@ -38,6 +38,7 @@ import TakeExam from "../cors/ViewCourse/TakeExam";
 import ExamResults from "../cors/ViewCourse/ExamResults";
 import CertificateView from "../cors/Certificate/CertificateView";
 import MyCertificates from "../cors/Dashboard/Certificate/MyCertificates";
+import AdminReviewsPage from "../../pages/AdminReviewsPage";
 
 const AnimatedRoutes = () => {
   const { user } = useSelector((state) => state.profile);
@@ -137,9 +138,11 @@ const AnimatedRoutes = () => {
           {user?.accountType == ACCOUNT_TYPE.ADMIN && (
             <>
               <Route path="/admin/report" element={<AdminReport />} />
-              <Route path="/admin/report/courses" element={<AdminCourseReport />} />
+              <Route path="/admin/courses" element={<AdminCourseReport />} />
               <Route path="/admin/users" element={<AdminInstructoreManagement />} />
               <Route path="/admin/analytics" element={<InstructorAnalytics />} />
+              <Route path="/admin/reviews" element={<AdminReviewsPage />} />
+
 
             </>
 

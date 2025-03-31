@@ -73,7 +73,7 @@ export const sidebarLinks = [
   {
     id: 9,
     name: "Course Report",
-    path: "/admin/report/courses",
+    path: "/admin/courses",
     type: ACCOUNT_TYPE.ADMIN,
     icon: VscFilePdf,
   },
@@ -101,7 +101,7 @@ export const sidebarLinks = [
   {
     id: 13,
     name: "Reviews",
-    path: "/dashboard/admin/reviews",
+    path: "/admin/reviews",
     type: ACCOUNT_TYPE.ADMIN,
     icon: VscGraph
   },
