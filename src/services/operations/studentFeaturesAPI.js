@@ -4,6 +4,7 @@ import { apiConnector } from "../apiconnector";
 import rzpLogo from "../../assets/Logo/rzp_logo.png"
 import { setPaymentLoading } from "../../slices/courseSlice";
 import { resetCart } from "../../slices/cartSlice";
+import { th } from "date-fns/locale";
 
 
 const { COURSE_PAYMENT_API, COURSE_VERIFY_API, SEND_PAYMENT_SUCCESS_EMAIL_API } = studentEndpoints;
@@ -59,6 +60,16 @@ export async function buyCourse(token, coursesId, userDetails, navigate, dispatc
             name: "StudyNotion",
             description: "Thank You for Purchasing the Course",
             image: rzpLogo,
+            theme: {
+                color: "#422faf",
+            },
+            modal: {
+                ondismiss: function () {
+                    toast.error("Payment cancelled by user");
+                    console.log("Payment cancelled by user");
+                }
+            },
+
             prefill: {
                 name: userDetails.firstName,
                 email: userDetails.email

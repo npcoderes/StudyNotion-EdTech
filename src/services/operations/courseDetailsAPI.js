@@ -21,6 +21,8 @@ const {
   DELETE_COURSE_API,
   GET_FULL_COURSE_DETAILS_AUTHENTICATED,
   CREATE_RATING_API,
+  UPDATE_RATING_API, // Add this new endpoint
+  CHECK_RATING_API,
   LECTURE_COMPLETION_API,
   
 } = courseEndpoints
@@ -344,24 +346,76 @@ export const markLectureAsComplete = async (data, token) => {
 
 // create a rating for course
 export const createRating = async (data, token) => {
-  const toastId = toast.loading("Loading...")
+  const toastId = toast.loading("Processing...")
   let success = false
   try {
-    const response = await apiConnector("POST", CREATE_RATING_API, data, {
-      Authorization: `Bearer ${token}`,
-    })
-    if (!response?.data?.success) {
-      throw new Error("Could Not Create Rating")
+    // First check if user has already rated
+    const checkResponse = await apiConnector(
+      "GET",
+      `${CHECK_RATING_API}/${data.courseId}`,
+      null,
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    )
+
+    let response
+    if (checkResponse?.data?.exists) {
+      // Update existing rating
+      response = await apiConnector(
+        "PUT",
+        UPDATE_RATING_API,
+        data,
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      )
+      if (!response?.data?.success) {
+        throw new Error("Could Not Update Rating")
+      }
+      toast.success("Rating Updated Successfully")
+    } else {
+      // Create new rating
+      response = await apiConnector(
+        "POST",
+        CREATE_RATING_API,
+        data,
+        {
+          Authorization: `Bearer ${token}`,
+        }
+      )
+      if (!response?.data?.success) {
+        throw new Error("Could Not Create Rating")
+      }
+      toast.success("Rating Added Successfully")
     }
-    toast.success("Rating Created")
+
     success = true
   } catch (error) {
     success = false
-    console.log("CREATE RATING API ERROR............", error)
-    toast.error(error.message)
+    console.log("RATING API ERROR............", error)
+    toast.error(error.response?.data?.message || "Could not process rating")
   }
   toast.dismiss(toastId)
   return success
+}
+
+// check rating for a course
+export const checkRating = async (courseId, token) => {
+  try {
+    const response = await apiConnector(
+      "GET",
+      `${CHECK_RATING_API}/${courseId}`,
+      null,
+      {
+        Authorization: `Bearer ${token}`,
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.log("CHECK RATING API ERROR............", error)
+    return { exists: false }
+  }
 }
 
 // create a course

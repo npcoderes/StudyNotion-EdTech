@@ -45,6 +45,8 @@ const {
   createRating,
   getAverageRating,
   getAllRating,
+  checkExistingRating,
+  updateRating,
 } = require("../controllers/RatingAndReview")
 const {
   updateCourseProgress,
@@ -84,7 +86,7 @@ router.post("/updateCourseProgress", auth, isStudent, updateCourseProgress)
 router.post("/getProgressPercentage", auth, isStudent, getProgressPercentage)
 
 // To check if course is completed
-router.post("/checkCourseCompleted",auth,checkCourseCompleted)
+router.post("/checkCourseCompleted", auth, checkCourseCompleted)
 // Delete a Course
 
 // ********************************************************************************************************
@@ -101,6 +103,9 @@ router.post("/updateCategory", auth, isAdmin, updateCategory)
 // ********************************************************************************************************
 //                                      Rating and Review
 // ********************************************************************************************************
+router.get("/rating/check/:courseId", auth, checkExistingRating)
+router.post("/rating/create", auth, createRating)
+router.put("/rating/update", auth, updateRating)
 router.post("/createRating", auth, isStudent, createRating)
 router.get("/getAverageRating", getAverageRating)
 router.get("/getReviews", getAllRating)
