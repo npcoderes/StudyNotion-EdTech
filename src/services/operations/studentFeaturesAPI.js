@@ -31,6 +31,7 @@ export async function buyCourse(token, coursesId, userDetails, navigate, dispatc
     try {
         //load the script
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+        console.log("razorpay script loaded... ", res);
 
         if (!res) {
             toast.error("RazorPay SDK failed to load");
@@ -49,7 +50,7 @@ export async function buyCourse(token, coursesId, userDetails, navigate, dispatc
         }
 
         const RAZORPAY_KEY = process.env.REACT_APP_RAZORPAY_KEY;
-        // console.log("RAZORPAY_KEY...", RAZORPAY_KEY);
+        console.log("RAZORPAY_KEY...", RAZORPAY_KEY);
 
         // options
         const options = {
