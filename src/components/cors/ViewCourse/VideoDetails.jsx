@@ -12,11 +12,12 @@ import IconBtn from "../../common/IconBtn"
 import DoubtList from "../Doubt/DoubtList"
 import CreateDoubt from "../Doubt/CreateDoubt "
 import { getDoubtsByCourse } from "../../../services/operations/doubtService"
-import { FaQuestionCircle, FaPencilAlt, FaLock } from 'react-icons/fa'
+import { FaQuestionCircle, FaPencilAlt, FaLock, FaFilePdf } from 'react-icons/fa'
 import { motion } from 'framer-motion'
-import { HiOutlineBadgeCheck } from 'react-icons/hi'
+import { HiOutlineBadgeCheck, HiDownload } from 'react-icons/hi'
 import { BiRewind } from 'react-icons/bi'
-import { FiChevronsLeft, FiChevronsRight } from 'react-icons/fi'
+import { FiChevronsLeft, FiChevronsRight, FiBookOpen, FiExternalLink } from 'react-icons/fi'
+import { RxCross2 } from 'react-icons/rx'
 
 const VideoDetails = () => {
   const { courseId, sectionId, subSectionId } = useParams()
@@ -36,6 +37,7 @@ const VideoDetails = () => {
   const [showDoubtForm, setShowDoubtForm] = useState(false)
   const [doubts, setDoubts] = useState([])
   const [isAllContentCompleted, setIsAllContentCompleted] = useState(false)
+  const [showPdfModal, setShowPdfModal] = useState(false)
 
   // Check if all content is completed
   useEffect(() => {
@@ -71,6 +73,7 @@ const VideoDetails = () => {
           (data) => data._id === subSectionId
         )
         setVideoData(filteredVideoData[0])
+        console.log("filteredVideoData", filteredVideoData[0])
         setPreviewSource(courseEntireData.thumbnail)
         setVideoEnded(false)
       }
@@ -342,6 +345,72 @@ const VideoDetails = () => {
           )}
         </div>
 
+        {/* PDF Study Material Section */}
+        {videoData?.otherUrl && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#F8FAFC] border border-[#E2E8F0] p-5 rounded-xl"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#422FAF]/10 p-3 rounded-lg">
+                  <FaFilePdf className="text-xl text-[#422FAF]" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-[#1E293B]">Study Materials</h3>
+                  <p className="text-sm text-[#64748B]">Supplementary PDF for this lecture</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <a 
+                  href={videoData.otherUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center gap-2 bg-white border border-[#CBD5E1] hover:border-[#422FAF] text-[#1E293B] hover:text-[#422FAF] px-4 py-2 rounded-lg transition-colors"
+                >
+                  <FiExternalLink className="text-[#422FAF]" />
+                  <span className="font-medium">View PDF</span>
+                </a>
+                
+                <a 
+                  href={videoData.otherUrl} 
+                  download="study-material.pdf"
+                  className="flex items-center gap-2 bg-[#422FAF] hover:bg-[#3B27A1] text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  <HiDownload />
+                  <span className="font-medium">Download</span>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* PDF Modal */}
+        {showPdfModal && videoData?.otherUrl && (
+          <div className="fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-5xl h-[80vh] flex flex-col">
+              <div className="flex justify-between items-center p-4 border-b">
+                <h3 className="text-lg font-medium">Study Material</h3>
+                <button 
+                  onClick={() => setShowPdfModal(false)}
+                  className="p-2 text-[#64748B] hover:text-[#1E293B]"
+                >
+                  <RxCross2 className="text-xl" />
+                </button>
+              </div>
+              <div className="flex-grow overflow-hidden">
+                <iframe
+                  src={`${videoData.otherUrl}#toolbar=0`}
+                  className="w-full h-full"
+                  title="PDF Viewer"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="border-t border-[#E2E8F0] pt-6">
           <div className="flex flex-wrap gap-4 mb-6">
             <button
@@ -351,6 +420,16 @@ const VideoDetails = () => {
               <FaQuestionCircle className="text-[#3B82F6]" />
               Ask a Doubt
             </button>
+
+            {videoData?.otherUrl && (
+              <button
+                onClick={() => setShowPdfModal(true)}
+                className="flex items-center gap-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#1E293B] px-4 py-2 rounded-lg transition-all"
+              >
+                <FiBookOpen className="text-[#422FAF]" />
+                View Study Material
+              </button>
+            )}
 
             {courseEntireData?.hasExam && (
               <button

@@ -6,6 +6,7 @@ import { setCourse } from "../../../../../slices/courseSlice";
 import toast from "react-hot-toast";
 import { RxCross2 } from "react-icons/rx";
 import Upload from "../Upload";
+import { FiFileText, FiTrash2 } from "react-icons/fi";
 
 const SubSectionModal = ({
   modalData,
@@ -23,6 +24,8 @@ const SubSectionModal = ({
   } = useForm();
   
   const [loading, setLoading] = useState(false);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [removePdf, setRemovePdf] = useState(false);
   const { course } = useSelector((state) => state.course);
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -32,6 +35,7 @@ const SubSectionModal = ({
       setValue("lectureTitle", modalData.title);
       setValue("lectureDesc", modalData.description);
       setValue("lectureVideo", modalData.videoUrl);
+      setValue("lecturePdf", modalData.otherUrl || "");
     }
   }, [view, edit, modalData, setValue]);
 
@@ -40,8 +44,21 @@ const SubSectionModal = ({
     return (
       currentValue.lectureTitle !== modalData?.title ||
       currentValue.lectureDesc !== modalData?.description ||
-      currentValue.lectureVideo !== modalData?.videoUrl
+      currentValue.lectureVideo !== modalData?.videoUrl ||
+      pdfFile !== null ||
+      removePdf
     );
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        toast.error('Please upload a PDF file');
+        return;
+      }
+      setPdfFile(file);
+    }
   };
 
   const handleEditSection = async () => {
@@ -58,7 +75,17 @@ const SubSectionModal = ({
       formData.append("description", currentValues.lectureDesc);
     }
     if (currentValues.lectureVideo !== modalData.videoUrl) {
-      formData.append("video", currentValues.lectureVideo);
+      formData.append("videoFile", currentValues.lectureVideo);
+    }
+    
+    // Add PDF if selected
+    if (pdfFile) {
+      formData.append("pdfMaterial", pdfFile);
+    }
+    
+    // Handle PDF removal
+    if (removePdf) {
+      formData.append("removePdf", "true");
     }
     
     setLoading(true);
@@ -94,6 +121,11 @@ const SubSectionModal = ({
     formData.append("title", data.lectureTitle);
     formData.append("description", data.lectureDesc);
     formData.append("video", data.lectureVideo);
+    
+    // Add PDF if selected
+    if (pdfFile) {
+      formData.append("pdfMaterial", pdfFile);
+    }
     
     setLoading(true);
     const result = await createSubSection(formData, token);
@@ -140,6 +172,105 @@ const SubSectionModal = ({
             viewData={view ? modalData.videoUrl : null}
             editData={edit ? modalData.videoUrl : null}
           />
+          
+          {/* PDF Material Upload */}
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium text-[#4B5563]" htmlFor="lecturePdf">
+              PDF Study Material <span className="text-xs text-[#6B7280]">(Optional)</span>
+            </label>
+            
+            {view && modalData.otherUrl ? (
+              <div className="flex items-center gap-3 p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg">
+                <FiFileText className="text-[#422FAF] text-xl" />
+                <div className="flex-grow">
+                  <p className="text-sm font-medium text-[#111827]">Study Material</p>
+                </div>
+                <a 
+                  href={modalData.otherUrl} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-3 py-1 text-sm text-[#422FAF] bg-white border border-[#422FAF] rounded-md hover:bg-[#EEF2FF] transition-colors"
+                >
+                  View PDF
+                </a>
+              </div>
+            ) : edit && modalData.otherUrl && !removePdf ? (
+              <div className="flex items-center justify-between p-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiFileText className="text-[#422FAF] text-xl" />
+                  <div>
+                    <p className="text-sm font-medium text-[#111827]">Study Material</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <a 
+                    href={modalData.otherUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="px-3 py-1 text-sm text-[#422FAF] bg-white border border-[#422FAF] rounded-md hover:bg-[#EEF2FF] transition-colors"
+                  >
+                    View
+                  </a>
+                  <button 
+                    type="button" 
+                    onClick={() => setRemovePdf(true)}
+                    className="px-3 py-1 text-sm text-[#EF4444] bg-white border border-[#EF4444] rounded-md hover:bg-[#FEE2E2] transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="relative border border-dashed border-[#D1D5DB] p-4 rounded-lg bg-[#F9FAFB] hover:bg-[#F3F4F6] transition-colors">
+                  <input
+                    type="file"
+                    id="lecturePdf"
+                    accept="application/pdf"
+                    disabled={view || loading}
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex flex-col items-center justify-center text-center py-4">
+                    <FiFileText className="text-3xl text-[#422FAF] mb-3" />
+                    <p className="text-sm font-medium text-[#111827] mb-1">
+                      {pdfFile ? pdfFile.name : "Upload PDF material"}
+                    </p>
+                    <p className="text-xs text-[#6B7280]">
+                      Drag and drop or click to browse
+                    </p>
+                  </div>
+                </div>
+                {pdfFile && (
+                  <div className="flex items-center justify-between p-2 bg-[#EEF2FF] rounded-lg">
+                    <span className="text-xs text-[#422FAF] truncate max-w-[80%]">{pdfFile.name}</span>
+                    <button 
+                      type="button" 
+                      onClick={() => setPdfFile(null)}
+                      className="p-1 text-[#6B7280] hover:text-[#EF4444]"
+                      aria-label="Remove PDF"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Show this when user chooses to remove PDF in edit mode */}
+            {edit && removePdf && (
+              <div className="flex items-center justify-between p-2 bg-[#FEF2F2] rounded-lg">
+                <span className="text-xs text-[#B91C1C]">PDF will be removed</span>
+                <button 
+                  type="button" 
+                  onClick={() => setRemovePdf(false)}
+                  className="text-xs underline text-[#4B5563] hover:text-[#111827]"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
           
           {/* Lecture Title */}
           <div className="flex flex-col space-y-2">
