@@ -79,7 +79,7 @@ export const sidebarLinks = [
   },
   {
     id: 10,
-    name: "Instructor Management",
+    name: "Instructor Approval",
     path: "/admin/users",
     type: ACCOUNT_TYPE.ADMIN,
     icon: VscAccount,

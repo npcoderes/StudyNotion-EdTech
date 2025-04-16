@@ -165,9 +165,30 @@ const Catelog = () => {
     
     // Apply level filter
     if (selectedLevels.length > 0) {
-      courses = courses.filter(course => 
-        selectedLevels.includes(course.tag || "Beginner")
-      );
+      courses = courses.filter(course => {
+        // Add this debug statement to see the exact structure
+        console.log(`Course "${course.courseName}" tags:`, course.tag);
+        
+        // Handle different tag formats
+        if (Array.isArray(course.tag)) {
+          // The tag might be an array of arrays
+          return course.tag.some(tag => {
+            // If individual tag is also an array (like ['Beginner'])
+            if (Array.isArray(tag)) {
+              // Check if any selected level matches any tag in the nested array
+              return tag.some(innerTag => selectedLevels.includes(innerTag));
+            } 
+            // If tag is a simple string
+            return selectedLevels.includes(tag);
+          });
+        } else if (typeof course.tag === 'string') {
+          // If tag is a single string
+          return selectedLevels.includes(course.tag);
+        } else {
+          // If there's no tag, default to Beginner
+          return selectedLevels.includes("Beginner");
+        }
+      });
     }
     
     // Apply rating filter

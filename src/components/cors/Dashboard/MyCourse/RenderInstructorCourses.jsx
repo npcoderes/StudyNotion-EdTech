@@ -19,7 +19,7 @@ import { deleteCourse } from "../../../../services/operations/courseDetailsAPI";
 import { COURSE_STATUS } from "../../../../utils/constants";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 
-const RenderInstructorCourses = () => {
+const RenderInstructorCourses = ({ searchTerm = '', filterStatus = 'all', setStatsData }) => {
   const TRUNCATE_LENGTH = 25;
   const { token } = useSelector((state) => state.auth);
   const [courses, setCourses] = useState([]);
@@ -40,7 +40,17 @@ const RenderInstructorCourses = () => {
       if (!response.data.success) {
         throw new Error(response.data.message);
       }
+      
       setCourses(response.data.data);
+      
+      // Update stats data when courses are loaded
+      if (setStatsData && response.data.stats) {
+        setStatsData({
+          totalCourses: response.data.stats.totalCourses || 0,
+          totalStudents: response.data.stats.totalStudents || 0,
+          completionRate: response.data.stats.completionRate || 0
+        });
+      }
     } catch (err) {
       console.error("Error fetching courses", err);
       toast.error("Failed to load courses");
@@ -58,7 +68,7 @@ const RenderInstructorCourses = () => {
     try {
       await deleteCourse({ courseId }, token);
       toast.success("Course deleted successfully");
-      await fetchCourses(); // Refresh the course list after deletion
+      await fetchCourses(); // This will refresh courses and update stats
       setConfirmationModal(null);
     } catch (e) {
       console.error("Error deleting course", e);
@@ -74,6 +84,18 @@ const RenderInstructorCourses = () => {
     return date.toLocaleDateString('en-US', options);
   };
 
+  // Filter courses based on search term and status
+  const filteredCourses = courses.filter((course) => {
+    const matchesSearch = course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = filterStatus === 'all' || 
+                         (filterStatus === 'draft' && course.status === COURSE_STATUS.DRAFT) ||
+                         (filterStatus === 'published' && course.status === COURSE_STATUS.PUBLISHED);
+    
+    return matchesSearch && matchesStatus;
+  });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -82,7 +104,7 @@ const RenderInstructorCourses = () => {
     );
   }
 
-  if (!courses || courses.length === 0) {
+  if (!filteredCourses || filteredCourses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <div className="bg-[#EEF2FF] rounded-full p-4 mb-4">
@@ -116,7 +138,7 @@ const RenderInstructorCourses = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-[#E5E7EB]">
-            {courses.map((course) => (
+            {filteredCourses.map((course) => (
               <motion.tr 
                 key={course._id}
                 initial={{ opacity: 0 }}

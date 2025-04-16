@@ -25,7 +25,8 @@ import {
   Stack,
   CircularProgress,
   Alert,
-  Snackbar
+  Snackbar,
+  Divider
 } from '@mui/material';
 import {
   PictureAsPdf,
@@ -34,13 +35,16 @@ import {
   Category,
   People,
   FilterAlt,
-  ClearAll
+  ClearAll,
+  MonetizationOn,
+  TrendingUp,
+  PieChartOutlined
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar, Pie, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -50,6 +54,12 @@ import {
   Title,
   Tooltip,
   Legend
+} from 'chart.js';
+
+// Add this import at the top of your file with the other chart.js imports
+import {
+  Chart,
+
 } from 'chart.js';
 
 // Register ChartJS components
@@ -447,7 +457,7 @@ const AdminCourseReport = () => {
           doc.setFontSize(20); // Increased font size
           const pieTitle = 'Courses by Category';
           doc.text(pieTitle, 25, 70); // Moved to left with margin
-          doc.addImage(pieImg, 'PNG', 15, 80, 180, 100); // Larger chart size
+          doc.addImage(pieImg, 'PNG', 15, 80, 160, 90); // Larger chart size
         } catch (err) {
           console.error('Error adding pie chart to PDF:', err);
         }
@@ -460,7 +470,7 @@ const AdminCourseReport = () => {
           doc.setFontSize(20);
           const barTitle = 'Revenue by Instructor';
           doc.text(barTitle, doc.internal.pageSize.width / 2 + 20, 70); // Adjusted position
-          doc.addImage(barImg, 'PNG', doc.internal.pageSize.width / 2 + 10, 80, 180, 100);
+          doc.addImage(barImg, 'PNG', doc.internal.pageSize.width / 2 + 10, 80, 160, 80);
         } catch (err) {
           console.error('Error adding bar chart to PDF:', err);
         }
@@ -473,7 +483,7 @@ const AdminCourseReport = () => {
           doc.setFontSize(20);
           const adminTitle = 'Revenue Of Admin';
           doc.text(adminTitle, 25, 200); // Aligned with first chart title
-          doc.addImage(adminImg, 'PNG', 15, 210, 180, 100);
+          doc.addImage(adminImg, 'PNG', 15, 210, 160, 90);
         } catch (err) {
           console.error('Error adding admin chart to PDF:', err);
         }
@@ -644,119 +654,444 @@ const AdminCourseReport = () => {
     }
   };
 
-  // Chart data functions
-  const getCategoryChartData = () => {
-    // Map categories to their counts in the filtered courses
-    const categoryCounts = {};
-    categories.forEach(cat => {
-      categoryCounts[cat.name] = 0;
-    });
-    
-    // Count courses per category
-    filteredCourses.forEach(course => {
-      if (course.category && course.category.name) {
-        if (categoryCounts[course.category.name] !== undefined) {
-          categoryCounts[course.category.name]++;
-        } else {
-          // Handle case where category exists in course but not in categories array
-          categoryCounts[course.category.name] = 1;
-        }
+  // Enhanced chart data functions for better visual representation
+
+const getCategoryChartData = () => {
+  // Map categories to their counts in the filtered courses
+  const categoryCounts = {};
+  categories.forEach(cat => {
+    categoryCounts[cat.name] = 0;
+  });
+  
+  // Count courses per category
+  filteredCourses.forEach(course => {
+    if (course.category && course.category.name) {
+      if (categoryCounts[course.category.name] !== undefined) {
+        categoryCounts[course.category.name]++;
+      } else {
+        // Handle case where category exists in course but not in categories array
+        categoryCounts[course.category.name] = 1;
       }
-    });
+    }
+  });
+  
+  // Filter out categories with zero courses for better visualization
+  const labels = Object.keys(categoryCounts)
+    .filter(name => categoryCounts[name] > 0)
+    // Sort by count for better visualization
+    .sort((a, b) => categoryCounts[b] - categoryCounts[a]);
     
-    // Filter out categories with zero courses for better visualization
-    const labels = Object.keys(categoryCounts).filter(name => categoryCounts[name] > 0);
-    const data = labels.map(name => categoryCounts[name]);
-    
-    // Generate colors dynamically based on number of categories
-    const backgroundColors = [
-      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', 
-      '#FF9F40', '#8AC926', '#1982C4', '#6A4C93', '#F94144'
+  const data = labels.map(name => categoryCounts[name]);
+  
+  // Custom color palette - StudyNotion brand colors with variations
+  const backgroundColors = [
+    '#422FAF', // Primary - StudyNotion Purple
+    '#EAB308', // Gold accent
+    '#16A34A', // Green
+    '#EA580C', // Orange
+    '#6366F1', // Indigo
+    '#0EA5E9', // Sky blue
+    '#D946EF', // Fuchsia
+    '#F43F5E', // Rose
+    '#10B981', // Emerald
+    '#8B5CF6', // Violet
+    // Add lighter variations for more categories if needed
+    'rgba(66, 47, 175, 0.8)',
+    'rgba(234, 179, 8, 0.8)',
+    'rgba(22, 163, 74, 0.8)',
+    'rgba(234, 88, 12, 0.8)',
+  ];
+  
+  // Create pattern fills for accessibility
+  const patterns = ['dots', 'diagonal', 'grid', 'cross', 'horizontal', 'vertical'];
+  
+  return {
+    labels,
+    datasets: [{
+      data,
+      backgroundColor: backgroundColors.slice(0, labels.length),
+      borderColor: 'white',
+      borderWidth: 2,
+      hoverBorderWidth: 3,
+      hoverBorderColor: '#ffffff',
+      hoverOffset: 15
+    }]
+  };
+};
+
+// Update the getRevenueChartData function for better visualization
+
+const getRevenueChartData = () => {
+  // Calculate revenue per instructor from filtered courses
+  const instructorRevenue = {};
+  
+  filteredCourses.forEach(course => {
+    if (course.instructor && course.instructor._id) {
+      const instructorId = course.instructor._id;
+      const instructorName = `${course.instructor.firstName} ${course.instructor.lastName}`;
+      const revenue = (course.price * 0.8) * course.studentsEnrolledCount; // 80% to instructor
+      const courseCount = 1;
+      const studentCount = course.studentsEnrolledCount;
+      
+      if (!instructorRevenue[instructorId]) {
+        instructorRevenue[instructorId] = { 
+          name: instructorName, 
+          shortName: instructorName.split(' ').map(n => n[0]).join(''), // For shorter labels
+          revenue: 0, 
+          courseCount: 0,
+          studentCount: 0
+        };
+      }
+      instructorRevenue[instructorId].revenue += revenue;
+      instructorRevenue[instructorId].courseCount += courseCount;
+      instructorRevenue[instructorId].studentCount += studentCount;
+    }
+  });
+  
+  // Convert to arrays for chart and sort by revenue
+  const instructorData = Object.values(instructorRevenue)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 8); // Take top 8 instructors for better visualization
+  
+  // Format instructor names to be more readable in chart
+  const formatInstructorName = (name) => {
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+      // Use first name + first letter of last name
+      return `${parts[0]} ${parts[1][0]}.`;
+    }
+    return name;
+  };
+  
+  // Generate gradient colors
+  const generateGradient = (ctx, index) => {
+    const colors = [
+      ['#422FAF', '#6366F1'], // Purple to indigo
+      ['#EAB308', '#FEF08A'], // Gold to yellow
+      ['#16A34A', '#86EFAC'], // Green to light green
+      ['#EA580C', '#FDBA74'], // Orange to light orange
+      ['#0EA5E9', '#BAE6FD'], // Sky to light sky
+      ['#D946EF', '#F5D0FE'], // Fuchsia to light fuchsia
+      ['#F43F5E', '#FECDD3'], // Rose to light rose
+      ['#10B981', '#A7F3D0'], // Emerald to light emerald
     ];
     
-    return {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: backgroundColors.slice(0, labels.length)
-      }]
-    };
+    const colorPair = colors[index % colors.length];
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, colorPair[0]);
+    gradient.addColorStop(1, colorPair[1]);
+    return gradient;
   };
-
-  const getRevenueChartData = () => {
-    // Calculate revenue per instructor from filtered courses
-    const instructorRevenue = {};
-    
-    filteredCourses.forEach(course => {
-      if (course.instructor && course.instructor._id) {
-        const instructorId = course.instructor._id;
-        const instructorName = `${course.instructor.firstName} ${course.instructor.lastName}`;
-        const revenue = (course.price * 0.8) * course.studentsEnrolledCount; // 80% to instructor
-        
-        if (!instructorRevenue[instructorId]) {
-          instructorRevenue[instructorId] = { name: instructorName, revenue: 0 };
+  
+  return {
+    labels: instructorData.map(inst => formatInstructorName(inst.name)),
+    datasets: [{
+      label: 'Instructor Revenue (₹)',
+      data: instructorData.map(inst => Math.round(inst.revenue)),
+      backgroundColor: (context) => {
+        if (!context.chart.chartArea) {
+          return 'rgba(66, 47, 175, 0.8)';
         }
-        instructorRevenue[instructorId].revenue += revenue;
-      }
-    });
-    
-    // Convert to arrays for chart
-    const instructorData = Object.values(instructorRevenue);
-    
-    return {
-      labels: instructorData.map(inst => inst.name),
-      datasets: [{
-        label: 'Instructor Revenue (₹)',
-        data: instructorData.map(inst => Math.round(inst.revenue)),
-        backgroundColor: '#36A2EB'
-      }]
-    };
-  };
-
-  const getRevenueAdminChartData = () => {
-    // Calculate admin revenue (20%) for filtered courses
-    const totalAdminRevenue = filteredCourses.reduce((sum, course) => {
-      return sum + ((course.price * 0.2) * course.studentsEnrolledCount);
-    }, 0);
-    
-    return {
-      labels: ['Admin Revenue'],
-      datasets: [{
-        label: 'Admin Revenue (₹)',
-        data: [Math.round(totalAdminRevenue)],
-        backgroundColor: '#FF6384'
-      }]
-    };
-  };
-
-  // The chart options for consistent styling
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: true,
-    plugins: {
-      legend: {
-        position: 'bottom'
+        const index = context.dataIndex;
+        const ctx = context.chart.ctx;
+        return generateGradient(ctx, index);
       },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.y !== undefined) {
-              label += new Intl.NumberFormat('en-IN', { 
-                style: 'currency', 
-                currency: 'INR',
-                minimumFractionDigits: 0
-              }).format(context.parsed.y);
-            }
-            return label;
+      borderColor: 'white',
+      borderWidth: 1,
+      borderRadius: 6,
+      hoverBorderWidth: 2,
+      hoverBorderColor: '#ffffff',
+      barThickness: 35,
+      maxBarThickness: 45,
+      minBarLength: 10
+    }],
+    instructorDetails: instructorData
+  };
+};
+
+const getRevenueAdminChartData = () => {
+  // Calculate detailed admin revenue stats
+  const totalCourses = filteredCourses.length;
+  const totalStudents = filteredCourses.reduce((sum, course) => sum + course.studentsEnrolledCount, 0);
+  
+  // Calculate revenue amounts
+  const totalRevenue = filteredCourses.reduce((sum, course) => 
+    sum + (course.price * course.studentsEnrolledCount), 0);
+    
+  const adminRevenue = totalRevenue * 0.2;
+  const instructorRevenue = totalRevenue * 0.8;
+  
+  // Calculate revenue per category
+  const categoryRevenue = {};
+  filteredCourses.forEach(course => {
+    if (course.category?.name) {
+      const categoryName = course.category.name;
+      const revenue = (course.price * course.studentsEnrolledCount) * 0.2;
+      
+      if (!categoryRevenue[categoryName]) {
+        categoryRevenue[categoryName] = 0;
+      }
+      categoryRevenue[categoryName] += revenue;
+    
+    }
+  
+  });
+  
+  // Convert to arrays and sort
+  const categoryRevenueData = Object.entries(categoryRevenue)
+    .map(([name, revenue]) => ({ name, revenue }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5); // Top 5 categories
+  
+  // Create a doughnut chart showing admin revenue breakdown by category
+  return {
+    labels: categoryRevenueData.map(cat => cat.name),
+    datasets: [{
+      label: 'Admin Revenue by Category (₹)',
+      data: categoryRevenueData.map(cat => Math.round(cat.revenue)),
+      backgroundColor: [
+        '#422FAF',
+        '#EAB308', 
+        '#16A34A',
+        '#EA580C',
+        '#0EA5E9',
+      ],
+      borderColor: 'white',
+      borderWidth: 2,
+      hoverOffset: 15,
+      cutout: '60%',
+    }],
+    // Add center text with total admin revenue
+    centerText: {
+      display: true,
+      text: `₹${Math.round(adminRevenue).toLocaleString()}`,
+      subtext: 'Admin Revenue'
+    }
+  };
+};
+
+// The chart options for improved styling
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: true,
+  layout: {
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    }
+  },
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: {
+          size: 12
+        }
+      }
+    },
+    title: {
+      display: false
+    },
+    tooltip: {
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      titleColor: '#111827',
+      bodyColor: '#111827',
+      borderColor: '#e5e7eb',
+      borderWidth: 1,
+      padding: 12,
+      cornerRadius: 8,
+      boxPadding: 6,
+      usePointStyle: true,
+      callbacks: {
+        label: function(context) {
+          let label = context.dataset.label || '';
+          if (label) {
+            label += ': ';
+          }
+          if (context.parsed.y !== undefined) {
+            label += new Intl.NumberFormat('en-IN', { 
+              style: 'currency', 
+              currency: 'INR',
+              minimumFractionDigits: 0
+            }).format(context.parsed.y);
+          } else if (context.parsed !== undefined) {
+            label += new Intl.NumberFormat('en-IN', { 
+              style: 'currency', 
+              currency: 'INR',
+              minimumFractionDigits: 0
+            }).format(context.parsed);
+          }
+          return label;
+        },
+        // For pie/doughnut chart, show percentage
+        afterLabel: function(context) {
+          if (context.chart.config.type === 'pie' || context.chart.config.type === 'doughnut') {
+            const dataset = context.dataset;
+            const total = dataset.data.reduce((acc, data) => acc + data, 0);
+            const percentage = Math.round((context.parsed * 100) / total);
+            return `${percentage}% of total admin revenue`;
           }
         }
       }
     }
-  };
+  }
+};
+
+// Specific options for each chart type
+const pieChartOptions = {
+  ...chartOptions,
+  plugins: {
+    ...chartOptions.plugins,
+    datalabels: {
+      formatter: (value, ctx) => {
+        const dataset = ctx.chart.data.datasets[0];
+        const total = dataset.data.reduce((acc, data) => acc + data, 0);
+        const percentage = Math.round((value * 100) / total);
+        return percentage + '%';
+      },
+      color: '#fff',
+      font: {
+        weight: 'bold',
+        size: 12
+      }
+    }
+  }
+};
+
+const barChartOptions = {
+  ...chartOptions,
+  responsive: true,
+  maintainAspectRatio: false,
+  layout: {
+    padding: {
+      top: 5,
+      right: 15,
+      bottom: 10, 
+      left: 10
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      grid: {
+        color: 'rgba(0, 0, 0, 0.05)',
+        drawBorder: false
+      },
+      ticks: {
+        callback: function(value) {
+          return '₹' + value.toLocaleString();
+        },
+        font: {
+          size: 12
+        },
+        padding: 10
+      },
+      title: { 
+        display: true, 
+        text: 'Revenue (₹)', 
+        font: { 
+          size: 14
+        },
+        padding: {
+          bottom: 10
+        }
+      }
+    },
+    x: {
+      grid: {
+        display: false,
+        drawBorder: false
+      },
+      ticks: {
+        autoSkip: true,
+        maxRotation: 45,
+        minRotation: 45,
+        font: {
+          size: 11
+        },
+        padding: 5
+      }
+    }
+  },
+  plugins: {
+    ...chartOptions.plugins,
+    legend: {
+      position: 'bottom',
+      labels: {
+        usePointStyle: true,
+        padding: 15,
+        boxWidth: 10,
+        boxHeight: 10,
+        font: {
+          size: 12
+        }
+      }
+    },
+  },
+  animation: {
+    duration: 2000,
+    easing: 'easeOutQuart'
+  }
+};
+
+// Special donut chart plugin to display center text
+const doughnutOptions = {
+  ...chartOptions,
+  cutout: '60%',
+  plugins: {
+    ...chartOptions.plugins,
+    legend: {
+      ...chartOptions.plugins.legend,
+      position: 'bottom'
+    }
+  }
+};
+
+// Create the plugin for center text in donut chart
+const centerTextPlugin = {
+  id: 'centerText',
+  beforeDraw: function(chart) {
+    if (chart.config.type === 'doughnut' && 
+        chart.config.data.datasets[0].centerText && 
+        chart.config.data.datasets[0].centerText.display) {
+      
+      const width = chart.width;
+      const height = chart.height;
+      const ctx = chart.ctx;
+      
+      ctx.restore();
+      
+      // Main text
+      const text = chart.config.data.datasets[0].centerText.text;
+      let fontSize = Math.min(width, height) / 10;
+      ctx.font = `bold ${fontSize}px sans-serif`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#422FAF';
+      
+      // Position is in the center
+      const textX = width / 2;
+      const textY = height / 2 - fontSize / 2;
+      ctx.fillText(text, textX, textY);
+      
+      // Subtext
+      const subtext = chart.config.data.datasets[0].centerText.subtext;
+      fontSize = Math.min(width, height) / 25;
+      ctx.font = `${fontSize}px sans-serif`;
+      ctx.fillStyle = '#6B7280';
+      ctx.fillText(subtext, textX, textY + fontSize * 2);
+      
+      ctx.save();
+    }
+  }
+};
+
+// Make sure the plugin is registered
+Chart.register(centerTextPlugin);
 
   // Determine if we should show course data or loading state
   const showCourseData = !fetchingData && filteredCourses.length > 0;
@@ -969,89 +1304,300 @@ const AdminCourseReport = () => {
               {/* Charts */}
               <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 2, height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
+                  <Paper 
+                    sx={{ 
+                      p: 3, 
+                      height: '100%', 
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.12)'
+                      }
+                    }}
+                  >
+                    <Typography 
+                      variant="h6" 
+                      gutterBottom 
+                      sx={{ 
+                        fontWeight: 'bold', 
+                        color: '#111827',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1 
+                      }}
+                    >
+                      <Category fontSize="small" sx={{ color: '#422FAF' }} />
                       Courses by Category
                     </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Distribution of courses across different subject categories
+                    </Typography>
+                    
+                    <Divider sx={{ mb: 3 }} />
+                    
                     {loading ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                        <CircularProgress />
+                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3, height: '300px', alignItems: 'center' }}>
+                        <CircularProgress size={60} sx={{ color: '#422FAF' }} />
                       </Box>
                     ) : (
-                      <Pie 
-                        ref={pieChartRef} 
-                        data={getCategoryChartData()}
-                        options={{
-                          ...chartOptions,
-                          plugins: {
-                            ...chartOptions.plugins,
-                            tooltip: {
-                              callbacks: {
-                                label: function(context) {
-                                  const label = context.label || '';
-                                  const value = context.parsed || 0;
-                                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                  const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                  return `${label}: ${value} courses (${percentage}%)`;
-                                }
-                              }
-                            }
-                          }
-                        }} 
-                      />
+                      <Box sx={{ height: 300, position: 'relative' }}>
+                        <Pie 
+                          ref={pieChartRef} 
+                          data={getCategoryChartData()}
+                          options={pieChartOptions} 
+                        />
+                      </Box>
                     )}
+                    
+                    <Box sx={{ mt: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Total Categories: {Object.keys(getCategoryChartData().labels).length} • 
+                        Total Courses: {filteredCourses.length}
+                      </Typography>
+                    </Box>
                   </Paper>
                 </Grid>
+                
                 <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 2, height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
+                  <Paper 
+                    sx={{ 
+                      p: 3, 
+                      height: '100%', 
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.12)'
+                      }
+                    }}
+                  >
+                    <Typography 
+                      variant="h6" 
+                      gutterBottom 
+                      sx={{ 
+                        fontWeight: 'bold', 
+                        color: '#111827',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      <MonetizationOn fontSize="small" sx={{ color: '#422FAF' }} />
                       Revenue by Instructor
                     </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Top earning instructors (80% revenue share)
+                    </Typography>
+                    
+                    <Divider sx={{ mb: 2 }} />
+                    
                     {loading ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                        <CircularProgress />
+                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3, height: '300px', alignItems: 'center' }}>
+                        <CircularProgress size={60} sx={{ color: '#422FAF' }} />
                       </Box>
                     ) : (
-                      <Bar 
-                        ref={barChartRef} 
-                        data={getRevenueChartData()}
-                        options={{
-                          ...chartOptions,
-                          scales: {
-                            y: {
-                              beginAtZero: true,
-                              title: { display: true, text: 'Revenue (₹)' }
+                      <Box sx={{ height: 350, position: 'relative', mt: 1 }}>
+                        <Bar 
+                          ref={barChartRef} 
+                          data={getRevenueChartData()}
+                          options={{
+                            ...barChartOptions,
+                            maintainAspectRatio: false,
+                            layout: {
+                              padding: {
+                                top: 5,
+                                right: 15,
+                                bottom: 10,
+                                left: 10
+                              }
                             }
-                          }
-                        }} 
-                      />
+                          }}
+                        />
+                      </Box>
                     )}
+                    
+                    <Box sx={{ mt: 1, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Showing top {getRevenueChartData().labels.length} instructors by revenue
+                      </Typography>
+                    </Box>
                   </Paper>
                 </Grid>
+                
                 <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 2 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Admin Revenue
+                  <Paper 
+                    sx={{ 
+                      p: 3, 
+                      height: '100%', 
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.12)'
+                      }
+                    }}
+                  >
+                    <Typography 
+                      variant="h6" 
+                      gutterBottom 
+                      sx={{ 
+                        fontWeight: 'bold', 
+                        color: '#111827',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      <TrendingUp fontSize="small" sx={{ color: '#EAB308' }} />
+                      Admin Revenue by Category
                     </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Distribution of admin revenue (20% share) across top categories
+                    </Typography>
+                    
+                    <Divider sx={{ mb: 3 }} />
+                    
                     {loading ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                        <CircularProgress />
+                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3, height: '300px', alignItems: 'center' }}>
+                        <CircularProgress size={60} sx={{ color: '#422FAF' }} />
                       </Box>
                     ) : (
-                      <Bar 
-                        ref={adminChartRef} 
-                        data={getRevenueAdminChartData()}
-                        options={{
-                          ...chartOptions,
-                          scales: {
-                            y: {
-                              beginAtZero: true,
-                              title: { display: true, text: 'Revenue (₹)' }
-                            }
-                          }
-                        }} 
-                      />
+                      <Box sx={{ height: 300, position: 'relative' }}>
+                        <Doughnut
+                          ref={adminChartRef}
+                          data={getRevenueAdminChartData()}
+                          options={doughnutOptions}
+                          plugins={[centerTextPlugin]}
+                        />
+                      </Box>
                     )}
+                    
+                    <Box sx={{ mt: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Showing top {getRevenueAdminChartData().labels.length} categories by admin revenue
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <Paper 
+                    sx={{ 
+                      p: 3, 
+                      height: '100%', 
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      '&:hover': {
+                        transform: 'translateY(-5px)',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.12)'
+                      }
+                    }}
+                  >
+                    <Typography 
+                      variant="h6" 
+                      gutterBottom 
+                      sx={{ 
+                        fontWeight: 'bold', 
+                        color: '#111827',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      <PieChartOutlined fontSize="small" sx={{ color: '#16A34A' }} />
+                      Revenue Split Overview
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Overall revenue distribution between instructors and admin
+                    </Typography>
+                    
+                    <Divider sx={{ mb: 3 }} />
+                    
+                    {loading ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3, height: '300px', alignItems: 'center' }}>
+                        <CircularProgress size={60} sx={{ color: '#422FAF' }} />
+                      </Box>
+                    ) : (
+                      <Box sx={{ height: 300, position: 'relative' }}>
+                        <Pie
+                          data={{
+                            labels: ['Instructor Revenue (80%)', 'Admin Revenue (20%)'],
+                            datasets: [{
+                              data: [
+                                Math.round(filteredCourses.reduce((sum, c) => sum + (c.price * c.studentsEnrolledCount), 0) * 0.8),
+                                Math.round(filteredCourses.reduce((sum, c) => sum + (c.price * c.studentsEnrolledCount), 0) * 0.2)
+                              ],
+                              backgroundColor: ['#422FAF', '#EAB308'],
+                              borderColor: 'white',
+                              borderWidth: 2
+                            }]
+                          }}
+                          options={pieChartOptions}
+                        />
+                      </Box>
+                    )}
+                    
+                    <Box sx={{ mt: 3 }}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <Paper 
+                            elevation={0} 
+                            sx={{ 
+                              p: 2, 
+                              textAlign: 'center', 
+                              bgcolor: 'rgba(66, 47, 175, 0.1)',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            <Typography variant="caption" color="textSecondary">Instructor Revenue</Typography>
+                            <Typography 
+                              variant="h6" 
+                              sx={{ 
+                                fontWeight: 'bold', 
+                                color: '#422FAF', 
+                                display: 'flex', 
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <FaIndianRupeeSign size={14} style={{ marginRight: '4px' }} />
+                              {Math.round(filteredCourses.reduce((sum, c) => sum + (c.price * c.studentsEnrolledCount), 0) * 0.8).toLocaleString()}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Paper 
+                            elevation={0} 
+                            sx={{ 
+                              p: 2, 
+                              textAlign: 'center', 
+                              bgcolor: 'rgba(234, 179, 8, 0.1)',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            <Typography variant="caption" color="textSecondary">Admin Revenue</Typography>
+                            <Typography 
+                              variant="h6" 
+                              sx={{ 
+                                fontWeight: 'bold', 
+                                color: '#EAB308', 
+                                display: 'flex', 
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <FaIndianRupeeSign size={14} style={{ marginRight: '4px' }} />
+                              {Math.round(filteredCourses.reduce((sum, c) => sum + (c.price * c.studentsEnrolledCount), 0) * 0.2).toLocaleString()}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      </Grid>
+                    </Box>
                   </Paper>
                 </Grid>
               </Grid>

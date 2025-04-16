@@ -210,3 +210,84 @@ exports.updateCategory = async (req, res) => {
     }
 }
 
+// Delete a category and all associated courses
+exports.deleteCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.body;
+    
+    // Check if category exists
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found"
+      });
+    }
+
+    // Import necessary models
+    const Course = require("../models/Course");
+    const User = require("../models/User");
+    const Section = require("../models/Section");
+    const SubSection = require("../models/Subsection");
+    const CourseProgress = require("../models/CourseProgress");
+
+    // Find all courses in this category
+    const courses = await Course.find({ category: categoryId });
+    
+    // Process each course
+    for (const course of courses) {
+      const courseId = course._id;
+      
+      // 1. Find all students enrolled in this course
+      const enrolledStudents = await User.find({ courses: courseId });
+      
+      // 2. Remove this course from each student's enrolled courses
+      for (const student of enrolledStudents) {
+        // Remove course from student's courses array
+        await User.findByIdAndUpdate(
+          student._id,
+          { $pull: { courses: courseId } }
+        );
+        
+        // Delete course progress data for this student and course
+        await CourseProgress.findOneAndDelete({
+          courseID: courseId,
+          userId: student._id
+        });
+      }
+      
+      // 3. Delete all subsections of this course
+      const courseSections = await Section.find({ courseId: courseId });
+      for (const section of courseSections) {
+        // Delete all subsections in this section
+        await SubSection.deleteMany({ sectionId: section._id });
+      }
+      
+      // 4. Delete all sections of this course
+      await Section.deleteMany({ courseId: courseId });
+      
+      // 5. Delete the course itself
+      await Course.findByIdAndDelete(courseId);
+    }
+    
+    // 6. Finally delete the category
+    await Category.findByIdAndDelete(categoryId);
+    
+    return res.status(200).json({
+      success: true,
+      message: "Category and all associated courses deleted successfully",
+      deletedCoursesCount: courses.length
+    });
+    
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete category",
+      error: error.message
+    });
+  }
+};
+
+
+

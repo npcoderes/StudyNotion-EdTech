@@ -258,3 +258,68 @@ exports.instructorDashboard = async (req, res) => {
     res.status(500).json({ message: "Server Error" })
   }
 }
+
+// Backend code (for reference)
+// GET /api/v1/profile/instructor-stats
+exports.getInstructorStats = async (req, res) => {
+  try {
+    const instructorId = req.user.id;
+    
+    // Get all courses by this instructor
+    const courses = await Course.find({ instructor: instructorId });
+    
+    if (!courses || courses.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          totalCourses: 0,
+          totalStudents: 0,
+          completionRate: 0
+        }
+      });
+    }
+    
+    // Calculate total enrolled students by counting studentsEnrolled array length from all courses
+    let totalStudents = 0;
+    courses.forEach(course => {
+      totalStudents += course.studentsEnrolled.length || 0;
+    });
+    
+    // Get course IDs for progress calculation
+    const courseIds = courses.map(course => course._id);
+    
+    // Get all course progress records for these courses
+    const courseProgress = await CourseProgress.find({ courseID: { $in: courseIds } });
+    
+    // Calculate completion rate
+    // A course is considered completed if 90% or more videos are watched
+    let completedCourses = 0;
+    let totalEnrollments = courseProgress.length;
+    
+    courseProgress.forEach(progress => {
+      const completionPercentage = progress.completedVideos.length / progress.totalVideos;
+      if (completionPercentage >= 0.9) {
+        completedCourses++;
+      }
+    });
+    
+    const completionRate = totalEnrollments > 0 
+      ? Math.round((completedCourses / totalEnrollments) * 100) 
+      : 0;
+    
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalCourses: courses.length,
+        totalStudents: totalStudents,
+        completionRate: completionRate
+      }
+    });
+  } catch (error) {
+    console.error("Error in getInstructorStats:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch instructor stats"
+    });
+  }
+};
