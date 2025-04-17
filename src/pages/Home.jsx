@@ -93,9 +93,7 @@ const Home = () => {
           <HButton active={true} linkto={"/catalog/Web-Dev"}>
             Learn More
           </HButton>
-          <HButton active={false} linkto={"/login"}>
-            Book a Demo
-          </HButton>
+
         </div>
         <motion.div
           variants={fadeIn("left", 0.2)}
