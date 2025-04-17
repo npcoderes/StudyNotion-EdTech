@@ -332,7 +332,7 @@ export default function CourseExamForm() {
                   className="w-full bg-[#F8FAFC] text-[#334155] rounded-lg p-3 border border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none"
                 />
               </div>
-              <div className="flex flex-col md:flex-row gap-4 md:mt-6">
+              {/* <div className="flex flex-col md:flex-row gap-4 md:mt-6">
                 <div className="flex items-center">
                   <input
                     id="showResults"
@@ -355,7 +355,7 @@ export default function CourseExamForm() {
                     Randomize questions
                   </label>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-8 border-t border-[#E2E8F0] pt-6">

@@ -26,6 +26,7 @@ export default function CourseInformationForm() {
     const getCategories = async () => {
       setLoading(true)
       const categories = await fetchCourseCategories();
+      console.log("Fetched categories:", categories)
       if (categories.length > 0) {
         setCourseCategories(categories.filter((category) => category.Active === true))
       }

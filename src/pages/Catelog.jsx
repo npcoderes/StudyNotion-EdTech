@@ -66,14 +66,16 @@ const Catelog = () => {
       try {
         setLoading(true);
         const res = await apiConnector("GET", categories.CATEGORIES_API);
+        console.log("Categories Data..........", res);
         const category = res?.data?.data.find(
           (ct) => ct.name.split(" ").join("-") === catalogName
         );
+        console.log("Category Data..........", category);
         
         if (category) {
           setCategoryId(category._id);
         } else {
-          toast.error("Category not found");
+          toast.error("Not Found Any courses in this category");
         }
       } catch (error) {
         toast.error("Failed to load categories");
